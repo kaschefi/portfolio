@@ -108,23 +108,41 @@ if (code.includes('z = new na(L, m), z.enabled = !1')) {
   );
 }
 
-// 6. Camera Framing in Detail Mode: Shift book gracefully to the left to give ample breathing room
-const orTarget = 'const t = o.left > 0 ? o.left : G * 0.64, r = A(G * 0.035, 32, 56);';
-if (code.includes(orTarget)) {
-  code = code.replace(
-    /function or\(\)\s*\{[\s\S]*?Ye = Math\.max\(0, G \* 0\.5 - c\);\s*\}/,
-    `function or() {
+// 6. Camera Framing: Center camera on open book spread (both pages visible)
+// Matches both the original ThreeUI or() and our previously patched version
+const orFnIdx = code.indexOf('function or() {');
+const orFnEnd = code.indexOf('\n  }', orFnIdx) + 4;
+if (orFnIdx !== -1) {
+  const newOrFn = `function or() {
     const e = G < 820;
-    if (Le.set(0, e ? 2.02 : 1.92, e ? 8.7 : 8.1), le.set(0, e ? 1.57 : 1.55, 0), Fe.set(e ? 0 : -0.35, e ? 2.3 : 1.56, e ? 0.15 : 0), ht.set(e ? 0 : -0.35, e ? 2.46 : 1.78, e ? 5.7 : 5.25), Je.copy(Fe), e) {
-      Ye = 0, Ge = G;
+    // Hero shelf camera (Le) and look-at (le)
+    Le.set(0, e ? 2.02 : 1.92, e ? 8.7 : 8.1);
+    le.set(0, e ? 1.57 : 1.55, 0);
+    // Book position in detail mode (Fe): shifted left to make room for the HUD panel
+    Fe.set(e ? 0 : -0.30, e ? 2.3 : 1.56, e ? 0.15 : 0);
+    // Open-spread camera (ht): tracks the book's x position
+    ht.set(e ? 0 : -0.30, e ? 2.46 : 1.78, e ? 5.7 : 5.55);
+    // Look-at for open spread: centered on the book spine
+    Je.set(e ? 0 : -0.30, e ? 2.18 : 1.62, 0);
+    if (e) {
+      Ye = 0; Ge = G;
       return;
     }
-    // Shift the book to the left (view offset = 22% of screen width)
     Ye = Math.round(G * 0.22);
     Ge = G * 0.56;
-  }`
-  );
+  }`;
+  code = code.slice(0, orFnIdx) + newOrFn + code.slice(orFnEnd);
 }
+
+// 6b. Patch xr(e) — the open-book animation — to apply a moderate viewport offset (8% of screen width)
+// so the open spread shifts LEFT in screen space, minimizing empty space on the left
+// while keeping the left page safely within the screen boundary.
+// (0 = fully centered; G*0.22 = original full shift. 8% is the sweet spot.)
+code = code.replace(
+  'se = ue($o, 0, o), Pe(), L.lookAt(ce);',
+  'se = ue($o, G * 0.08, o), Pe(), L.lookAt(ce);'
+);
+
 
 // 7. Update wheel handler vr(e): Allow vertical scrolling to naturally scroll down the website, while horizontal scrolling moves the shelf
 if (code.includes('function vr(e) {')) {
@@ -149,6 +167,7 @@ code = code.replace(/title:\s*"Codex"/g, 'title: "MOKA"');
 code = code.replace(/title:\s*"codex"/g, 'title: "MOKA"');
 code = code.replace(/discipline:\s*"Agentic craft"/g, 'discipline: "AI assistant"');
 code = code.replace(/discipline:\s*"agentic craft"/g, 'discipline: "AI assistant"');
+code = code.replace('foil: "#c87046"', 'foil: "#F0EBE3"');
 code = code.replace('Precise intent, translated into tested systems.', 'Two-tier cognitive hierarchy: 45ms reflexes & LangGraph brain.');
 code = code.replace('A field manual for delegating repository work to Codex: state the intent, let the agent trace the system, and treat tests and browser proof as part of the craft.', 'An AI-powered robotic assistant built around the Anki Cozmo robot. Features a dual-layer cognitive pipeline: Layer 1 fast semantic reflexes (50ms) for hardware safety and laptop automation, and Layer 2 dynamic LangGraph AI brain with FAISS Tool RAG, local Ollama LLMs, and persistent dual-tier PostgreSQL memory.');
 
@@ -213,23 +232,18 @@ if (wnStartIdx !== -1 && anStartIdx !== -1) {
       t.fillRect(47, 0, 1, o.height);
 
       // Top Volume tag
-      t.fillStyle = e.foil;
+      t.fillStyle = "#F0EBE3";
       t.textAlign = "left";
       t.textBaseline = "alphabetic";
       t.font = '600 15px Inter, "Helvetica Neue", Arial, sans-serif';
       t.letterSpacing = "3px";
       t.fillText("WORKING VOLUMES  /  01", 64, 88);
 
-      t.strokeStyle = e.foil;
+      t.strokeStyle = "#F0EBE3";
       t.lineWidth = 2;
       t.beginPath();
       t.moveTo(64, 102);
       t.lineTo(260, 102);
-      t.stroke();
-
-      t.beginPath();
-      t.moveTo(o.width / 2, 0);
-      t.lineTo(o.width / 2, 90);
       t.stroke();
 
       for (let y = 110; y <= 210; y += 14) {
@@ -281,22 +295,17 @@ if (wnStartIdx !== -1 && anStartIdx !== -1) {
         t.fill();
       }
 
-      t.beginPath();
-      t.moveTo(o.width / 2, 840);
-      t.lineTo(o.width / 2, o.height);
-      t.stroke();
-
       t.font = '600 90px "Iowan Old Style", Baskerville, Georgia, serif';
       t.letterSpacing = "4px";
-      t.fillStyle = e.foil;
+      t.fillStyle = "#F0EBE3";
       t.fillText("MOKA", 74, 980);
 
       t.font = '600 16px Inter, "Helvetica Neue", Arial, sans-serif';
       t.letterSpacing = "4px";
       t.fillText("AI ASSISTANT", 78, 1024);
 
-      // Bookmark ribbon at bottom
-      t.fillStyle = e.foil;
+      // Bookmark ribbon at bottom — hardcoded bronze accent
+      t.fillStyle = "#c87046";
       t.fillRect(130, o.height - 12, 16, 12);
 
       const texture = Q(new l.CanvasTexture(o), { anisotropy: 16 });
@@ -376,11 +385,6 @@ if (wnStartIdx !== -1 && anStartIdx !== -1) {
       t.lineTo(260, 102);
       t.stroke();
 
-      t.beginPath();
-      t.moveTo(o.width / 2, 0);
-      t.lineTo(o.width / 2, 90);
-      t.stroke();
-
       for (let y = 110; y <= 210; y += 14) {
         t.beginPath();
         t.arc(o.width / 2, y, 1.8, 0, Math.PI * 2);
@@ -392,11 +396,6 @@ if (wnStartIdx !== -1 && anStartIdx !== -1) {
         t.arc(o.width / 2, y, 2, 0, Math.PI * 2);
         t.fill();
       }
-
-      t.beginPath();
-      t.moveTo(o.width / 2, 840);
-      t.lineTo(o.width / 2, o.height);
-      t.stroke();
 
       t.font = '600 90px "Iowan Old Style", Baskerville, Georgia, serif';
       t.letterSpacing = "4px";

@@ -70,7 +70,7 @@ export const VOLUMES_DATA: VolumeProject[] = [
     motifKey: "moka",
     paletteLabel: "Ultramarine · bone · copper",
     color: "#182a43",
-    foil: "#c87046",
+    foil: "#F0EBE3",
     accent: "#3884ff",
     palette: {
       paper: "#171a24",
