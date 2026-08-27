@@ -17,7 +17,9 @@ const TITLE_TO_ID: Record<string, string> = {
   'antigravity': 'antigravity',
   'figma': 'figma',
   'framer': 'framer',
-  'xcode': 'xcode'
+  'xcode': 'xcode',
+  'joinapp': 'xcode',
+  'join app': 'xcode'
 };
 
 export const BookshelfContainer: React.FC<BookshelfContainerProps> = ({

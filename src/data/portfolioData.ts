@@ -498,74 +498,81 @@ export const VOLUMES_DATA: VolumeProject[] = [
   },
   {
     id: "xcode",
-    title: "Xcode",
-    subtitle: "Native Systems, IoT & Platform Engineering",
+    title: "JoinApp",
+    subtitle: "Scalable Community Event Hub & Distributed Coordination Engine",
     roman: "VII",
-    discipline: "Native making",
-    note: "A measured path from blueprint to living device.",
-    deck: "A technical folio for making with Xcode: shape the Swift interface, compile against the platform, inspect the runtime, and refine until the result feels native.",
-    binding: "Icy-cyan cloth · aluminum foil",
+    discipline: "Full-Stack Web Systems",
+    note: "A measured path from blueprint to living platform.",
+    deck: "A modern full-stack web platform engineering hyperlocal event discovery, atomic participation lifecycles, and automated transactional dispatch across Vienna's metropolitan districts.",
+    binding: "Royal purple cloth · neon lime foil",
     format: "158 × 232 mm · FH Campus Wien Edition",
-    theme: "Xcode · native precision",
-    motif: "Precision grid",
-    motifKey: "grid",
-    paletteLabel: "Icy cyan · deep navy · aluminum",
-    color: "#0a84ff",
-    foil: "#cce5ff",
-    accent: "#00d2ff",
+    theme: "JoinApp · blueprint into living form",
+    motif: "Drafting compass",
+    motifKey: "compass",
+    paletteLabel: "Royal purple · electric lime · slate",
+    color: "#7c3aed",
+    foil: "#a3e635",
+    accent: "#a3e635",
     palette: {
-      paper: "#0b2038",
-      paperDeep: "#061322",
-      paperPale: "#d9ecff",
-      ink: "#f0f8ff",
-      inkSoft: "#a3c8ee",
-      wall: "#0b2038",
-      shelf: "#3a2118",
-      shelfDark: "#1a0d08",
-      light: "#d9ecff",
-      fill: "#62a8ed"
+      paper: "#1e1338",
+      paperDeep: "#110924",
+      paperPale: "#f3f4f6",
+      ink: "#ffffff",
+      inkSoft: "#a78bfa",
+      wall: "#1e1338",
+      shelf: "#382017",
+      shelfDark: "#1b0e09",
+      light: "#f3f4f6",
+      fill: "#8b5cf6"
     },
     projectDetails: {
-      name: "PulseGuard IoT Vitals & Sensor Network",
-      category: "Native Mobile & Embedded Systems",
+      name: "JoinApp Community Event Platform",
+      category: "Full-Stack Web Systems & Distributed Application Architecture",
       timeframe: "2025 - 2026",
-      institution: "FH Campus Wien · Mobile App & IoT Engineering",
-      role: "Embedded & iOS Systems Developer",
-      summary: "A native iOS & Flutter biometric telemetry suite communicating with ESP32 edge sensors over Bluetooth CoreBluetooth, offering live ECG waveform plotting and on-device anomaly detection.",
-      problem: "Wireless biometric monitors frequently suffer from packet drops, high battery consumption, and latency spikes during critical patient transport.",
-      solution: "Engineered a low-overhead binary framing protocol with Metal-accelerated 120Hz waveform rendering and CoreML edge inference for arrhythmia detection.",
+      institution: "FH Campus Wien · Software Engineering",
+      role: "Lead Full-Stack Architect & Backend Engineer",
+      summary: "A full-stack community event platform featuring 3-tier architecture (Express 5.x + PostgreSQL), stateless JWT/RBAC security, interactive Leaflet GIS discovery, automated 1-hour ticket dispatch via Node-Cron & Nodemailer, and real-time polling chat.",
+      problem: "Modern event discovery platforms suffer from heavyweight dependencies, intrusive monetization models, and fragmented community communication with poor reliability in local coordination.",
+      solution: "Architected a lightweight, decoupled 3-tier system (Controller-Service-Repository) on Express 5.x and PostgreSQL with atomic junction constraints, asynchronous background geocoding (Photon API), RFC 5545 iCalendar generation, and automated cron ticket pipelines.",
       keyMetrics: [
-        { label: "Battery Life", value: "72+ Hours" },
-        { label: "ECG Plot Rate", value: "120 FPS Metal" },
-        { label: "Anomaly Recall", value: "98.5%" }
+        { label: "Architecture", value: "3-Tier Layered" },
+        { label: "API Latency", value: "< 85ms p95" },
+        { label: "Relational Tables", value: "7 Entities" },
+        { label: "Supported Locales", value: "DE-AT & EN-US" }
       ],
-      techStack: ["Swift", "CoreBluetooth", "Metal 3", "Flutter", "C++ / FreeRTOS", "CoreML", "SQLite"],
-      githubUrl: "https://github.com",
-      liveUrl: "https://pulseguard.demo.at",
-      architectureDescription: "FreeRTOS embedded firmware broadcasting differential ring buffer packets decoded by Swift concurrency actors directly onto Metal GPU textures."
+      techStack: ["Node.js", "Express 5.x", "PostgreSQL (pg.Pool)", "Leaflet.js", "JavaScript (ES6+)", "JWT & Bcrypt", "Node-Cron", "Nodemailer", "Photon Geocoding API", "HTML5/CSS3"],
+      githubUrl: "https://github.com/kaschefi/joinApp",
+      liveUrl: "https://github.com/kaschefi/joinApp",
+      architectureDescription: "Decoupled 3-tier service-oriented architecture with stateless JWT authentication, atomic PostgreSQL unique constraints, non-blocking asynchronous GIS geocoding, and cron-driven transactional outbox email dispatch."
     },
     chapters: [
       {
         number: "01",
-        title: "Metal GPU Waveforms",
-        subtitle: "120Hz Real-Time Oscilloscope Rendering",
-        content: "Rendering thousands of biometric datapoints with standard CPU canvases results in battery drain and UI stutters. By dispatching Metal compute shaders, we render smooth anti-aliased ECG lines with less than 2% CPU utilization.",
-        codeSnippet: `// Swift / Metal 3 Real-Time Waveform Shader\nkernel void renderECGWaveform(\n  texture2d<float, access::write> outTexture [[texture(0)]],\n  device const float* ecgSamples [[buffer(0)]],\n  uint2 gid [[thread_position_in_grid]])\n{\n  // Compute sub-pixel antialiased distance field\n}`,
-        highlights: ["Metal 3 vertex/compute pipelines", "Zero-copy ring buffer sharing", "Ultra-low power consumption"]
+        title: "Clean Architecture & RBAC",
+        subtitle: "Decoupled Express 5 Services & JWT",
+        content: "Enforces single-responsibility boundaries across controllers, services, and parameterized PostgreSQL repositories. Reusable middleware interceptors enforce stateless JWT authentication and granular role-based authorization (USER vs ADMIN) across all protected routes.",
+        highlights: ["Decoupled 3-tier architecture", "Stateless 7-day JWT token rotation", "Granular requireRole & requireSelfOrAdmin guards"]
       },
       {
         number: "02",
-        title: "CoreBluetooth Low Energy Mesh",
-        subtitle: "Deterministic Packet Delivery",
-        content: "Custom MTU negotiation and packet chunking guarantee loss-less continuous telemetry streams even in noisy hospital RF environments.",
-        highlights: ["512-byte MTU throughput optimization", "Automatic background reconnection", "Hardware CRC checksum validation"]
+        title: "GIS Mapping & Live Chat",
+        subtitle: "Interactive Leaflet Pins & Capacity Gating",
+        content: "Synchronizes Vienna-wide event clusters on Leaflet.js with interactive search cards using bidirectional viewport panning. The event lifecycle prevents double-joining via PostgreSQL unique constraints (error 23505) and gates participant lists until 1 hour before kickoff.",
+        highlights: ["60 FPS Leaflet.js map marker binding", "Atomic participant capacity validation", "Polling chat engine with auto-scroll threshold"]
       },
       {
         number: "03",
-        title: "On-Device Neural Inference",
-        subtitle: "Edge Intelligence with CoreML",
-        content: "Quantized 1D Convolutional Neural Networks run directly on the Apple Neural Engine to detect cardiac arrhythmias locally in 4ms without cloud dependencies.",
-        highlights: ["4ms inference latency", "100% offline privacy", "Continuous background anomaly alerts"]
+        title: "PostgreSQL & Cron Outbox",
+        subtitle: "7-Entity Schema & Ticket Daemon",
+        content: "A normalized 7-table schema with foreign-key cascades, array types (tags TEXT[]), and subquery aggregations. An automated background daemon polls upcoming events (NOW() + INTERVAL '1 hour') and dispatches personalized HTML tickets via Nodemailer.",
+        highlights: ["7 normalized relational entities with ON DELETE CASCADE", "At-most-once ticket delivery via cron & PostgreSQL interval arithmetic", "Parallel attendee cancellation emails with Promise.allSettled"]
+      },
+      {
+        number: "04",
+        title: "Geocoding & Calendar Sync",
+        subtitle: "Photon Spatial API & RFC 5545 iCal",
+        content: "Offloads address coordinate resolution to Komoot's Photon API asynchronously without stalling HTTP responses. Implements a zero-dependency RFC 5545 iCalendar (.ics) generator on the client side with batch export and Google Calendar web intents.",
+        highlights: ["Non-blocking asynchronous background geocoding", "Standards-compliant RFC 5545 iCalendar generator", "Bilingual client-side i18n runtime (DE-AT / EN-US)"]
       }
     ]
   }

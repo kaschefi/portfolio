@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { sound } from '../utils/audio';
 import type { VolumeProject } from '../data/portfolioData';
 import { VOLUMES_DATA } from '../data/portfolioData';
 import { MOKA_PAGES_DATA, type MokaPageContent } from '../data/mokaPagesData';
+import { XCODE_PAGES_DATA, type XcodePageContent } from '../data/xcodePagesData';
 
 interface BookshelfHUDProps {
   sceneState: { isOpen: boolean; isInspecting: boolean; page: number };
@@ -15,6 +16,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
   sceneState,
   volume
 }) => {
+  const [copied, setCopied] = useState(false);
 
   const triggerDomAction = (id: string, soundFn?: () => void) => {
     if (soundFn) soundFn();
@@ -37,9 +39,23 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
     triggerDomAction('next');
   };
 
+  const handleCloseDetail = () => {
+    sound.playBookClose();
+    // 1. Click source controls close-detail button
+    const elem = document.querySelector('.bookshelf__source-controls #close-detail') as HTMLButtonElement | null;
+    if (elem) {
+      elem.click();
+    }
+    // 2. Dispatch Escape keydown to the .bookshelf element
+    const shelf = document.querySelector('.bookshelf') as HTMLElement | null;
+    if (shelf) {
+      shelf.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true, cancelable: true }));
+    }
+  };
+
   const handleInspectToggle = () => {
     if (sceneState.isInspecting) {
-      triggerDomAction('close-detail', () => sound.playBookClose());
+      handleCloseDetail();
     } else {
       triggerDomAction('inspect', () => sound.playFoilShimmer());
     }
@@ -85,14 +101,24 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
     }
   };
 
-  // Resolve Active Page Content for MOKA
+  const handleCopyCode = (codeText: string) => {
+    navigator.clipboard.writeText(codeText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Resolve Active Page Content for MOKA or Xcode
   const activePageKey = `page0${Math.min(Math.max(sceneState.page, 1), 5)}`;
-  const mokaContent: MokaPageContent | undefined =
-    volume.id === 'codex' ? MOKA_PAGES_DATA[activePageKey] : undefined;
+  const richContent: MokaPageContent | XcodePageContent | undefined =
+    volume.id === 'codex'
+      ? MOKA_PAGES_DATA[activePageKey]
+      : volume.id === 'xcode'
+      ? XCODE_PAGES_DATA[activePageKey]
+      : undefined;
 
   const getPageTitle = (page: number) => {
-    if (mokaContent) {
-      return mokaContent.pageLabel;
+    if (richContent) {
+      return richContent.pageLabel;
     }
     if (page <= 1) return 'Title Page & Overview';
     const chapterIdx = page - 2;
@@ -196,8 +222,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
       >
         <button
           className="close-button"
-          id="close-detail"
-          onClick={handleInspectToggle}
+          onClick={handleCloseDetail}
           type="button"
           aria-label="Return volume to shelf"
         >
@@ -207,13 +232,13 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
         </button>
 
         <p className="eyebrow" id="detail-eyebrow">
-          Volume {volume.roman} · {sceneState.isOpen && mokaContent?.discipline ? mokaContent.discipline : volume.discipline}
+          Volume {volume.roman} · {sceneState.isOpen && richContent?.discipline ? richContent.discipline : volume.discipline}
         </p>
         <h2 className="detail-title" id="detail-title">
-          {sceneState.isOpen && mokaContent ? mokaContent.title : volume.title}
+          {sceneState.isOpen && richContent ? richContent.title : volume.title}
         </h2>
         <p className="detail-deck" id="detail-deck">
-          {sceneState.isOpen && mokaContent ? mokaContent.subtitle : volume.deck}
+          {sceneState.isOpen && richContent ? richContent.subtitle : volume.deck}
         </p>
 
         {/* Closed State Actions / GitHub Repository Link */}
@@ -232,7 +257,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
                 </svg>
                 <div className="detail-github-text">
                   <span className="detail-github-repo">
-                    {volume.id === 'codex' ? 'kaschefi/cozmo_ai_assistant' : 'Repository Source'}
+                    {volume.id === 'codex' ? 'kaschefi/cozmo_ai_assistant' : (volume.id === 'xcode' ? 'kaschefi/joinApp' : 'Repository Source')}
                   </span>
                   <span className="detail-github-label">Open on GitHub</span>
                 </div>
@@ -244,18 +269,18 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
           </div>
         )}
 
-        {/* MOKA Rich Page Content (Extended Description, Highlights, Code snippet, Diagrams, Metrics) - ONLY WHEN OPEN */}
-        {sceneState.isOpen && mokaContent && (
+        {/* Rich Page Content (Extended Description, Highlights, Code snippet, Diagrams, Metrics) - ONLY WHEN OPEN */}
+        {sceneState.isOpen && richContent && (
           <div className="moka-rich-content">
-            {mokaContent.thesis && (
-              <div className="moka-thesis-block">
-                {mokaContent.thesis}
+            {richContent.thesis && (
+              <div className="moka-thesis-block" style={{ borderLeftColor: volume.accent || '#c87046' }}>
+                {richContent.thesis}
               </div>
             )}
 
-            {mokaContent.description && (
+            {richContent.description && (
               <div className="moka-description-block">
-                {mokaContent.description.split('\n\n').map((paragraph, pIdx) => (
+                {richContent.description.split('\n\n').map((paragraph: string, pIdx: number) => (
                   <p key={pIdx} className="moka-desc-paragraph">
                     {paragraph}
                   </p>
@@ -263,31 +288,49 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
               </div>
             )}
 
-            {mokaContent.highlights && mokaContent.highlights.length > 0 && (
+            {richContent.highlights && richContent.highlights.length > 0 && (
               <div className="moka-highlights-block">
-                <div className="moka-highlights-title">Key Architectural Highlights</div>
-                {mokaContent.highlights.map((h, hIdx) => (
+                <div className="moka-highlights-title" style={{ color: volume.accent || '#c87046' }}>Key Architectural Highlights</div>
+                {richContent.highlights.map((h: string, hIdx: number) => (
                   <div key={hIdx} className="moka-highlight-item">
-                    <span className="moka-highlight-dot" />
+                    <span className="moka-highlight-dot" style={{ background: volume.accent || '#c87046' }} />
                     <span>{h}</span>
                   </div>
                 ))}
               </div>
             )}
 
-            {mokaContent.image && (
+            {richContent.codeSnippet && (
+              <div className="moka-code-box">
+                <div className="moka-code-header">
+                  <span>EXCERPT // {richContent.pageNumber}</span>
+                  <button
+                    className="moka-code-copy-btn"
+                    onClick={() => handleCopyCode(richContent.codeSnippet!)}
+                    type="button"
+                  >
+                    {copied ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
+                <pre className="moka-code-block">
+                  <code>{richContent.codeSnippet}</code>
+                </pre>
+              </div>
+            )}
+
+            {richContent.image && (
               <div className="moka-img-box">
                 <img
-                  src={mokaContent.image}
-                  alt={mokaContent.imageCaption || "System Architecture"}
+                  src={richContent.image}
+                  alt={richContent.imageCaption || "System Architecture"}
                   className="moka-diagram-img"
                 />
               </div>
             )}
 
-            {mokaContent.keyMetrics && mokaContent.keyMetrics.length > 0 && (
+            {richContent.keyMetrics && richContent.keyMetrics.length > 0 && (
               <div className="moka-metrics-row">
-                {mokaContent.keyMetrics.map((m, idx) => (
+                {richContent.keyMetrics.map((m: { label: string; value: string }, idx: number) => (
                   <div key={idx} className="moka-metric-item">
                     <span className="moka-metric-val">{m.value}</span>
                     <span className="moka-metric-lbl">{m.label}</span>
