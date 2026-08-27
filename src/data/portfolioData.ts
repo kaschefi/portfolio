@@ -100,8 +100,8 @@ export const VOLUMES_DATA: VolumeProject[] = [
         { label: "Safety Loop Rate", value: "33Hz real-time" }
       ],
       techStack: ["Python", "LangGraph", "PyCozmo", "FAISS", "FastEmbed", "FastAPI", "Ollama (qwen2.5 / ornith)", "PostgreSQL", "OpenCV", "Kokoro-ONNX", "Tavily MCP", "n8n"],
-      githubUrl: "https://github.com",
-      liveUrl: "https://github.com",
+      githubUrl: "https://github.com/kaschefi/cozmo_ai_assistant",
+      liveUrl: "https://github.com/kaschefi/cozmo_ai_assistant",
       architectureDescription: "Two-Tier Fallback Hierarchy: Layer 1 Semantic Router (FastEmbed) directly triggers PyCozmo motor actions & PC routines in ~45ms; Layer 2 routes complex multi-step reasoning through LangGraph with FAISS dynamic Tool RAG, dual-tier PostgreSQL memory, and Kokoro-ONNX TTS."
     },
     chapters: [

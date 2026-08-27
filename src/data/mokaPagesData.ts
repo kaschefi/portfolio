@@ -1,3 +1,6 @@
+// src/data/mokaPagesData.ts
+// Comprehensive, production-grade architectural specifications and data models for the MoKa AI Assistant portfolio book.
+
 export interface MokaPageContent {
   pageNumber: string;
   pageLabel: string;
@@ -6,8 +9,8 @@ export interface MokaPageContent {
   discipline?: string;
   thesis?: string;
   overview?: string;
-  description?: string;
-  codeSnippet?: string;
+  description?: string; // Extended, comprehensive deep dive for the right-hand panel
+  codeSnippet?: string; // Production code excerpt with explanatory comments
   metadata?: {
     binding: string;
     format: string;
@@ -20,248 +23,318 @@ export interface MokaPageContent {
   imageCaption?: string;
 }
 
-export const MOKA_PAGES_DATA: Record<string, MokaPageContent> = {
-  page01: {
+export const mokaPagesData: MokaPageContent[] = [
+  // =========================================================================================
+  // PAGE 01: GENESIS & SYSTEM OVERVIEW
+  // =========================================================================================
+  {
     pageNumber: "01",
-    pageLabel: "Title Page & System Genesis",
+    pageLabel: "GENESIS // SYSTEM OVERVIEW",
     title: "MOKA",
-    subtitle: "Two-Tier Autonomous Physical & Digital AI Assistant",
-    discipline: "Autonomous Robotics & LangGraph Cognitive Systems",
-    thesis:
-      "Bridging embodied physical robotics (Anki Cozmo) and desktop AI orchestration via a dual-plane hybrid cognitive architecture: zero-latency spinal reflexes for immediate kinetic safety and workstation routines, coupled with a multi-turn LangGraph brain utilizing local LLMs and dynamic vector tool RAG.",
-    metadata: {
-      binding: "Ultramarine cloth · copper foil",
-      format: "148 × 216 mm · Anki Cozmo Edition",
-      theme: "MoKa · two-tier intelligence pipeline",
-      motif: "MoKa Dual-Layer Matrix Glyph"
-    },
+    subtitle: "An AI-powered robotic assistant built around the Anki Cozmo robot. Features a dual-layer cognitive pipeline: Layer 1 fast semantic reflexes (50ms) for hardware safety and laptop automation, and Layer 2 dynamic LangGraph AI brain with FAISS Tool RAG, local Ollama LLMs, and persistent dual-tier PostgreSQL memory.",
+    discipline: "Autonomous Robotics & Edge AI",
+    thesis: "Overcoming the Latency-Versatility Dilemma via Decoupled Spinal Reflexes and Graph-Orchestrated Local SLMs",
     overview:
-      "MoKa is an embodied personal assistant engineered around the Anki Cozmo robotic platform. The system resolves the fundamental latency-versatility dilemma of robotic AI by splitting cognition into two distinct tiers: an ultra-fast (~45ms) Layer 1 FastEmbed reflex layer for instant physical maneuvers and OS-level workstation automations, and a stateful Layer 2 LangGraph brain for contextual dialogue, Google Calendar scheduling, deterministic code execution, and real-time web retrieval. Operating entirely on local neural networks (Ollama qwen2.5:3b, ornith:9b, and ONNX TTS), MoKa provides studio-quality voice feedback, 33Hz packet-level hardware safety guards, and persistent dual-tier PostgreSQL memory.",
+      "MoKa is a local-first, embodied robotic AI assistant engineered on top of the Anki Cozmo hardware platform. It eliminates cloud dependencies by pairing an ultra-low-latency semantic reflex arc (~45ms P50) with an asynchronous, graph-compiled cognitive deliberator powered by Ollama Small Language Models (SLMs) and on-device neural synthesis.",
+    description:
+      "Embodied conversational agents face a fundamental architectural dichotomy: physical hardware demands instantaneous, deterministic reaction times (<50ms) to ensure stability and user responsiveness, whereas open-domain linguistic reasoning and dynamic tool execution traditionally impose massive computational latency (1,000ms - 3,000ms) and cloud API coupling.\n\n" +
+      "MoKa resolves this latency-versatility dilemma through a dual-plane hybrid cognitive architecture:\n\n" +
+      "1. The Spinal Reflex Plane (Tier 1): Implemented in pure on-device C++ and Python bindings via FastEmbed (BAAI/bge-small-en-v1.5 384D embeddings) and the semantic-router framework. Utterances matching physical actuation, safety stops, or local OS workstation setups are resolved in ~45ms without allocating a single LLM token.\n\n" +
+      "2. The Cognitive Cortical Plane (Tier 2): Complex natural language queries, multi-step tool calls, and stateful memory reasoning route into a compiled LangGraph state machine. This plane runs entirely on local quantization substrates (Ollama qwen2.5:3b for routing/synthesis, ornith:9b for isolated code sandboxing, and Kokoro-v1.0 ONNX for zero-disk streaming TTS).\n\n" +
+      "3. Hardware-Software Decoupling: The cognitive substrate interfaces with physical actuators via a 33Hz low-level PyCozmo packet loop, safeguarded by asynchronous monkey-patched motor interrupters that guarantee physical stability even during heavy GPU/CPU tensor loads.",
     keyMetrics: [
-      { label: "Hardware Architecture", value: "Anki Cozmo (PyCozmo Protocol)" },
-      { label: "Reflex Reaction Time", value: "~45ms (Layer 1 FastEmbed)" },
-      { label: "Cognitive State Graph", value: "LangGraph + PostgresSaver" },
-      { label: "Local LLM Inference", value: "Ollama (qwen2.5:3b & ornith:9b)" }
+      { label: "Reflex P50 Latency", value: "~45 ms" },
+      { label: "Cognitive P50 Latency", value: "~1.28 s" },
+      { label: "Cloud API Footprint", value: "0 Calls (Core)" },
+      { label: "Hardware Sync Loop", value: "33.3 Hz (30ms)" },
     ],
     highlights: [
-      "Physical & Digital Dual Bridge: Seamlessly bridges physical hardware control (OpenCV HSV docking, 128×64 OLED graphics, 4-DOF articulators) with desktop digital automation (Steam, JetBrains IDEs, n8n, Google Calendar).",
-      "Spinal Reflex vs. Deep Thought Split: Direct mathematical vector routing for latency-critical operations bypassing LLMs entirely, backed by a stateful multi-step agent graph for ambiguous conversational queries.",
-      "100% Local Intelligence & Zero-Cloud Telemetry: Built entirely on local embeddings (BAAI/bge-small-en-v1.5), local speech recognition, zero-disk ONNX neural speech synthesis, and self-hosted PostgreSQL memory."
-    ]
+      "Zero-cloud dependency: All embeddings, language generation, and speech synthesis execute locally on edge workstation hardware.",
+      "Dual-plane decoupling guarantees 45ms physical reflex responses while preserving multi-step LangGraph reasoning capabilities.",
+      "Ollama quantization (Q4_K_M) enables sub-2GB RAM footprints for the primary 3B router/chat deliberator.",
+      "Integrated FastAPI REST gateway and terminal REPL expose identical high-level state representations to external consumers."
+    ],
+    codeSnippet:
+`# High-Level System Initialization Pipeline (main.py / cozmo_mode.py)
+import asyncio
+from core.routing.layer1.semantic_layer import initialize_router, check_layer_1, execute_reflex
+from core.routing.layer2.router import run_cozmo_agent
+from actions.physical.speak import voice_speaker
+
+async def process_user_utterance(user_input: str, thread_id: str = "cozmo_default_session") -> str:
+    """
+    Dual-Plane Hybrid Dispatch: Evaluates Tier 1 reflex arc before allocating
+    computational cycles to the compiled LangGraph Tier 2 brain.
+    """
+    # 1. Tier 1: Sub-50ms embedding similarity reflex check (bypasses LLM)
+    reflex_route = check_layer_1(user_input)
+    if reflex_route:
+        success, response_text = await execute_reflex(reflex_route)
+        if success:
+            return response_text
+
+    # 2. Tier 2: Asynchronous LangGraph state machine invocation
+    # Evaluates Tool RAG, PostgreSQL vector state, and local Ollama models
+    return await asyncio.to_thread(run_cozmo_agent, user_input, thread_id)`
   },
 
-  page02: {
+  // =========================================================================================
+  // PAGE 02: THE TWO-TIER ROUTER
+  // =========================================================================================
+  {
     pageNumber: "02",
-    pageLabel: "The Two-Tier Router",
-    title: "The Two-Tier Router",
-    subtitle: "50ms FastEmbed Reflexes & LangGraph Dynamic Tool RAG",
+    pageLabel: "ROUTING SUBSYSTEM // TWO-TIER HIERARCHY",
+    title: "Two-Tier Tool RAG Router",
+    subtitle: "Spinal Reflex Layer & FAISS-Indexed Tool Vector Space",
+    discipline: "Information Retrieval & Directed Acyclic Graph (DAG) Routing",
+    thesis: "Eliminating Tool Crowding and Prompt Confusion via Vector Subspace Filtering and Unified Node Execution",
     image: "/router_benchmark.png",
     imageCaption: "LangSmith 57-Case Benchmark: Monolithic LLM Baseline (A) vs. MoKa Two-Layer Router (B) achieving 93.0% routing accuracy, 83% token reduction, and ~45ms P50 latency.",
+    overview:
+      "A hierarchical dispatch pipeline that marries zero-LLM semantic embeddings with an in-memory FAISS tool vector store. Layer 1 executes hardware actions in ~45ms; Layer 2 dynamically retrieves top-k tool schemas, slashing prompt tokens by 83% and boosting routing accuracy to 93.0%.",
     description:
-      "The core cognitive routing engine of MoKa. Traditional monolithic LLM prompts suffer from attention dilution, high token overhead, and dangerous 1.5s+ latency when handling dozens of physical and digital tools. MoKa solves this with a two-tier hierarchy:\n\n1. Layer 1 Semantic Reflexes: Uses local FastEmbed embeddings (BAAI/bge-small-en-v1.5) to calculate cosine similarity against a local action registry (@reflex_registry.reflex). Matches execute in ~45ms without calling an LLM, providing instantaneous reaction for physical docking, movement, and OS workstation modes.\n\n2. Layer 2 Dynamic Tool RAG: For conversational and complex queries that bypass Layer 1, the query vector searches an in-memory FAISS vector index (ToolVectorRegistry) to dynamically retrieve only the top 2–3 relevant candidate tool schemas. A structured LLM supervisor (qwen2.5:3b) classifies the intent into a RouteDecision and dispatches execution to a single generic execute_tool_node mapping over TOOL_REGISTRY, scaling seamlessly to 100+ tools without graph recompilation.\n\nLangSmith Benchmark: Evaluated across a 57-case test suite, MoKa's Two-Tier Router achieved 93.0% routing accuracy (vs 89.5% monolithic baseline), slashed input token consumption by 83% (10,150 tokens vs 59,200 tokens), and reduced median P50 response latency by ~30x (~45ms vs 1,340ms).",
-    codeSnippet: `# core/routing/layer1/semantic_layer.py & layer2/router.py
-from semantic_router.routers import SemanticRouter
-from core.routing.layer1.registry import reflex_registry
-from core.routing.layer2.tool_vector_db import tool_rag_registry
-from core.routing.layer2.worker_nodes import TOOL_REGISTRY
-
-# 1. LAYER 1: FastEmbed Instant Reflex Lookup (~45ms)
-def check_layer_1(user_input: str) -> str:
-    global layer_1_router
-    if layer_1_router is None:
-        initialize_router()
-    route_choice = layer_1_router(user_input)
-    return route_choice.name
-
-# 2. LAYER 2: FAISS Dynamic Tool RAG & Structured Supervisor
-def tool_retrieval_node(state: AgentState):
-    query = state["messages"][-1].content
-    # Pull only the top 2-3 matching tool schemas from FAISS
-    matched_tools = tool_rag_registry.search_relevant_tools(query, k=3)
-    return {"active_tools": matched_tools}
-
-def route_query(state: AgentState):
-    active_tools = state.get("active_tools", [])
-    if not active_tools:
-        return {"next_route": "none"}
-    
-    tool_menu = "".join([f'- "{t["name"]}": {t["description"]}\\n' for t in active_tools])
-    prompt = f"Classify intent using ONLY candidate tools:\\n{tool_menu}"
-    decision = structured_router.invoke([SystemMessage(content=prompt), state["messages"][-1]])
-    return {"next_route": decision.route}
-
-# 3. UNIFIED GENERIC TOOL EXECUTOR (Scales to 100+ tools)
-def execute_tool_node(state: AgentState):
-    route = state.get("next_route", "none")
-    handler = TOOL_REGISTRY.get(route)
-    return handler(state) if handler else chat_node(state)`,
+      "Monolithic agent architectures suffer from prompt bloat: feeding 15+ tool definitions into a compact local SLM (such as qwen2.5:3b) dilutes attention heads, leading to severe tool hallucination, catastrophic routing latency (>1,300ms), and 59,000+ token context expenditures.\n\n" +
+      "MoKa eliminates this failure mode using a Two-Tier Fallback Hierarchy:\n\n" +
+      "• Tier 1 (Spinal Reflex Arc): Utilizes FastEmbed (384-dimensional dense vectors via ONNX Runtime) to compute maximum cosine similarity against pre-compiled phrase centroids. If the utterance exceeds a tuned threshold (0.80 - 0.85), execution dispatches synchronously in ~45ms, completely bypassing tokenizer overhead.\n\n" +
+      "• Tier 2 (Dynamic Tool RAG & Graph Router): When Tier 1 yields no match, the query enters LangGraph's tool_retrieval_node. Here, an in-memory FAISS index computes L2 distance over registered tool docstrings, filtering out irrelevant schemas and pruning candidates to the top 2-3 tools (distance threshold d <= 1.15).\n\n" +
+      "• Structured Supervisor & Unified Node: A zero-temperature LLM receives only the pruned candidates and generates a validated Pydantic RouteDecision. Instead of maintaining N discrete tool nodes with branching conditional edges, the graph routes into a single execute_tool_node that dispatches dynamically against a Python function registry.\n\n" +
+      "In a 57-case LangSmith benchmark, this two-tier paradigm achieved 93.0% accuracy (vs 89.5% monolithic baseline), lowered P50 latency from 1,340ms to 45ms (~30x acceleration), and cut prompt token consumption from 59,200 to 10,150 tokens (-82.9%).",
     keyMetrics: [
-      { label: "Reflex Latency", value: "45ms (~30x faster)" },
-      { label: "Routing Accuracy", value: "93.0% (vs 89.5% baseline)" },
-      { label: "Prompt Token Reduction", value: "83% (10.1k vs 59.2k tokens)" },
-      { label: "Benchmark Evaluation", value: "57 LangSmith Test Cases" }
+      { label: "Routing Accuracy", value: "93.0% (53/57 Cases)" },
+      { label: "P50 Latency (Tier 1)", value: "45 ms (30x Speedup)" },
+      { label: "Token Reduction", value: "-82.9% (10.1k vs 59.2k)" },
+      { label: "Candidate Fan-Out", value: "Top 2-3 of 20+ Tools" },
     ],
     highlights: [
-      "Attention-Preserving Tool RAG: Queries an in-memory FAISS index with BAAI/bge-small-en-v1.5 embeddings to pass only top candidate schemas to qwen2.5:3b, eliminating tool hallucination.",
-      "Unified Tool Executor Node: Replaces O(N) LangGraph node boilerplate with a single generic execute_tool_node that resolves route keys against a Python TOOL_REGISTRY dictionary.",
-      "Dual Fallback Safety Net: If creative user phrasing misses Layer 1 reflexes, the query is gracefully caught by Layer 2's semantic vector database rather than dropped."
-    ]
+      "Eliminates prompt crowding by dynamically injecting only FAISS-filtered tool definitions into the LLM context window.",
+      "Spinal reflex arc guarantees instantaneous ~45ms reaction for safety stops, battery docking, and local workspace presets.",
+      "Unified Tool Executor node scales linearly to 100+ tools without expanding graph compilation complexity or edge boilerplate.",
+      "LangSmith verified: 93.0% routing accuracy with an 83% reduction in active context token consumption."
+    ],
+    codeSnippet:
+`# Dynamic Tool Vector Indexing & Subspace Filtering (tool_vector_db.py)
+from langchain_community.vectorstores import FAISS
+from core.routing.encoder import get_shared_encoder
+
+class ToolVectorRegistry:
+    def __init__(self):
+        self.embeddings = LangChainFastEmbedBridge()
+        self.db = None
+        self._tools_source = []
+
+    def register_tool_schema(self, name: str, description: str):
+        self._tools_source.append(Document(page_content=description, metadata={"tool_name": name}))
+
+    def search_relevant_tools(self, user_query: str, k: int = 3, distance_threshold: float = 1.15) -> list[dict]:
+        """Performs vector similarity search, pruning distant tool schemas (L2 distance <= 1.15)."""
+        if not self.db:
+            return []
+        results = self.db.similarity_search_with_score(user_query, k=k)
+        return [{"name": doc.metadata["tool_name"], "description": doc.page_content} 
+                for doc, score in results if score <= distance_threshold]`
   },
 
-  page03: {
+  // =========================================================================================
+  // PAGE 03: HARDWARE SAFETY GUARDS & AUTONOMOUS REFLEXES
+  // =========================================================================================
+  {
     pageNumber: "03",
-    pageLabel: "33Hz Hardware Safety Guards",
-    title: "Real-Time Hardware Reflex Safety",
-    subtitle: "Sub-Packet Interception, Multi-Modal Stasis & Anti-Dump Protection",
+    pageLabel: "HARDWARE CORE // REAL-TIME REFLEX SAFETY",
+    title: "Real-Time Hardware Safety Guards",
+    subtitle: "33Hz Low-Level Packet Monkey-Patching & IMU/Vision Fusion",
+    discipline: "Embedded Robotics & Real-Time Cyber-Physical Control",
+    thesis: "Zero-Latency Hardware Interception via SDK Monkey-Patching, Deceleration Shock Filters, and Visual Stasis Sliding Windows",
     image: "/cozmo_hardware_sketch.png",
     imageCaption: "Physical Schematic & Dimensions: Anki Cozmo robotic chassis with 4-DOF articulators, drop IR sensors, 3-axis IMU pitch tilt guards, and 33Hz packet-level safety interceptors.",
+    overview:
+      "A multi-modal safety supervisor operating at PyCozmo's 33Hz packet frequency. It monkey-patches motor controls to intercept dangerous host commands, fusing cliff IR, IMU pitch tilt (>0.35 rad), impact shock deceleration, and OpenCV visual stasis (cv2.absdiff < 3.5) into autonomous evasion routines.",
     description:
-      "Operating directly inside PyCozmo's low-level packet thread context (~33Hz / ~30ms cycle), ReflexSafetyGuard provides zero-latency hardware protection by monkey-patching motor dispatch methods (drive_wheels, drive_straight, turn_in_place, stop_all_motors) to lock out high-level host commands whenever dangerous conditions occur.\n\nMulti-Modal Guard Architecture:\n1. Anti-Fall Guard (Cliff & Freefall Protection): Listens to low-level hardware status flags (CLIFF_DETECTED, IS_FALLING). When triggered, it halts all motors immediately and launches an isolated daemon thread that executes an evasive maneuver (reversing for 1.2s and executing a 180° U-turn spin away from the edge).\n\n2. Anti-Dump & Anti-Stall Guard: Evaluates 3 multi-modal signals during forward movement: (a) IMU Pitch Tilt: Detects pitch angle spikes (>0.35 rad / ~20° tilt) caused by climbing objects or tipping upward; (b) Impact Deceleration: Measures true gravity-compensated deceleration (ax - g sin(theta) <= -3500 mm/s²); (c) Pose & OpenCV Visual Motion Stasis: Combines an 0.8s pose displacement window (<10mm moved) with a 1.0s sliding OpenCV frame difference (cv2.absdiff on downsampled, Gaussian-blurred camera frames with mean diff <3.5). If camera pixels remain static while wheels are driving forward, visual collision stasis trips the safety, stopping motors and reversing 1.0s.",
-    codeSnippet: `# backend/core/hardware/safety.py
-class ReflexSafetyGuard:
-    def __init__(self, cli: pycozmo.Client):
-        self.cli = cli
-        self.safety_tripped = threading.Event()
-        self.PITCH_BUMP_THRESHOLD = 0.35  # ~20 degrees tilt
-        self.ACCEL_SHOCK_DELTA_THRESHOLD = -2200.0  # mm/s^2
-        self.VISUAL_STALL_WINDOW_DURATION = 1.0  # 1.0s sliding window
-        self.STALL_DIFF_THRESHOLD = 3.5  # Mean absdiff threshold
-        self._patch_client_motor_methods()
-        self.cli.add_handler(pycozmo.event.EvtRobotStateUpdated, self._on_robot_state)
-        self.cli.add_handler(pycozmo.event.EvtNewRawCameraImage, self._on_camera_image)
-
-    def _patch_client_motor_methods(self):
-        orig_drive = self.cli.drive_wheels
-        def guarded_drive_wheels(lwheel=0.0, rwheel=0.0, *args, **kwargs):
-            if self.safety_tripped.is_set() and threading.get_ident() != self._evasive_thread_id:
-                return  # Block incoming host movement commands
-            return orig_drive(lwheel, rwheel, *args, **kwargs)
-        self.cli.drive_wheels = guarded_drive_wheels
-
-    def update_camera_frame(self, bgr_image, is_driving_forward: bool):
-        small = cv2.resize(bgr_image, (80, 60))
-        gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-        
-        # Sliding-window visual stasis calculation
-        if time.time() - self.visual_window_start_time >= self.VISUAL_STALL_WINDOW_DURATION:
-            diff = float(cv2.absdiff(blurred, self.visual_window_ref_frame).mean())
-            if diff < self.STALL_DIFF_THRESHOLD and is_driving_forward:
-                self._trigger_evasive_reflex("BUMP_DETECTED (Visual Stasis)")`,
+      "In physical robotics, safety routines cannot rely on asynchronous application threads or model inference queues. A delayed halt of 200ms when approaching a desk ledge causes catastrophic physical drops.\n\n" +
+      "MoKa's ReflexSafetyGuard operates directly within the PyCozmo SDK 33.3Hz packet thread context (~30ms cycle time) and enforces protection through three synchronized layers:\n\n" +
+      "1. Sub-Packet Method Interception: On initialization, ReflexSafetyGuard monkey-patches the PyCozmo client's drive_wheels, drive_straight, turn_in_place, and stop_all_motors methods. When safety is tripped, all external movement invocations are discarded at zero latency unless originated by the isolated evasion thread.\n\n" +
+      "2. Multi-Modal Collision & Tilt Detection:\n" +
+      "   • IMU Pitch Tilt: Detects climbing or tipping when absolute pitch exceeds 0.35 rad (~20°).\n" +
+      "   • Impact Deceleration Filter: Compensates raw X-axis accelerometer data for gravity tilt: a_true = a_x - g * sin(theta). Deceleration spikes relative to an adaptive resting baseline (delta <= -2,200 mm/s²) trigger instant impact detection.\n" +
+      "   • Visual Motion Stasis Window: Downsamples 30fps camera feed to 80x60 grayscale with 5x5 Gaussian blur. If wheels are commanded forward for >1.0s but frame differencing yields mean(absdiff) < 3.5, visual stall is declared (preventing motor burnout against transparent or soft obstacles).\n" +
+      "   • Pose Stasis: A 0.8s sliding window verifies linear displacement (hypot(dx, dy) < 10.0mm).\n\n" +
+      "3. Autonomous Non-Blocking Evasion: When a tripwire fires, an isolated daemon worker thread halts motors, pulses reverse thrust (-80 mm/s for 1.2s), and executes a 180° rotation away from danger before clearing the lock.",
     keyMetrics: [
-      { label: "Packet Loop Rate", value: "33Hz (~30ms cycle)" },
-      { label: "Pitch Tilt Limit", value: "0.35 rad (~20°)" },
-      { label: "Visual Stasis Delta", value: "cv2.absdiff < 3.5" },
-      { label: "Evasion Maneuver", value: "1.2s reverse + 180° U-turn" }
+      { label: "Packet Loop Frequency", value: "33.3 Hz (30ms)" },
+      { label: "Cliff Tripwire Latency", value: "< 12 ms" },
+      { label: "Visual Stasis Matrix", value: "80x60 Gaussian (5x5)" },
+      { label: "Evasive Maneuver", value: "1.2s Rev + 180° Spin" },
     ],
     highlights: [
-      "Low-Level Method Interception: Overrides drive_wheels and stop_all_motors directly on PyCozmo Client to prevent asynchronous commands from overriding active safety states.",
-      "Multi-Modal Sensor Fusion: Combines physical cliff IR sensors, IMU gravity-compensated accelerometer shocks, pose odometry, and blurred downsampled OpenCV frame differences.",
-      "Non-Blocking Autonomous Evasion: Spawns dedicated daemon recovery threads to reverse away from table edges and execute 180° escape pivots without blocking the main event loop."
-    ]
+      "Direct PyCozmo SDK monkey-patching prevents host commands from overriding emergency halt states.",
+      "Gravity-compensated accelerometer filtering isolates true kinetic impacts from gravitational pitch shifts.",
+      "OpenCV frame differencing detects wheel slip and invisible barriers without tactile bumper switches.",
+      "Non-blocking threaded evasion autonomously reverses and rotates 180° away from table edges."
+    ],
+    codeSnippet:
+`# Real-Time Deceleration & Visual Stasis Detection (backend/core/hardware/safety.py)
+def _on_robot_state(self, cli, state=None):
+    # Gravity-compensated linear acceleration impact shock
+    pitch_rad = float(getattr(state, "pose_pitch_rad", 0.0))
+    gravity_x = math.sin(pitch_rad) * 9800.0  # mm/s^2
+    true_accel_x = float(getattr(state, "accel_x", 0.0)) - gravity_x
+    accel_shock = true_accel_x - self.baseline_accel_x
+
+    # Tripwire: Severe forward deceleration shock below resting baseline
+    if self.is_forward_driving and accel_shock <= self.ACCEL_SHOCK_DELTA_THRESHOLD:
+        self._trigger_evasive_reflex("BUMP_DETECTED")
+
+def update_camera_frame(self, bgr_image) -> bool:
+    """Evaluates 1.0s sliding window frame difference (cv2.absdiff) for visual stasis."""
+    small = cv2.resize(bgr_image, (80, 60))
+    gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    diff = float(cv2.absdiff(blurred, self.visual_window_ref_frame).mean())
+    if diff < self.STALL_DIFF_THRESHOLD and self.is_forward_driving:
+        self._trigger_evasive_reflex("BUMP_DETECTED")`
   },
 
-  page04: {
+  // =========================================================================================
+  // PAGE 04: DUAL-TIER MEMORY & ZERO-DISK VOICE PIPELINE
+  // =========================================================================================
+  {
     pageNumber: "04",
-    pageLabel: "Dual-Tier Memory & Local Voice Pipeline",
-    title: "Stateful Memory Substrate & Zero-Disk Voice Engine",
-    subtitle: "PostgreSQL State Checkpoints, REAL[] Semantic Store & Kokoro-ONNX TTS",
+    pageLabel: "STATE & AUDIO // PERSISTENT MEMORY & STREAMING TTS",
+    title: "Stateful Memory & Audio Substrate",
+    subtitle: "PostgreSQL REAL[] Vector Store & 20ms Ring-Buffered Kokoro TTS",
+    discipline: "State Management, Vector Mathematics & Audio Signal Processing",
+    thesis: "Decoupling State Durability from Cloud Footprints via In-Engine Vector Math and Asynchronous Pipeline Streaming",
+    overview:
+      "A production state and speech engine combining LangGraph session checkpoints with a PostgreSQL native REAL[] biographical vector store (NumPy 0.82 cosine deduplication). Paired with Kokoro-ONNX zero-disk TTS streaming 20ms float32 PCM frames into PortAudio ring buffers.",
     description:
-      "MoKa features a persistent dual-tier memory substrate paired with a zero-disk streaming voice synthesis engine:\n\n1. Short-Term Memory (Session Checkpointing & Pruning):\nDriven by LangGraph's PostgresSaver, conversational sessions persist across reboots via thread tracking (thread_id='cozmo_default_session'). When sessions exceed 6 messages, summarize_conversation_node generates a rolling summary and emits RemoveMessage instructions to prune messages older than the last 4 exchanges (2 full turns), keeping LLM context windows razor small.\n\n2. Long-Term Memory (Permanent Semantic Core):\nPersists user biographical traits into native PostgreSQL float arrays (REAL[]), bypassing OS-level pgvector binary dependencies. Generates 384-dimensional dense vectors locally via LangChainFastEmbedBridge (BAAI/bge-small-en-v1.5). Implements O(1) Entity Resolution for unique categories (user_name, user_occupation, favorite_sports_team, favorite_programming_language, user_location) and mathematical 0.82 NumPy cosine similarity deduplication (Similarity = (A · B) / (||A|| ||B||)). Fact extraction runs asynchronously on a non-blocking background thread using qwen2.5:3b at temperature 0.0 with strict temporal noise filtering.\n\n3. Zero-Disk Streaming Voice Pipeline:\nIntegrates Kokoro-ONNX neural speech synthesis. Generates full phrase prosody in memory and chops float32 audio into 20ms chunks (480 samples @ 24kHz) for non-blocking PortAudio playback, supporting instant C-level ring buffer flushing on user interruption and 22050Hz 16-bit PCM resampling for Cozmo's onboard speaker.",
-    codeSnippet: `# schemas/memory_db.py & actions/physical/speak.py
-class LongTermMemoryManager:
-    UNIQUE_CATEGORIES = {"user_name", "user_occupation", "favorite_sports_team", 
-                         "favorite_programming_language", "user_location"}
-
-    def save_memory(self, fact: str, category: str = None, user_id: str = "cozmo_owner"):
-        new_embedding = np.array(self.embedder.embed_query(fact))
-        
-        # 1. O(1) Entity Resolution for unique biographical slots
-        if category in self.UNIQUE_CATEGORIES:
-            with connect(DB_URI) as conn:
-                with conn.cursor() as cur:
-                    cur.execute("SELECT id FROM user_profile_memories WHERE category = %s;", (category,))
-                    if row := cur.fetchone():
-                        cur.execute("UPDATE user_profile_memories SET fact=%s, embedding=%s WHERE id=%s;",
-                                    (fact, new_embedding.tolist(), row[0]))
-                        return
-
-        # 2. NumPy Cosine Similarity Deduplication (Threshold 0.82)
-        for db_id, db_fact, db_emb, db_cat in self._get_all_memories_for_user(user_id):
-            similarity = np.dot(new_embedding, np.array(db_emb)) / (
-                np.linalg.norm(new_embedding) * np.linalg.norm(db_emb)
-            )
-            if similarity > 0.82:
-                # Update existing memory rather than creating duplicate row
-                return self._update_memory(db_id, fact, new_embedding, category)
-
-# Kokoro-ONNX Zero-Disk Audio Callback
-def _audio_callback(self, outdata, frames, time, status):
-    if self._paused or self._audio_queue.empty():
-        outdata[:] = 0.0
-        return
-    chunk = self._audio_queue.get_nowait()
-    outdata[:len(chunk), 0] = chunk`,
+      "Personalized companionship requires lifelong biographical recall, yet deploying specialized vector databases (like Milvus or pgvector compiled extensions) introduces severe deployment friction on edge environments like Windows.\n\n" +
+      "MoKa implements a dual-tier state and acoustic synthesis architecture:\n\n" +
+      "1. Short-Term Context Management (LangGraph + PostgresSaver):\n" +
+      "   • Every interaction is committed to a local PostgreSQL checkpointer under session thread identifiers.\n" +
+      "   • Rolling Context Summarizer: When turn depth exceeds 6 messages, summarize_conversation_node compiles older history into an incremental state summary and issues RemoveMessage primitives to prune all but the 4 most recent turns, maintaining constant-time inference.\n\n" +
+      "2. Long-Term Biographical Memory (schemas/memory_db.py):\n" +
+      "   • Native PostgreSQL REAL[] Array Storage: Bypasses C-extension vector plugins by storing raw 384D float arrays in standard relational schemas.\n" +
+      "   • O(1) Unique Entity Resolution: Core slots (user_name, user_occupation, favorite_sports_team, favorite_programming_language, user_location) are updated via deterministic key overwrites.\n" +
+      "   • NumPy Vector Cosine Deduplication: General facts compute similarity S = (A · B) / (||A|| ||B||). If S > 0.82, the record is updated in place rather than duplicated.\n" +
+      "   • Asynchronous Fact Extraction: Non-daemon background threads extract user facts via temperature-0 LLMs, filtering out transient data (weather/calendar).\n\n" +
+      "3. Zero-Disk Streaming Voice Substrate (actions/physical/speak.py):\n" +
+      "   • Kokoro-ONNX generates 24kHz float32 audio tensors directly in memory.\n" +
+      "   • Streams 20ms chunks (480 samples @ 24,000Hz) into a PortAudio C-level callback queue, enabling near-zero latency playback and instantaneous barge-in interruption.",
     keyMetrics: [
-      { label: "Memory Vector Dim", value: "384-d (BAAI/bge-small)" },
+      { label: "TTS Chunk Buffer", value: "20 ms (480 Float32 Samples)" },
       { label: "Deduplication Threshold", value: "0.82 Cosine Similarity" },
-      { label: "Summarization Threshold", value: ">6 messages (prunes to 4)" },
-      { label: "Audio Chunk Size", value: "20ms (480 samples @ 24kHz)" }
+      { label: "Vector Extension Cost", value: "0 MB (Native REAL[])" },
+      { label: "Context Window Cap", value: "Rolling 4 Turns + Summary" },
     ],
     highlights: [
-      "Native PostgreSQL REAL[] Array Storage: Eliminates compiled pgvector OS binary dependencies on Windows while preserving high-speed vector retrieval using vectorized NumPy dot products.",
-      "Dual-Track Entity Resolution (O(1)): Automatically updates single-value profile slots (names, jobs, teams) without vector drift, while applying semantic cosine matching for general preferences.",
-      "Zero-Disk Streaming Audio Engine: Delivers studio-quality Kokoro-ONNX neural speech directly to PortAudio ring buffers with immediate hardware abortion capability on user interruption."
-    ]
+      "Native PostgreSQL REAL[] array storage eliminates complex pgvector compilation requirements on Windows.",
+      "NumPy-driven 0.82 cosine similarity threshold prevents memory duplication and resolves updated user preferences.",
+      "Asynchronous non-daemon memory extraction processes biographical data without introducing conversational latency.",
+      "Kokoro-ONNX streams 24kHz float32 audio chunks directly to sound hardware with zero disk I/O bottlenecks."
+    ],
+    codeSnippet:
+`# Vector Cosine Deduplication & Ring Buffer Stream (memory_db.py & speak.py)
+# 1. NumPy Vectorized Cosine Similarity (schemas/memory_db.py)
+dot_prod = np.dot(new_embedding, db_embedding)
+norm_new, norm_db = np.linalg.norm(new_embedding), np.linalg.norm(db_embedding)
+similarity = dot_prod / (norm_new * norm_db) if (norm_new > 0 and norm_db > 0) else 0.0
+
+if similarity > 0.82:  # Update existing fact in place
+    cur.execute("UPDATE user_profile_memories SET fact = %s, embedding = %s WHERE id = %s;",
+                (fact, new_embedding.tolist(), db_id))
+
+# 2. PortAudio 20ms Zero-Disk Streaming Callback (actions/physical/speak.py)
+def _audio_callback(self, outdata, frames, time, status):
+    needed, filled = frames, 0
+    while needed > 0 and not self._audio_queue.empty():
+        chunk = self._audio_queue.get_nowait()
+        take = min(needed, len(chunk))
+        outdata[filled:filled + take, 0] = chunk[:take]
+        needed -= take
+        filled += take
+    if needed > 0:
+        outdata[filled:, 0] = 0.0  # Zero-fill remaining buffer`
   },
 
-  page05: {
+  // =========================================================================================
+  // PAGE 05: TOOL SUBSYSTEMS: UNIFIED TOOL ECOSYSTEM
+  // =========================================================================================
+  {
     pageNumber: "05",
-    pageLabel: "Deterministic Sandbox & MCP Integration",
-    title: "Sub-Agent Sandboxes & External Tools",
-    subtitle: "Isolated Python Subprocess Execution, Tavily MCP & n8n Automation",
+    pageLabel: "EXECUTION ENGINES // UNIFIED TOOL ECOSYSTEM",
+    title: "Tools and Actions",
+    subtitle: "From Isolated Subprocess Python to Open MCPs, OS Automation & Vision",
+    discipline: "Tool-Augmented LLMs, Protocol Engineering & Cyber-Physical Actuation",
+    thesis: "Empowering Local Embodied Agents via Strict Sandbox Isolation, Open Protocol Standards, and Multi-Domain Tool Specialization",
+    overview:
+      "A comprehensive, multi-domain tool ecosystem spanning deterministic Python sandboxing, Model Context Protocol (MCP) web retrieval, n8n Google Calendar pipelines, OS workstation routines, OpenCV visual docking, and real-time OLED face rendering.",
     description:
-      "MoKa combines cognitive planning with deterministic, isolated execution tools to guarantee 100% accuracy for mathematical, logical, and real-time data tasks:\n\n1. Deterministic Code Execution Sub-Agent (code_executor.py):\nWhen complex calculations, algebra, date arithmetic, array filtering, or string reversals are required, the router delegates to a specialized sub-agent powered by local ornith:9b (via Ollama). Operating under a strict 'Tool first, answer second' contract, it drafts a minimal script and executes it inside an isolated subprocess sandbox (execute_python_sandbox) with an 8.0-second hard timeout. The raw sandbox stdout is treated as ground truth and translated into warm conversational prose.\n\n2. Standard Model Context Protocol (MCP) Client (MCPs.py):\nIntegrates real-time web search using the official Tavily Model Context Protocol server. Spawns an npx tavily-mcp@latest stdio subprocess, handles the client-server JSON-RPC handshake over asynchronous pipes (stdio_client), and retrieves advanced search results with zero cloud SDK bloat.\n\n3. Autonomous Visual Docking & n8n Workflows:\nFeatures autonomous charger docking via OpenCV HSV color segmentation (Hue 15–60, Sat 30–255, Val 80–255) and contour centroid tracking to acquire the charger's RGB(204, 255, 51) marker, steering Cozmo to back onto charging pins. Connects to n8n webhooks for Google Calendar management and weather lookups via wttr.in.",
-    codeSnippet: `# backend/actions/digital/langchain/code_executor.py & MCPs.py
-@tool
-def execute_python_sandbox(code_string: str) -> str:
-    """Executes raw Python inside an isolated local subprocess sandbox."""
-    temp_file = "moka_isolated_sandbox.py"
-    with open(temp_file, "w", encoding="utf-8") as f:
-        f.write(code_string.strip())
-    try:
-        res = subprocess.run([sys.executable, temp_file], capture_output=True, text=True, timeout=8)
-        return res.stdout if res.returncode == 0 else f"Execution Error: {res.stderr}"
-    finally:
-        if os.path.exists(temp_file):
-            os.remove(temp_file)
-
-# Standard Model Context Protocol (MCP) Client via Stdio
-async def fetch_tavily_search(query: str) -> str:
-    server_params = StdioServerParameters(
-        command="npx",
-        args=["-y", "tavily-mcp@latest"],
-        env=os.environ.copy(),
-        extra_spawn_args={"shell": True}
-    )
-    async with stdio_client(server_params) as (read_stream, write_stream):
-        async with ClientSession(read_stream, write_stream) as session:
-            await session.initialize()
-            response = await session.call_tool(
-                name="tavily_search",
-                arguments={"query": query, "search_depth": "advanced", "max_results": 5}
-            )
-            return "\\n".join([c.text for c in response.content if hasattr(c, "text")])`,
+      "Small local language models excel at natural dialogue and intent routing, but fail catastrophically when attempting mental arithmetic, real-time web extraction, OS automation, and physical spatial navigation. MoKa resolves these limitations by backing the agent with a diverse, specialized tool ecosystem unified under the LangGraph TOOL_REGISTRY:\n\n" +
+      "1. Deterministic Python Code Sandbox (actions/digital/langchain/code_executor.py):\n" +
+      "   • Driven by local ornith:9b with a strict 'tool-first, answer-second' system prompt.\n" +
+      "   • Spawns an isolated Python subprocess (subprocess.run with 8.0s hard timeout) capturing stdout/stderr with guaranteed temp file cleanup.\n" +
+      "   • What it does: Multi-step arithmetic, statistical calculations, unit conversions, date/time offsets, matrix/vector math, tabular/CSV/JSON data transformations, and deterministic algorithm verification.\n\n" +
+      "2. Real-Time Web Intelligence & Open Protocols (actions/digital/MCPs.py):\n" +
+      "   • Model Context Protocol (MCP): Spawns npx -y tavily-mcp@latest over standard asynchronous stdio pipes using JSON-RPC 2.0 (ClientSession).\n" +
+      "   • What it does: Performs live multi-source web searches, extracts deep content payloads, and feeds real-time world knowledge back to the LLM.\n\n" +
+      "3. Productivity & Cloud Agents (actions/digital/):\n" +
+      "   • Google Calendar Agent (n8n_agents.py): Calls n8n webhook workflows connected to Gemini to query, schedule, reschedule, and cancel calendar events.\n" +
+      "   • Todo List Manager (langgraph/todolist_agent.py): Stateful task tracker for creating, prioritizing, and completing user action items.\n" +
+      "   • Meteorological Agent (weather_agent.py): Queries wttr.in, formats natural speech, and renders dynamic weather graphics on Cozmo's OLED face.\n\n" +
+      "4. Local OS Workstation Setups (actions/digital/setups.py):\n" +
+      "   • Gaming Mode: Launches Steam (steam://rungameid/730 for Counter-Strike 2) and Discord.\n" +
+      "   • Study Mode: Opens browser tabs for Moodle, Gemini, NotebookLM, and YouTube.\n" +
+      "   • Coding Mode: Launches PyCharm IDE, GitHub, and AI developer tools.\n\n" +
+      "5. Cyber-Physical Actuation & Perception (actions/physical/):\n" +
+      "   • Autonomous Charger Docking (charger.py): OpenCV HSV segmentation (RGB 204,255,51 -> HSV [15..60]), 360° radar sweep, contour centroid tracking (Cx = M10/M00), and reverse alignment onto charging pads.\n" +
+      "   • Locomotion & Spatial Scanning (movement.py): Calibrated millimeter drive (move_forward/backward), precise angle turns, and arc_sweep environmental surveys.\n" +
+      "   • OLED Face Expressions & Timers (face.py, timer.py): 128x64 bitmap rendering of animated emotional eyes, countdown timers (MM:SS), weather icons, and thinking indicators.\n" +
+      "   • System Hardware Telemetry (system_tools.py): Real-time system clock and date queries synchronized with the host OS.",
     keyMetrics: [
-      { label: "Sandbox Model", value: "ornith:9b (Ollama local)" },
-      { label: "Execution Timeout", value: "8.0s hard isolation limit" },
-      { label: "Search Protocol", value: "Model Context Protocol (MCP)" },
-      { label: "Visual Target Marker", value: "RGB(204, 255, 51) HSV Tracked" }
+      { label: "Active Tool Domains", value: "5 Distinct Categories" },
+      { label: "Sandbox Hard Timeout", value: "8.0s Subprocess Isolation" },
+      { label: "Protocol Standard", value: "MCP (JSON-RPC 2.0 / stdio)" },
+      { label: "Autonomous Docking", value: "HSV Radar + Centroid Tracking" },
     ],
     highlights: [
-      "Tool-First Deterministic Reasoning: Eliminates LLM math hallucinations by forcing the ornith:9b sub-agent to verify calculations in a local Python subprocess before answering.",
-      "Native Model Context Protocol (MCP): Connects directly to tavily-mcp over stdio JSON-RPC streams via npx, enabling real-time deep web retrieval without heavy custom client wrappers.",
-      "HSV Vision-Guided Autonomous Docking: Employs real-time OpenCV color segmentation and contour analysis to locate the charging dock marker, steering and executing a 180° reverse park onto the charging contacts."
-    ]
+      "Deterministic Python sandbox offloads math, data parsing, and logic to an isolated subprocess with 8.0s timeout.",
+      "Model Context Protocol (MCP) and n8n webhooks bridge live web intelligence and Google Calendar automation.",
+      "Workstation presets trigger multi-app OS routines for Gaming (CS2/Discord), Study (Moodle/NotebookLM), and Coding (PyCharm/GitHub).",
+      "Full physical tool suite handles autonomous HSV charger docking, OLED face expressions, countdown timers, and calibrated locomotion."
+    ],
+    codeSnippet:
+`# Unified Tool Dispatch & Multi-Domain Handlers (worker_nodes.py, code_executor.py, setups.py)
+# 1. Unified Dynamic Tool Registry (core/routing/layer2/worker_nodes.py)
+TOOL_REGISTRY = {
+    # Computational & Web Intelligence
+    "code_executor_node": code_executor_node,   # ornith:9b Python sandbox (8.0s isolation)
+    "web_search_node": web_search_node,         # Tavily MCP (JSON-RPC 2.0 stdio client)
+    "weather_node": weather_node,               # wttr.in real-time meteorological agent
+    "calendar_node": calendar_node,             # n8n webhook Google Calendar manager
+    "todolist_node": todolist_node,             # Interactive stateful task tracker
+    # Physical Actuation & Vision
+    "dock_with_charger": dock_with_charger_node,# OpenCV HSV color segmentation docking
+    "move_forward": move_forward_node,          # Calibrated 100mm differential locomotion
+    "arc_sweep": arc_sweep_node,                # 360° radar environmental survey
+    # OS Workstation Automation
+    "setup_gaming": setup_gaming_node,          # Native Steam (CS2) & Discord launcher
+    "setup_study": setup_study_node,            # Browser multi-tab study workspace
+    "setup_coding": setup_coding_node,          # PyCharm IDE & GitHub launcher
+    "tell_time": tell_time_node,                # Real-time system clock synchronization
+}
+
+def execute_tool_node(state: AgentState):
+    """Dynamically dispatches any retrieved tool from a single generic LangGraph node."""
+    route = state.get("next_route", "none")
+    handler = TOOL_REGISTRY.get(route)
+    return handler(state) if handler else {"messages": [AIMessage(content="Tool not found.")]}`
   }
-};
+];
+
+// Map lookup dictionary for easy index access (page01 .. page05)
+export const MOKA_PAGES_DATA: Record<string, MokaPageContent> = mokaPagesData.reduce(
+  (acc, page) => {
+    acc[`page${page.pageNumber}`] = page;
+    return acc;
+  },
+  {} as Record<string, MokaPageContent>
+);

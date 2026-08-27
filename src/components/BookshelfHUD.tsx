@@ -1,9 +1,4 @@
-import React, { useState } from 'react';
-import {
-  Code2,
-  Copy,
-  Check
-} from 'lucide-react';
+import React from 'react';
 import { sound } from '../utils/audio';
 import type { VolumeProject } from '../data/portfolioData';
 import { VOLUMES_DATA } from '../data/portfolioData';
@@ -20,7 +15,6 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
   sceneState,
   volume
 }) => {
-  const [copiedCode, setCopiedCode] = useState(false);
 
   const triggerDomAction = (id: string, soundFn?: () => void) => {
     if (soundFn) soundFn();
@@ -72,13 +66,6 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
   const handleResetCamera = () => {
     sound.playClick();
     triggerDomAction('reset-view');
-  };
-
-  const handleCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(true);
-    sound.playClick();
-    setTimeout(() => setCopiedCode(false), 2000);
   };
 
   const volumeIdx = VOLUMES_DATA.findIndex((v) => v.id === volume.id);
@@ -220,37 +207,45 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
         </button>
 
         <p className="eyebrow" id="detail-eyebrow">
-          Volume {volume.roman} · {volume.discipline}
+          Volume {volume.roman} · {sceneState.isOpen && mokaContent?.discipline ? mokaContent.discipline : volume.discipline}
         </p>
         <h2 className="detail-title" id="detail-title">
-          {volume.title}
+          {sceneState.isOpen && mokaContent ? mokaContent.title : volume.title}
         </h2>
         <p className="detail-deck" id="detail-deck">
-          {volume.deck}
+          {sceneState.isOpen && mokaContent ? mokaContent.subtitle : volume.deck}
         </p>
 
-        {/* 2x2 Metadata Grid */}
-        <dl className="meta-list">
-          <div>
-            <dt>Binding</dt>
-            <dd id="detail-binding">{volume.binding}</dd>
+        {/* Closed State Actions / GitHub Repository Link */}
+        {!sceneState.isOpen && (
+          <div className="detail-github-box">
+            <a
+              href={volume.id === 'codex' ? 'https://github.com/kaschefi/cozmo_ai_assistant' : (volume.projectDetails?.githubUrl || 'https://github.com/kaschefi')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="detail-github-btn"
+              aria-label="View source repository on GitHub"
+            >
+              <div className="detail-github-info">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+                <div className="detail-github-text">
+                  <span className="detail-github-repo">
+                    {volume.id === 'codex' ? 'kaschefi/cozmo_ai_assistant' : 'Repository Source'}
+                  </span>
+                  <span className="detail-github-label">Open on GitHub</span>
+                </div>
+              </div>
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M6 3h7v7M13 3 7 9" />
+              </svg>
+            </a>
           </div>
-          <div>
-            <dt>Format</dt>
-            <dd id="detail-format">{volume.format}</dd>
-          </div>
-          <div>
-            <dt>Theme</dt>
-            <dd id="detail-theme">{volume.theme}</dd>
-          </div>
-          <div>
-            <dt>Motif</dt>
-            <dd id="detail-motif">{volume.motif}</dd>
-          </div>
-        </dl>
+        )}
 
-        {/* MOKA Rich Page Content (Code snippet, Benchmark diagram, Metrics) */}
-        {mokaContent && (
+        {/* MOKA Rich Page Content (Extended Description, Highlights, Code snippet, Diagrams, Metrics) - ONLY WHEN OPEN */}
+        {sceneState.isOpen && mokaContent && (
           <div className="moka-rich-content">
             {mokaContent.thesis && (
               <div className="moka-thesis-block">
@@ -258,25 +253,25 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
               </div>
             )}
 
-            {mokaContent.codeSnippet && (
-              <div className="moka-code-box">
-                <div className="moka-code-header">
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <Code2 size={12} />
-                    <span>PYTHON ARCHITECTURE</span>
-                  </span>
-                  <button
-                    className="moka-code-copy-btn"
-                    onClick={() => handleCopyCode(mokaContent.codeSnippet!)}
-                    type="button"
-                  >
-                    {copiedCode ? <Check size={11} /> : <Copy size={11} />}
-                    <span style={{ marginLeft: '3px' }}>{copiedCode ? 'COPIED' : 'COPY'}</span>
-                  </button>
-                </div>
-                <pre className="moka-code-block">
-                  <code>{mokaContent.codeSnippet}</code>
-                </pre>
+            {mokaContent.description && (
+              <div className="moka-description-block">
+                {mokaContent.description.split('\n\n').map((paragraph, pIdx) => (
+                  <p key={pIdx} className="moka-desc-paragraph">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {mokaContent.highlights && mokaContent.highlights.length > 0 && (
+              <div className="moka-highlights-block">
+                <div className="moka-highlights-title">Key Architectural Highlights</div>
+                {mokaContent.highlights.map((h, hIdx) => (
+                  <div key={hIdx} className="moka-highlight-item">
+                    <span className="moka-highlight-dot" />
+                    <span>{h}</span>
+                  </div>
+                ))}
               </div>
             )}
 
