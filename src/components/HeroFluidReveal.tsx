@@ -13,22 +13,52 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const gl = canvas.getContext('webgl2', { alpha: false, depth: false, antialias: false }) ||
-      canvas.getContext('webgl', { alpha: false, depth: false, antialias: false });
+    // 1. Initialize WebGL Context with float/half-float texture capabilities
+    const gl =
+      (canvas.getContext('webgl2', { alpha: false, depth: false, antialias: false }) as WebGL2RenderingContext | null) ||
+      (canvas.getContext('webgl', { alpha: false, depth: false, antialias: false }) as WebGLRenderingContext | null);
 
     if (!gl) {
       console.warn('WebGL is not available for fluid simulation');
       return;
     }
 
+    const isWebGL2 = 'WebGL2RenderingContext' in window && gl instanceof WebGL2RenderingContext;
+
+    // Texture format resolution
+    let internalFormat = gl.RGBA;
+    let format = gl.RGBA;
+    let type = gl.UNSIGNED_BYTE;
+    let supportLinear = true;
+
+    if (isWebGL2) {
+      const gl2 = gl as WebGL2RenderingContext;
+      gl2.getExtension('EXT_color_buffer_float');
+      const halfFloatLinear = gl2.getExtension('OES_texture_float_linear') || gl2.getExtension('OES_texture_half_float_linear');
+      internalFormat = (gl2 as any).RGBA16F || gl.RGBA;
+      format = gl.RGBA;
+      type = (gl2 as any).HALF_FLOAT || gl.FLOAT;
+      supportLinear = Boolean(halfFloatLinear);
+    } else {
+      const halfFloat = gl.getExtension('OES_texture_half_float');
+      const halfFloatLinear = gl.getExtension('OES_texture_half_float_linear');
+      gl.getExtension('EXT_color_buffer_half_float');
+      if (halfFloat) {
+        internalFormat = gl.RGBA;
+        format = gl.RGBA;
+        type = (halfFloat as any).HALF_FLOAT_OES || gl.FLOAT;
+        supportLinear = Boolean(halfFloatLinear);
+      }
+    }
+
     // Shader compiler helper
-    const createShader = (type: number, source: string) => {
-      const s = gl.createShader(type);
+    const createShader = (shaderType: number, source: string) => {
+      const s = gl.createShader(shaderType);
       if (!s) return null;
       gl.shaderSource(s, source);
       gl.compileShader(s);
       if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-        console.error('Shader error:', gl.getShaderInfoLog(s));
+        console.error('Shader compile error:', gl.getShaderInfoLog(s));
         gl.deleteShader(s);
         return null;
       }
@@ -51,18 +81,18 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       return p;
     };
 
-    // Full-screen Quad
+    // Full-screen Quad Buffer
     const quadBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([
         -1, -1,
-         1, -1,
-        -1,  1,
-        -1,  1,
-         1, -1,
-         1,  1
+        1, -1,
+        -1, 1,
+        -1, 1,
+        1, -1,
+        1, 1
       ]),
       gl.STATIC_DRAW
     );
@@ -77,7 +107,27 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       }
     };
 
+    // 2. Vertex Shaders with 4-neighborhood offsets for Jacobi and gradient passes
     const baseVS = `
+      attribute vec2 aPosition;
+      varying vec2 vUV;
+      varying vec2 vL;
+      varying vec2 vR;
+      varying vec2 vT;
+      varying vec2 vB;
+      uniform vec2 uTexelSize;
+
+      void main() {
+        vUV = (aPosition + 1.0) * 0.5;
+        vL = vUV - vec2(uTexelSize.x, 0.0);
+        vR = vUV + vec2(uTexelSize.x, 0.0);
+        vT = vUV + vec2(0.0, uTexelSize.y);
+        vB = vUV - vec2(0.0, uTexelSize.y);
+        gl_Position = vec4(aPosition, 0.0, 1.0);
+      }
+    `;
+
+    const simpleVS = `
       attribute vec2 aPosition;
       varying vec2 vUV;
       void main() {
@@ -86,23 +136,9 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       }
     `;
 
-    // 1. Advect
-    const advectFS = `
-      precision highp float;
-      varying vec2 vUV;
-      uniform sampler2D uVelocity;
-      uniform sampler2D uSource;
-      uniform vec2 uTexelSize;
-      uniform float uDt;
-      uniform float uDissipation;
+    // 3. Navier-Stokes Fragment Shaders
 
-      void main() {
-        vec2 coord = vUV - uDt * texture2D(uVelocity, vUV).xy * uTexelSize;
-        gl_FragColor = uDissipation * texture2D(uSource, coord);
-      }
-    `;
-
-    // 2. Splat
+    // Splat: Injects force or dye with circular aspect ratio correction
     const splatFS = `
       precision highp float;
       varying vec2 vUV;
@@ -121,169 +157,290 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       }
     `;
 
-    // 3. Divergence
+    // Curl (Vorticity Computation): Computes partial derivatives of velocity (curl = dv_y/dx - dv_x/dy)
+    const curlFS = `
+      precision highp float;
+      varying vec2 vL;
+      varying vec2 vR;
+      varying vec2 vT;
+      varying vec2 vB;
+      uniform sampler2D uVelocity;
+
+      void main() {
+        float L = texture2D(uVelocity, vL).y;
+        float R = texture2D(uVelocity, vR).y;
+        float T = texture2D(uVelocity, vT).x;
+        float B = texture2D(uVelocity, vB).x;
+        float vorticity = 0.5 * ((R - L) - (T - B));
+        gl_FragColor = vec4(vorticity, 0.0, 0.0, 1.0);
+      }
+    `;
+
+    // Vorticity Confinement: Restores micro-turbulence, curls, and eddies
+    const vorticityFS = `
+      precision highp float;
+      varying vec2 vUV;
+      varying vec2 vL;
+      varying vec2 vR;
+      varying vec2 vT;
+      varying vec2 vB;
+      uniform sampler2D uVelocity;
+      uniform sampler2D uCurl;
+      uniform float uCurlStrength;
+      uniform float uDt;
+
+      void main() {
+        float L = texture2D(uCurl, vL).x;
+        float R = texture2D(uCurl, vR).x;
+        float T = texture2D(uCurl, vT).x;
+        float B = texture2D(uCurl, vB).x;
+        float C = texture2D(uCurl, vUV).x;
+
+        vec2 force = 0.5 * vec2(abs(T) - abs(B), abs(R) - abs(L));
+        float len = length(force) + 0.0001;
+        force = (force / len) * vec2(1.0, -1.0) * (uCurlStrength * C);
+
+        vec2 vel = texture2D(uVelocity, vUV).xy;
+        gl_FragColor = vec4(vel + force * uDt, 0.0, 1.0);
+      }
+    `;
+
+    // Divergence: Computes incompressibility deviation
     const divergenceFS = `
       precision highp float;
       varying vec2 vUV;
+      varying vec2 vL;
+      varying vec2 vR;
+      varying vec2 vT;
+      varying vec2 vB;
       uniform sampler2D uVelocity;
-      uniform vec2 uTexelSize;
 
       void main() {
-        float L = texture2D(uVelocity, vUV - vec2(uTexelSize.x, 0.0)).x;
-        float R = texture2D(uVelocity, vUV + vec2(uTexelSize.x, 0.0)).x;
-        float T = texture2D(uVelocity, vUV + vec2(0.0, uTexelSize.y)).y;
-        float B = texture2D(uVelocity, vUV - vec2(0.0, uTexelSize.y)).y;
+        float L = texture2D(uVelocity, vL).x;
+        float R = texture2D(uVelocity, vR).x;
+        float T = texture2D(uVelocity, vT).y;
+        float B = texture2D(uVelocity, vB).y;
+
+        vec2 C = texture2D(uVelocity, vUV).xy;
+        if (vL.x < 0.0) L = -C.x;
+        if (vR.x > 1.0) R = -C.x;
+        if (vT.y > 1.0) T = -C.y;
+        if (vB.y < 0.0) B = -C.y;
+
         float div = 0.5 * (R - L + T - B);
         gl_FragColor = vec4(div, 0.0, 0.0, 1.0);
       }
     `;
 
-    // 4. Pressure Solver
+    // Pressure Poisson Solver (Jacobi iteration)
     const pressureFS = `
       precision highp float;
       varying vec2 vUV;
+      varying vec2 vL;
+      varying vec2 vR;
+      varying vec2 vT;
+      varying vec2 vB;
       uniform sampler2D uPressure;
       uniform sampler2D uDivergence;
-      uniform vec2 uTexelSize;
 
       void main() {
-        float L = texture2D(uPressure, vUV - vec2(uTexelSize.x, 0.0)).x;
-        float R = texture2D(uPressure, vUV + vec2(uTexelSize.x, 0.0)).x;
-        float T = texture2D(uPressure, vUV + vec2(0.0, uTexelSize.y)).x;
-        float B = texture2D(uPressure, vUV - vec2(0.0, uTexelSize.y)).x;
+        float L = texture2D(uPressure, vL).x;
+        float R = texture2D(uPressure, vR).x;
+        float T = texture2D(uPressure, vT).x;
+        float B = texture2D(uPressure, vB).x;
         float div = texture2D(uDivergence, vUV).x;
         float p = (L + R + T + B - div) * 0.25;
         gl_FragColor = vec4(p, 0.0, 0.0, 1.0);
       }
     `;
 
-    // 5. Gradient Subtraction
+    // Gradient Subtraction: Enforces zero-divergence incompressibility on the velocity field
     const gradSubFS = `
       precision highp float;
       varying vec2 vUV;
+      varying vec2 vL;
+      varying vec2 vR;
+      varying vec2 vT;
+      varying vec2 vB;
       uniform sampler2D uPressure;
       uniform sampler2D uVelocity;
-      uniform vec2 uTexelSize;
 
       void main() {
-        float L = texture2D(uPressure, vUV - vec2(uTexelSize.x, 0.0)).x;
-        float R = texture2D(uPressure, vUV + vec2(uTexelSize.x, 0.0)).x;
-        float T = texture2D(uPressure, vUV + vec2(0.0, uTexelSize.y)).x;
-        float B = texture2D(uPressure, vUV - vec2(0.0, uTexelSize.y)).x;
+        float L = texture2D(uPressure, vL).x;
+        float R = texture2D(uPressure, vR).x;
+        float T = texture2D(uPressure, vT).x;
+        float B = texture2D(uPressure, vB).x;
         vec2 vel = texture2D(uVelocity, vUV).xy;
         vel -= 0.5 * vec2(R - L, T - B);
         gl_FragColor = vec4(vel, 0.0, 1.0);
       }
     `;
 
-    // 6. Final Composite Shader
+    // Advection: Advects velocity and density back through velocity characteristics with dissipation & linear decay
+    const advectFS = `
+      precision highp float;
+      varying vec2 vUV;
+      uniform sampler2D uVelocity;
+      uniform sampler2D uSource;
+      uniform vec2 uTexelSize;
+      uniform float uDt;
+      uniform float uDissipation;
+      uniform float uLinearDecay;
+
+      void main() {
+        vec2 vel = texture2D(uVelocity, vUV).xy;
+        vec2 coord = vUV - uDt * vel * uTexelSize;
+        vec4 res = uDissipation * texture2D(uSource, coord);
+        gl_FragColor = max(vec4(0.0), res - vec4(uLinearDecay));
+      }
+    `;
+
+    // Clear / Decay Pass
+    const clearFS = `
+      precision highp float;
+      varying vec2 vUV;
+      uniform sampler2D uTarget;
+      uniform float uDecay;
+
+      void main() {
+        gl_FragColor = uDecay * texture2D(uTarget, vUV);
+      }
+    `;
+
+    // Reveal Composite Shader with Chromatic Dispersion, Edge Curls, and Portrait Transition
     const compositeFS = `
       precision highp float;
       varying vec2 vUV;
       uniform sampler2D uDensity;
-      uniform sampler2D uFrontTexture;
-      uniform sampler2D uBackTexture;
+      uniform sampler2D uVelocity;
+      uniform sampler2D uLayer1;
+      uniform sampler2D uLayer2;
       uniform vec2 uResolution;
       uniform vec2 uImageResolution;
       uniform float uTime;
 
-      vec2 getFitUV(vec2 uv, vec2 screenRes, vec2 imgRes) {
+      vec2 getFitUV(vec2 uvCoord, vec2 screenRes, vec2 imgRes) {
         float screenAspect = screenRes.x / screenRes.y;
         float imgAspect = imgRes.x / imgRes.y;
-        
-        // Scale factor: maintain good vertical dominance while staying contained
         float scale = 0.92;
-        vec2 centered = uv - 0.5;
-        
+        vec2 centered = uvCoord - 0.5;
         if (screenAspect > imgAspect) {
           centered.x *= (screenAspect / imgAspect);
         } else {
           centered.y *= (imgAspect / screenAspect);
         }
-        
         return (centered / scale) + 0.5;
+      }
+
+      vec4 safeSample(sampler2D tex, vec2 uvCoord) {
+        if (uvCoord.x < 0.001 || uvCoord.x > 0.999 || uvCoord.y < 0.001 || uvCoord.y > 0.999) {
+          return vec4(0.0);
+        }
+        return texture2D(tex, uvCoord);
       }
 
       void main() {
         vec2 fitUV = getFitUV(vUV, uResolution, uImageResolution);
-        
-        // Sample fluid density
-        float fluidVal = texture2D(uDensity, vUV).r;
-        
-        // Calculate fluid gradient for refractive chromatic aberration
+
+        // Fluid density & velocity
+        float fluidDensity = texture2D(uDensity, vUV).r;
+        vec2 vel = texture2D(uVelocity, vUV).xy;
+
+        // Density gradient for refractive displacement and edge curl highlights
         vec2 eps = vec2(1.0 / uResolution.x, 1.0 / uResolution.y) * 2.5;
         float fluidR = texture2D(uDensity, vUV + vec2(eps.x, 0.0)).r;
         float fluidL = texture2D(uDensity, vUV - vec2(eps.x, 0.0)).r;
         float fluidT = texture2D(uDensity, vUV + vec2(0.0, eps.y)).r;
         float fluidB = texture2D(uDensity, vUV - vec2(0.0, eps.y)).r;
         vec2 fluidGrad = vec2(fluidR - fluidL, fluidT - fluidB);
-        
-        vec2 distort = fluidGrad * 0.04;
-        
+
+        // Smooth liquid reveal mask (cleanly resolves to Layer 1 when density < 0.05)
+        float revealAmount = smoothstep(0.05, 0.70, fluidDensity);
+
+        // Transition boundary (peaks strictly at the active tearing edge: 1.0 at edge, 0.0 in interior)
+        float transitionBoundary = revealAmount * (1.0 - revealAmount) * 4.0;
+
+        // Confine fluid optical distortion and chromatic shift strictly to the tearing perimeter
+        vec2 rawDistort = clamp(vel * 0.002, vec2(-0.02), vec2(0.02)) + clamp(fluidGrad * 0.015, vec2(-0.02), vec2(0.02));
+        vec2 edgeDistort = rawDistort * transitionBoundary;
+
         bool inBounds = (fitUV.x >= 0.0 && fitUV.x <= 1.0 && fitUV.y >= 0.0 && fitUV.y <= 1.0);
-        
-        // Sample Layer 1: Front (robotme.png)
-        vec4 frontCol = inBounds ? texture2D(uFrontTexture, fitUV) : vec4(0.0);
-        
-        // Sample Layer 2: Back (me.png) with chromatic aberration
-        vec2 backUV = fitUV + distort;
-        bool inBoundsBack = (backUV.x >= 0.0 && backUV.x <= 1.0 && backUV.y >= 0.0 && backUV.y <= 1.0);
-        
-        vec4 backCol = vec4(0.0);
-        if (inBoundsBack) {
-          float r = texture2D(uBackTexture, backUV + distort * 0.4).r;
-          float g = texture2D(uBackTexture, backUV).g;
-          float b = texture2D(uBackTexture, backUV - distort * 0.4).b;
-          float a = texture2D(uBackTexture, backUV).a;
-          backCol = vec4(r, g, b, a);
+
+        // Sample Layer 1: Resting cybernetic portrait (robotme.png)
+        vec4 col1 = inBounds ? texture2D(uLayer1, fitUV) : vec4(0.0);
+
+        // Sample Layer 2: Revealed human engineer portrait (me.png)
+        // In the revealed interior (where transitionBoundary == 0), edgeDistort is 0 so the face is 100% razor sharp!
+        vec2 uv2 = fitUV + edgeDistort;
+        bool inBounds2 = (uv2.x >= 0.0 && uv2.x <= 1.0 && uv2.y >= 0.0 && uv2.y <= 1.0);
+
+        vec4 col2 = vec4(0.0);
+        if (inBounds2) {
+          vec2 cOffset = clamp(edgeDistort * 0.35, vec2(-0.005), vec2(0.005));
+          float r = texture2D(uLayer2, clamp(uv2 + cOffset, vec2(0.0), vec2(1.0))).r;
+          float g = texture2D(uLayer2, uv2).g;
+          float b = texture2D(uLayer2, clamp(uv2 - cOffset, vec2(0.0), vec2(1.0))).b;
+          float a = texture2D(uLayer2, uv2).a;
+          col2 = vec4(r, g, b, a);
         }
-        
-        float revealAmount = smoothstep(0.04, 0.82, fluidVal);
-        
-        // Fluid edge glow
-        float edgeGlow = smoothstep(0.01, 0.18, length(fluidGrad)) * (1.0 - revealAmount) * 0.75;
-        vec3 glowColor = vec3(0.35, 0.7, 1.0) * edgeGlow * fluidVal;
-        
-        vec4 compositeSubject = mix(frontCol, backCol, revealAmount);
-        compositeSubject.rgb += glowColor;
-        
+
+        // Clean subject composition: dissolve Layer 1 to reveal Layer 2
+        vec4 subject = mix(col1, col2, revealAmount);
+
+        // Edge curl energy glow strictly at transition boundaries
+        float edgeStrength = smoothstep(0.01, 0.18, length(fluidGrad)) * transitionBoundary;
+        vec3 edgeGlow = vec3(0.25, 0.7, 1.0) * edgeStrength * 0.35;
+        subject.rgb += edgeGlow * subject.a;
+
         // Dark atmosphere backdrop
         vec3 bg = vec3(0.039, 0.051, 0.078);
-        
-        // Subtle ambient spotlight
         float centerDist = length(vUV - vec2(0.5, 0.5));
-        float spotGlow = exp(-centerDist * 2.0) * 0.08;
+        float spotGlow = exp(-centerDist * 2.2) * 0.08;
         bg += vec3(0.12, 0.18, 0.28) * spotGlow;
-        
-        // Fluid vapor in ambient background
-        bg += vec3(0.04, 0.08, 0.16) * fluidVal * 0.35;
-        
-        vec3 finalRGB = mix(bg, compositeSubject.rgb, compositeSubject.a);
-        
+
+        vec3 finalRGB = mix(bg, subject.rgb, subject.a);
         gl_FragColor = vec4(finalRGB, 1.0);
       }
     `;
 
-    const progAdvect = createProgram(baseVS, advectFS);
-    const progSplat = createProgram(baseVS, splatFS);
+    // 4. Compile Shader Programs
+    const progSplat = createProgram(simpleVS, splatFS);
+    const progCurl = createProgram(baseVS, curlFS);
+    const progVorticity = createProgram(baseVS, vorticityFS);
     const progDivergence = createProgram(baseVS, divergenceFS);
     const progPressure = createProgram(baseVS, pressureFS);
     const progGradSub = createProgram(baseVS, gradSubFS);
-    const progComposite = createProgram(baseVS, compositeFS);
+    const progAdvect = createProgram(simpleVS, advectFS);
+    const progClear = createProgram(simpleVS, clearFS);
+    const progComposite = createProgram(simpleVS, compositeFS);
 
-    if (!progAdvect || !progSplat || !progDivergence || !progPressure || !progGradSub || !progComposite) {
+    if (
+      !progSplat ||
+      !progCurl ||
+      !progVorticity ||
+      !progDivergence ||
+      !progPressure ||
+      !progGradSub ||
+      !progAdvect ||
+      !progClear ||
+      !progComposite
+    ) {
+      console.error('Failed to initialize fluid simulation programs');
       return;
     }
 
+    // 5. Ping-Pong FBO Render Targets
     const simRes = 256;
+    const filterMode = supportLinear ? gl.LINEAR : gl.NEAREST;
+
     const createFBO = (w: number, h: number) => {
       const tex = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, tex);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filterMode);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filterMode);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, w, h, 0, format, type, null);
 
       const fbo = gl.createFramebuffer();
       gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
@@ -296,35 +453,65 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       let fbo1 = createFBO(w, h);
       let fbo2 = createFBO(w, h);
       return {
-        get read() { return fbo1; },
-        get write() { return fbo2; },
-        swap() { const tmp = fbo1; fbo1 = fbo2; fbo2 = tmp; }
+        get read() {
+          return fbo1;
+        },
+        get write() {
+          return fbo2;
+        },
+        swap() {
+          const tmp = fbo1;
+          fbo1 = fbo2;
+          fbo2 = tmp;
+        }
       };
     };
 
-    let density = createDoubleFBO(simRes, simRes);
     let velocity = createDoubleFBO(simRes, simRes);
-    let divergence = createFBO(simRes, simRes);
+    let density = createDoubleFBO(simRes, simRes);
     let pressure = createDoubleFBO(simRes, simRes);
+    let divergence = createFBO(simRes, simRes);
+    let curl = createFBO(simRes, simRes);
+
+    // 6. Texture Loader
+    const baseUrl = import.meta.env.BASE_URL.endsWith('/')
+      ? import.meta.env.BASE_URL
+      : `${import.meta.env.BASE_URL}/`;
 
     const loadTexture = (url: string, onLoad?: (img: HTMLImageElement) => void) => {
       const tex = gl.createTexture();
+      gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([10, 13, 20, 255]));
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        1,
+        1,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        new Uint8Array([0, 0, 0, 0])
+      );
 
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.src = url;
       img.onload = () => {
+        gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, tex);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        motionFrames = Math.max(motionFrames, 60);
         if (onLoad) onLoad(img);
+      };
+      img.onerror = (err) => {
+        console.error('Failed to load texture:', url, err);
       };
 
       return tex;
@@ -339,32 +526,50 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       }
     };
 
-    const frontTexture = loadTexture('/robotme.png', (img) => {
+    // Layer 1: robotme.png (cybernetic portrait at rest)
+    const layer1Texture = loadTexture(`${baseUrl}robotme.png`, (img) => {
       imageDimensions = { width: img.naturalWidth || 1952, height: img.naturalHeight || 2150 };
       checkLoaded();
     });
 
-    const backTexture = loadTexture('/me.png', () => {
+    // Layer 2: me.png (human engineer revealed under fluid cursor)
+    const layer2Texture = loadTexture(`${baseUrl}me.png`, () => {
       checkLoaded();
     });
 
-    const splats: Array<{ x: number; y: number; dx: number; dy: number; color: [number, number, number] }> = [];
+    // 7. Mouse Physics & Splat Queue
+    interface SplatItem {
+      x: number;
+      y: number;
+      dx: number;
+      dy: number;
+      color: [number, number, number];
+    }
+
+    const splats: SplatItem[] = [];
     let lastX = 0;
     let lastY = 0;
+    let lastMoveTime = performance.now();
     let hasMoved = false;
+    let motionFrames = 60; // Initial render frames
 
     const addSplat = (x: number, y: number, dx: number, dy: number) => {
       const rect = canvas.getBoundingClientRect();
       const nx = (x - rect.left) / rect.width;
       const ny = 1.0 - (y - rect.top) / rect.height;
 
+      // Scaling momentum multiplier for high-velocity mouse flicks
+      const momentumMultiplier = 4.2;
+
       splats.push({
         x: nx,
         y: ny,
-        dx: dx * 3.2,
-        dy: -dy * 3.2,
-        color: [1.3, 1.3, 1.3]
+        dx: dx * momentumMultiplier,
+        dy: -dy * momentumMultiplier,
+        color: [1.4, 1.4, 1.4]
       });
+
+      motionFrames = Math.max(motionFrames, 360);
     };
 
     const onPointerMove = (e: MouseEvent | TouchEvent) => {
@@ -378,6 +583,10 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         clientY = (e as MouseEvent).clientY;
       }
 
+      const now = performance.now();
+      const dt = Math.max((now - lastMoveTime) / 1000, 0.001);
+      lastMoveTime = now;
+
       if (!hasMoved) {
         lastX = clientX;
         lastY = clientY;
@@ -390,26 +599,12 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       lastX = clientX;
       lastY = clientY;
 
-      if (Math.abs(dx) > 0.4 || Math.abs(dy) > 0.4) {
-        addSplat(clientX, clientY, dx, dy);
+      // Dynamic flick momentum boost
+      const flickBoost = Math.min(Math.hypot(dx, dy) / (dt * 1200), 2.2);
+      if (Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3) {
+        addSplat(clientX, clientY, dx * (1.0 + flickBoost), dy * (1.0 + flickBoost));
       }
     };
-
-    const addRandomImpulse = () => {
-      const rx = 0.38 + Math.random() * 0.24;
-      const ry = 0.42 + Math.random() * 0.24;
-      const angle = Math.random() * Math.PI * 2;
-      splats.push({
-        x: rx,
-        y: ry,
-        dx: Math.cos(angle) * 7.5,
-        dy: Math.sin(angle) * 7.5,
-        color: [1.1, 1.1, 1.1]
-      });
-    };
-
-    setTimeout(() => addRandomImpulse(), 300);
-    setTimeout(() => addRandomImpulse(), 750);
 
     window.addEventListener('mousemove', onPointerMove, { passive: true });
     window.addEventListener('touchmove', onPointerMove, { passive: true });
@@ -422,135 +617,194 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
       gl.viewport(0, 0, width, height);
+      motionFrames = Math.max(motionFrames, 60);
     };
 
     window.addEventListener('resize', onResize);
 
+    // 8. Simulation Loop
     let animationFrameId: number;
     let lastTime = performance.now();
+    let isRunning = true;
 
     const render = () => {
+      if (!isRunning) return;
+
       const now = performance.now();
       const dt = Math.min((now - lastTime) / 1000, 0.032);
       lastTime = now;
 
-      // 1. Splats
-      while (splats.length > 0) {
-        const s = splats.pop()!;
+      // Only simulate while active motion or active fluid remains (Zero-load idle: 0 FPS / 0% GPU)
+      if (motionFrames > 0 || splats.length > 0) {
+        if (motionFrames > 0) motionFrames--;
 
-        // Splat into Velocity
+        const texelSize = [1.0 / simRes, 1.0 / simRes];
+        const aspect = width / height;
+
+        // --- Step 1: Ingest mouse impulses / splats into Velocity and Dye Density ---
+        while (splats.length > 0) {
+          const s = splats.pop()!;
+
+          // Velocity Splat (100% bigger brush radius)
+          gl.viewport(0, 0, simRes, simRes);
+          bindQuad(progSplat);
+          gl.bindFramebuffer(gl.FRAMEBUFFER, velocity.write.fbo);
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
+          gl.uniform1i(gl.getUniformLocation(progSplat, 'uTarget'), 0);
+          gl.uniform1f(gl.getUniformLocation(progSplat, 'uAspectRatio'), aspect);
+          gl.uniform2f(gl.getUniformLocation(progSplat, 'uPoint'), s.x, s.y);
+          gl.uniform3f(gl.getUniformLocation(progSplat, 'uColor'), s.dx, s.dy, 0.0);
+          gl.uniform1f(gl.getUniformLocation(progSplat, 'uRadius'), 0.015); // Doubled radius
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+          velocity.swap();
+
+          // Density Splat (100% bigger brush radius)
+          gl.bindFramebuffer(gl.FRAMEBUFFER, density.write.fbo);
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, density.read.tex);
+          gl.uniform1i(gl.getUniformLocation(progSplat, 'uTarget'), 0);
+          gl.uniform1f(gl.getUniformLocation(progSplat, 'uAspectRatio'), aspect);
+          gl.uniform2f(gl.getUniformLocation(progSplat, 'uPoint'), s.x, s.y);
+          gl.uniform3f(gl.getUniformLocation(progSplat, 'uColor'), s.color[0], s.color[1], s.color[2]);
+          gl.uniform1f(gl.getUniformLocation(progSplat, 'uRadius'), 0.019); // Doubled radius
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+          density.swap();
+        }
+
+        // --- Step 2: Curl / Vorticity Computation ---
         gl.viewport(0, 0, simRes, simRes);
-        bindQuad(progSplat);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, velocity.write.fbo);
+        bindQuad(progCurl);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, curl.fbo);
+        gl.uniform2f(gl.getUniformLocation(progCurl, 'uTexelSize'), texelSize[0], texelSize[1]);
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
-        gl.uniform1i(gl.getUniformLocation(progSplat, 'uTarget'), 0);
-        gl.uniform1f(gl.getUniformLocation(progSplat, 'uAspectRatio'), width / height);
-        gl.uniform2f(gl.getUniformLocation(progSplat, 'uPoint'), s.x, s.y);
-        gl.uniform3f(gl.getUniformLocation(progSplat, 'uColor'), s.dx, s.dy, 0.0);
-        gl.uniform1f(gl.getUniformLocation(progSplat, 'uRadius'), 0.0035);
+        gl.uniform1i(gl.getUniformLocation(progCurl, 'uVelocity'), 0);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        // --- Step 3: Vorticity Confinement (Restores Micro-Turbulence & Curls) ---
+        bindQuad(progVorticity);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, velocity.write.fbo);
+        gl.uniform2f(gl.getUniformLocation(progVorticity, 'uTexelSize'), texelSize[0], texelSize[1]);
+        gl.uniform1f(gl.getUniformLocation(progVorticity, 'uCurlStrength'), 32.0);
+        gl.uniform1f(gl.getUniformLocation(progVorticity, 'uDt'), dt);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
+        gl.uniform1i(gl.getUniformLocation(progVorticity, 'uVelocity'), 0);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, curl.tex);
+        gl.uniform1i(gl.getUniformLocation(progVorticity, 'uCurl'), 1);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         velocity.swap();
 
-        // Splat into Density
-        gl.bindFramebuffer(gl.FRAMEBUFFER, density.write.fbo);
+        // --- Step 4: Calculate Divergence ---
+        bindQuad(progDivergence);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, divergence.fbo);
+        gl.uniform2f(gl.getUniformLocation(progDivergence, 'uTexelSize'), texelSize[0], texelSize[1]);
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, density.read.tex);
-        gl.uniform1i(gl.getUniformLocation(progSplat, 'uTarget'), 0);
-        gl.uniform3f(gl.getUniformLocation(progSplat, 'uColor'), s.color[0], s.color[1], s.color[2]);
-        gl.uniform1f(gl.getUniformLocation(progSplat, 'uRadius'), 0.0045);
+        gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
+        gl.uniform1i(gl.getUniformLocation(progDivergence, 'uVelocity'), 0);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
-        density.swap();
-      }
 
-      // 2. Advect Velocity
-      gl.viewport(0, 0, simRes, simRes);
-      bindQuad(progAdvect);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, velocity.write.fbo);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
-      gl.uniform1i(gl.getUniformLocation(progAdvect, 'uVelocity'), 0);
-      gl.activeTexture(gl.TEXTURE1);
-      gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
-      gl.uniform1i(gl.getUniformLocation(progAdvect, 'uSource'), 1);
-      gl.uniform2f(gl.getUniformLocation(progAdvect, 'uTexelSize'), 1.0 / simRes, 1.0 / simRes);
-      gl.uniform1f(gl.getUniformLocation(progAdvect, 'uDt'), dt);
-      gl.uniform1f(gl.getUniformLocation(progAdvect, 'uDissipation'), 0.985);
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-      velocity.swap();
-
-      // 3. Advect Density
-      gl.bindFramebuffer(gl.FRAMEBUFFER, density.write.fbo);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
-      gl.uniform1i(gl.getUniformLocation(progAdvect, 'uVelocity'), 0);
-      gl.activeTexture(gl.TEXTURE1);
-      gl.bindTexture(gl.TEXTURE_2D, density.read.tex);
-      gl.uniform1i(gl.getUniformLocation(progAdvect, 'uSource'), 1);
-      gl.uniform1f(gl.getUniformLocation(progAdvect, 'uDissipation'), 0.978);
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-      density.swap();
-
-      // 4. Calculate Divergence
-      bindQuad(progDivergence);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, divergence.fbo);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
-      gl.uniform1i(gl.getUniformLocation(progDivergence, 'uVelocity'), 0);
-      gl.uniform2f(gl.getUniformLocation(progDivergence, 'uTexelSize'), 1.0 / simRes, 1.0 / simRes);
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-      // 5. Pressure Poisson Solver
-      bindQuad(progPressure);
-      gl.uniform2f(gl.getUniformLocation(progPressure, 'uTexelSize'), 1.0 / simRes, 1.0 / simRes);
-      gl.activeTexture(gl.TEXTURE1);
-      gl.bindTexture(gl.TEXTURE_2D, divergence.tex);
-      gl.uniform1i(gl.getUniformLocation(progPressure, 'uDivergence'), 1);
-
-      for (let i = 0; i < 16; i++) {
+        // --- Step 5: Clear / Decay Pressure ---
+        bindQuad(progClear);
         gl.bindFramebuffer(gl.FRAMEBUFFER, pressure.write.fbo);
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, pressure.read.tex);
-        gl.uniform1i(gl.getUniformLocation(progPressure, 'uPressure'), 0);
+        gl.uniform1i(gl.getUniformLocation(progClear, 'uTarget'), 0);
+        gl.uniform1f(gl.getUniformLocation(progClear, 'uDecay'), 0.8);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         pressure.swap();
+
+        // --- Step 6: Pressure Poisson Solver (Jacobi Iterations) ---
+        bindQuad(progPressure);
+        gl.uniform2f(gl.getUniformLocation(progPressure, 'uTexelSize'), texelSize[0], texelSize[1]);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, divergence.tex);
+        gl.uniform1i(gl.getUniformLocation(progPressure, 'uDivergence'), 1);
+
+        for (let i = 0; i < 20; i++) {
+          gl.bindFramebuffer(gl.FRAMEBUFFER, pressure.write.fbo);
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, pressure.read.tex);
+          gl.uniform1i(gl.getUniformLocation(progPressure, 'uPressure'), 0);
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+          pressure.swap();
+        }
+
+        // --- Step 7: Gradient Subtraction (Divergence-Free Projection) ---
+        bindQuad(progGradSub);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, velocity.write.fbo);
+        gl.uniform2f(gl.getUniformLocation(progGradSub, 'uTexelSize'), texelSize[0], texelSize[1]);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, pressure.read.tex);
+        gl.uniform1i(gl.getUniformLocation(progGradSub, 'uPressure'), 0);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
+        gl.uniform1i(gl.getUniformLocation(progGradSub, 'uVelocity'), 1);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        velocity.swap();
+
+        // --- Step 8: Advect Velocity (Viscosity / Velocity Dissipation) ---
+        bindQuad(progAdvect);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, velocity.write.fbo);
+        gl.uniform2f(gl.getUniformLocation(progAdvect, 'uTexelSize'), texelSize[0], texelSize[1]);
+        gl.uniform1f(gl.getUniformLocation(progAdvect, 'uDt'), dt);
+        gl.uniform1f(gl.getUniformLocation(progAdvect, 'uDissipation'), 0.985); // Smooth rolling vortices
+        gl.uniform1f(gl.getUniformLocation(progAdvect, 'uLinearDecay'), 0.0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
+        gl.uniform1i(gl.getUniformLocation(progAdvect, 'uVelocity'), 0);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
+        gl.uniform1i(gl.getUniformLocation(progAdvect, 'uSource'), 1);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        velocity.swap();
+
+        // --- Step 9: Advect Dye Density (Smooth Evaporation without Asymptotic Lingering) ---
+        gl.bindFramebuffer(gl.FRAMEBUFFER, density.write.fbo);
+        gl.uniform1f(gl.getUniformLocation(progAdvect, 'uDissipation'), 0.985); // Smooth continuous evaporation
+        gl.uniform1f(gl.getUniformLocation(progAdvect, 'uLinearDecay'), 0.0016); // Reaches true 0 seamlessly
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
+        gl.uniform1i(gl.getUniformLocation(progAdvect, 'uVelocity'), 0);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, density.read.tex);
+        gl.uniform1i(gl.getUniformLocation(progAdvect, 'uSource'), 1);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        density.swap();
+
+        // --- Step 10: Final Reveal Composite Pass ---
+        gl.viewport(0, 0, width, height);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        bindQuad(progComposite);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, density.read.tex);
+        gl.uniform1i(gl.getUniformLocation(progComposite, 'uDensity'), 0);
+
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
+        gl.uniform1i(gl.getUniformLocation(progComposite, 'uVelocity'), 1);
+
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, layer1Texture);
+        gl.uniform1i(gl.getUniformLocation(progComposite, 'uLayer1'), 2);
+
+        gl.activeTexture(gl.TEXTURE3);
+        gl.bindTexture(gl.TEXTURE_2D, layer2Texture);
+        gl.uniform1i(gl.getUniformLocation(progComposite, 'uLayer2'), 3);
+
+        gl.uniform2f(gl.getUniformLocation(progComposite, 'uResolution'), width, height);
+        gl.uniform2f(
+          gl.getUniformLocation(progComposite, 'uImageResolution'),
+          imageDimensions.width,
+          imageDimensions.height
+        );
+        gl.uniform1f(gl.getUniformLocation(progComposite, 'uTime'), now * 0.001);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
       }
-
-      // 6. Gradient Subtraction
-      bindQuad(progGradSub);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, velocity.write.fbo);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, pressure.read.tex);
-      gl.uniform1i(gl.getUniformLocation(progGradSub, 'uPressure'), 0);
-      gl.activeTexture(gl.TEXTURE1);
-      gl.bindTexture(gl.TEXTURE_2D, velocity.read.tex);
-      gl.uniform1i(gl.getUniformLocation(progGradSub, 'uVelocity'), 1);
-      gl.uniform2f(gl.getUniformLocation(progGradSub, 'uTexelSize'), 1.0 / simRes, 1.0 / simRes);
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-      velocity.swap();
-
-      // 7. Composite Pass
-      gl.viewport(0, 0, width, height);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      bindQuad(progComposite);
-
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, density.read.tex);
-      gl.uniform1i(gl.getUniformLocation(progComposite, 'uDensity'), 0);
-
-      gl.activeTexture(gl.TEXTURE1);
-      gl.bindTexture(gl.TEXTURE_2D, frontTexture);
-      gl.uniform1i(gl.getUniformLocation(progComposite, 'uFrontTexture'), 1);
-
-      gl.activeTexture(gl.TEXTURE2);
-      gl.bindTexture(gl.TEXTURE_2D, backTexture);
-      gl.uniform1i(gl.getUniformLocation(progComposite, 'uBackTexture'), 2);
-
-      gl.uniform2f(gl.getUniformLocation(progComposite, 'uResolution'), width, height);
-      gl.uniform2f(gl.getUniformLocation(progComposite, 'uImageResolution'), imageDimensions.width, imageDimensions.height);
-      gl.uniform1f(gl.getUniformLocation(progComposite, 'uTime'), now * 0.001);
-
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -558,6 +812,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
     render();
 
     return () => {
+      isRunning = false;
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('mousemove', onPointerMove);
       window.removeEventListener('touchmove', onPointerMove);
@@ -567,7 +822,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
 
   return (
     <div className="hero-fluid-container">
-      {/* Background WebGL Fluid Canvas */}
+      {/* Background WebGL Navier-Stokes Fluid Canvas */}
       <canvas
         ref={canvasRef}
         style={{

@@ -54,7 +54,8 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   min-height: 100%;
   overflow-x: hidden;
@@ -1343,9 +1344,17 @@ html, body {
   border-radius: 50%;
 }
 
-.dot-red { background: #ff5f56; }
-.dot-yellow { background: #ffbd2e; }
-.dot-green { background: #27c93f; }
+.dot-red {
+  background: #ff5f56;
+}
+
+.dot-yellow {
+  background: #ffbd2e;
+}
+
+.dot-green {
+  background: #27c93f;
+}
 
 .terminal-body {
   padding: 1.5rem;
@@ -1424,8 +1433,13 @@ html, body {
    ========================================================================== */
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideInDown {
@@ -1433,6 +1447,7 @@ html, body {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1444,6 +1459,7 @@ html, body {
     opacity: 0;
     transform: translateX(40px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -1451,9 +1467,12 @@ html, body {
 }
 
 @keyframes pulseGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 16px -2px rgba(56, 132, 255, 0.3);
   }
+
   50% {
     box-shadow: 0 0 28px 2px rgba(56, 132, 255, 0.6);
   }
@@ -2249,6 +2268,7 @@ html, body {
 }
 
 @media (max-width: 560px) {
+
   .editorial-index span:last-child,
   .selection__note,
   .microcopy {
@@ -2287,4 +2307,3 @@ html, body {
     width: 19px;
   }
 }
-
