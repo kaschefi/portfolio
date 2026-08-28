@@ -40,6 +40,11 @@ const VOLUME_OVERRIDES = [
       light: '#82bca2',
       fill: '#0e2e20'
     }
+  },
+  {
+    id: 'antigravity',
+    title: 'Roboflow',
+    discipline: 'Warehouse Routing and Scheduling System'
   }
 ];
 

@@ -7,6 +7,7 @@ import { XCODE_PAGES_DATA, type XcodePageContent } from '../data/xcodePagesData'
 import { FIGMA_PAGES_DATA, type FigmaPageContent } from '../data/figmaPagesData';
 import { CURSOR_PAGES_DATA, type CursorPageContent } from '../data/cursorPagesData';
 import { CLAUDE_CODE_PAGES_DATA, type ClaudeCodePageContent } from '../data/claudeCodePagesData';
+import { ANTIGRAVITY_PAGES_DATA, type AntigravityPageContent } from '../data/antigravityPagesData';
 
 interface BookshelfHUDProps {
   sceneState: { isOpen: boolean; isInspecting: boolean; page: number };
@@ -104,9 +105,9 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
     }
   };
 
-  // Resolve Active Page Content for MOKA, Xcode, Figma, Cursor, or Claude Code
+  // Resolve Active Page Content for MOKA, Xcode, Figma, Cursor, Claude Code, or Antigravity (RoboFlow)
   const activePageKey = `page0${Math.min(Math.max(sceneState.page, 1), 5)}`;
-  const richContent: MokaPageContent | XcodePageContent | FigmaPageContent | CursorPageContent | ClaudeCodePageContent | undefined =
+  const richContent: MokaPageContent | XcodePageContent | FigmaPageContent | CursorPageContent | ClaudeCodePageContent | AntigravityPageContent | undefined =
     volume.id === 'codex'
       ? MOKA_PAGES_DATA[activePageKey]
       : volume.id === 'xcode'
@@ -117,6 +118,8 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
       ? CURSOR_PAGES_DATA[activePageKey]
       : volume.id === 'claude-code'
       ? CLAUDE_CODE_PAGES_DATA[activePageKey]
+      : volume.id === 'antigravity'
+      ? ANTIGRAVITY_PAGES_DATA[activePageKey]
       : undefined;
 
   const getPageTitle = (page: number) => {

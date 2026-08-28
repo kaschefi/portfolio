@@ -330,10 +330,10 @@ export function applyPagePatches(code) {
       }
 
       if (n === 1 && e.id === "claude-code") {
-        // Spread 2 Left Page: PLATE 01 / CLINICAL ONTOLOGY & REASONING TOPOLOGY
+        // Spread 2 Left Page: PLATE 01 / CONVNEXT-TINY ARCHITECTURE & GRAD-CAM
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
-        s.fillText("PLATE 01  /  CLINICAL ONTOLOGY & REASONING TOPOLOGY", 54, 146);
+        s.fillText("PLATE 01  /  CONVNEXT-TINY ARCHITECTURE & GRAD-CAM", 54, 146);
 
         if (typeof customClaudeDiagramImg !== "undefined" && customClaudeDiagramImg && (customClaudeDiagramImg.complete || customClaudeDiagramImg.naturalWidth > 0)) {
           const imgW = 404;
@@ -356,7 +356,7 @@ export function applyPagePatches(code) {
           s.lineWidth = 1.2;
           s.strokeRect(imgX, imgY, imgW, imgH);
 
-          // Box 1: Medical Ontology & RAG
+          // Box 1: ConvNeXt-tiny Baseline
           s.fillStyle = "#133827";
           s.fillRect(imgX + 16, imgY + 24, 114, 150);
           s.strokeStyle = "#34d399";
@@ -365,15 +365,15 @@ export function applyPagePatches(code) {
           s.fillStyle = "#34d399";
           s.font = '700 11px Inter, sans-serif';
           s.textAlign = "center";
-          s.fillText("Ontology RAG", imgX + 73, imgY + 48);
+          s.fillText("ConvNeXt-tiny", imgX + 73, imgY + 48);
           s.fillStyle = "#e6f4ed";
           s.font = '500 10px Inter, sans-serif';
-          s.fillText("ICD-10 / SNOMED", imgX + 73, imgY + 74);
-          s.fillText("Europe PMC Index", imgX + 73, imgY + 96);
+          s.fillText("7x7 Depthwise", imgX + 73, imgY + 74);
+          s.fillText("Inverted Neck", imgX + 73, imgY + 96);
           s.fillStyle = "#34d399";
-          s.fillText("99.2% Recall", imgX + 73, imgY + 130);
+          s.fillText("95.42% Base", imgX + 73, imgY + 130);
 
-          // Box 2: Contextual Reasoner
+          // Box 2: Regularization Pass
           s.fillStyle = "#133827";
           s.fillRect(imgX + 144, imgY + 24, 114, 150);
           s.strokeStyle = "#10b981";
@@ -381,15 +381,15 @@ export function applyPagePatches(code) {
           s.strokeRect(imgX + 144, imgY + 24, 114, 150);
           s.fillStyle = "#10b981";
           s.font = '700 11px Inter, sans-serif';
-          s.fillText("Context Engine", imgX + 201, imgY + 48);
+          s.fillText("Regularization", imgX + 201, imgY + 48);
           s.fillStyle = "#e6f4ed";
           s.font = '500 10px Inter, sans-serif';
-          s.fillText("Temporal Graph", imgX + 201, imgY + 74);
-          s.fillText("Drug Conflicts", imgX + 201, imgY + 96);
+          s.fillText("Label Smooth 0.1", imgX + 201, imgY + 74);
+          s.fillText("Dropout / Erase", imgX + 201, imgY + 96);
           s.fillStyle = "#10b981";
-          s.fillText("200k Context", imgX + 201, imgY + 130);
+          s.fillText("96.67% Acc", imgX + 201, imgY + 130);
 
-          // Box 3: Verifiable Citations
+          // Box 3: Explainability & Grad-CAM
           s.fillStyle = "#133827";
           s.fillRect(imgX + 272, imgY + 24, 114, 150);
           s.strokeStyle = "#6ee7b7";
@@ -397,19 +397,94 @@ export function applyPagePatches(code) {
           s.strokeRect(imgX + 272, imgY + 24, 114, 150);
           s.fillStyle = "#6ee7b7";
           s.font = '700 11px Inter, sans-serif';
-          s.fillText("Citation Guard", imgX + 329, imgY + 48);
+          s.fillText("Grad-CAM XAI", imgX + 329, imgY + 48);
           s.fillStyle = "#e6f4ed";
           s.font = '500 10px Inter, sans-serif';
-          s.fillText("PubMed Linking", imgX + 329, imgY + 74);
-          s.fillText("HIPAA / GDPR", imgX + 329, imgY + 96);
+          s.fillText("Facial Attention", imgX + 329, imgY + 74);
+          s.fillText("12 Breed FGVC", imgX + 329, imgY + 96);
           s.fillStyle = "#6ee7b7";
-          s.fillText("100% Verified", imgX + 329, imgY + 130);
+          s.fillText("0.9666 F1", imgX + 329, imgY + 130);
         }
 
         s.globalAlpha = 0.52;
         s.textAlign = "left";
         s.font = '400 16px "Iowan Old Style", Baskerville, Georgia, serif';
-        de(s, "Context-first clinical reasoning pipeline: High-density ICD-10 ontology retrieval, longitudinal temporal knowledge graph traversal, and strict citation provenance verification.", 54, 460, 40, 22, 5);
+        de(s, "Fine-grained feline vision pipeline: ImageNet transfer learning on Oxford-IIIT Pet dataset, aggressive regularization pass, and Grad-CAM spatial attribution.", 54, 460, 40, 22, 5);
+
+        s.globalAlpha = 0.2;
+        s.fillRect(48, d - 48, i - 96, 1);
+        s.globalAlpha = 1;
+        const x = Q(new l.CanvasTexture(c), { anisotropy: 16 });
+        x.name = e.id + "-interior-page-" + (n + 1);
+        return x;
+      }
+
+      if (n === 1 && e.id === "antigravity") {
+        // Spread 2 Left Page: PLATE 01 / GRAPH-BASED WAREHOUSE ENGINE TOPOLOGY
+        s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
+        s.letterSpacing = "2px";
+        s.fillText("PLATE 01  /  GRAPH-BASED WAREHOUSE ENGINE TOPOLOGY", 54, 146);
+
+        const imgX = 54, imgY = 180, imgW = 404, imgH = 250;
+        s.fillStyle = "rgba(11, 25, 83, 0.88)";
+        s.fillRect(imgX, imgY, imgW, imgH);
+        s.strokeStyle = "rgba(181, 199, 233, 0.4)";
+        s.lineWidth = 1.2;
+        s.strokeRect(imgX, imgY, imgW, imgH);
+
+        // Box 1: Dijkstra Shortest Path
+        s.fillStyle = "#142a80";
+        s.fillRect(imgX + 16, imgY + 24, 114, 150);
+        s.strokeStyle = "#60a5fa";
+        s.lineWidth = 1.2;
+        s.strokeRect(imgX + 16, imgY + 24, 114, 150);
+        s.fillStyle = "#60a5fa";
+        s.font = '700 11px Inter, sans-serif';
+        s.textAlign = "center";
+        s.fillText("Dijkstra Route", imgX + 73, imgY + 48);
+        s.fillStyle = "#dbe8f1";
+        s.font = '500 10px Inter, sans-serif';
+        s.fillText("Adjacency Graph", imgX + 73, imgY + 74);
+        s.fillText("Min-Heap Queue", imgX + 73, imgY + 96);
+        s.fillStyle = "#60a5fa";
+        s.fillText("Obstacle Detours", imgX + 73, imgY + 130);
+
+        // Box 2: Prim MST Cabling
+        s.fillStyle = "#142a80";
+        s.fillRect(imgX + 144, imgY + 24, 114, 150);
+        s.strokeStyle = "#93c5fd";
+        s.lineWidth = 1.2;
+        s.strokeRect(imgX + 144, imgY + 24, 114, 150);
+        s.fillStyle = "#93c5fd";
+        s.font = '700 11px Inter, sans-serif';
+        s.fillText("Prim MST", imgX + 201, imgY + 48);
+        s.fillStyle = "#dbe8f1";
+        s.font = '500 10px Inter, sans-serif';
+        s.fillText("Station Cabling", imgX + 201, imgY + 74);
+        s.fillText("Drop Zone Trunk", imgX + 201, imgY + 96);
+        s.fillStyle = "#93c5fd";
+        s.fillText("Min Wire Cost", imgX + 201, imgY + 130);
+
+        // Box 3: Topological Sort & DFS
+        s.fillStyle = "#142a80";
+        s.fillRect(imgX + 272, imgY + 24, 114, 150);
+        s.strokeStyle = "#bfdbfe";
+        s.lineWidth = 1.2;
+        s.strokeRect(imgX + 272, imgY + 24, 114, 150);
+        s.fillStyle = "#bfdbfe";
+        s.font = '700 11px Inter, sans-serif';
+        s.fillText("DAG Scheduler", imgX + 329, imgY + 48);
+        s.fillStyle = "#dbe8f1";
+        s.font = '500 10px Inter, sans-serif';
+        s.fillText("3-Color DFS", imgX + 329, imgY + 74);
+        s.fillText("Task Ordering", imgX + 329, imgY + 96);
+        s.fillStyle = "#bfdbfe";
+        s.fillText("Deadlock Alerts", imgX + 329, imgY + 130);
+
+        s.globalAlpha = 0.52;
+        s.textAlign = "left";
+        s.font = '400 16px "Iowan Old Style", Baskerville, Georgia, serif';
+        de(s, "RoboFlow warehouse engine: 20x20 discrete floor grid, Dijkstra robot routing with obstacle avoidance, Prim infrastructure cabling, and DAG task dependency ordering.", 54, 460, 40, 22, 5);
 
         s.globalAlpha = 0.2;
         s.fillRect(48, d - 48, i - 96, 1);
@@ -444,9 +519,9 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
       } else if (n === 2) {
         // Chapter 01
-        const title = e.id === "codex" ? "The Two-Tier Router" : (e.id === "xcode" ? "Clean Architecture & RBAC" : (e.id === "figma" ? "Architecture & Waving" : (e.id === "cursor" ? "Multi-Modal Ingestion" : (e.id === "claude-code" ? "Clinical Grounding & RAG" : (e.chapters?.[0]?.title || "Chapter 01")))));
-        const sub = e.id === "codex" ? "50ms FastEmbed Reflexes & Dynamic Tool RAG" : (e.id === "xcode" ? "Decoupled Express 5 Services & JWT" : (e.id === "figma" ? "7-DoF Cobot & WebSocket Teleoperation" : (e.id === "cursor" ? "Layout-Aware Parsing & Async HTTP 202" : (e.id === "claude-code" ? "ICD-10 Ontologies & Citation-Enforced Synthesis" : (e.chapters?.[0]?.subtitle || e.deck || "")))));
-        const body = e.id === "codex" ? "Sub-50ms spinal reflexes for instant hardware safety and PC routines, paired with in-memory FAISS candidate vector injection for local LLM routing." : (e.id === "xcode" ? "Strict 3-tier architecture isolating Express routing, domain business logic, and PostgreSQL data access with stateless JWT and RBAC guards." : (e.id === "figma" ? "Bridges a Node.js web GUI with the 7-DoF Sawyer cobot via rosbridge_suite WebSockets. A hierarchical Design Tree enforces safe baseline postures, 5-cycle continuous wave loops, and linear Cartesian waypoints." : (e.id === "cursor" ? "Docling v2 with RapidOCR at 1.5x scale preserves markdown grid tables and visual asset routes, paired with non-blocking HTTP 202 job queues and deterministic MD5 content hashing." : (e.id === "claude-code" ? "Every assertion is validated against high-density medical vector indices (Qdrant) populated with Europe PMC and ICD-10 ontologies. Statements failing strict citation confidence (>0.88) are rejected prior to UI presentation." : e.note))));
+        const title = e.id === "codex" ? "The Two-Tier Router" : (e.id === "xcode" ? "Clean Architecture & RBAC" : (e.id === "figma" ? "Architecture & Waving" : (e.id === "cursor" ? "Multi-Modal Ingestion" : (e.id === "claude-code" ? "Architecture Benchmarks" : (e.id === "antigravity" ? "Academic Origin & Grid Model" : (e.chapters?.[0]?.title || "Chapter 01"))))));
+        const sub = e.id === "codex" ? "50ms FastEmbed Reflexes & Dynamic Tool RAG" : (e.id === "xcode" ? "Decoupled Express 5 Services & JWT" : (e.id === "figma" ? "7-DoF Cobot & WebSocket Teleoperation" : (e.id === "cursor" ? "Layout-Aware Parsing & Async HTTP 202" : (e.id === "claude-code" ? "ConvNeXt-tiny vs. ResNet50 & EfficientNet-B2" : (e.id === "antigravity" ? "Graph-Theoretic Warehouse Modeling at FH Campus Wien" : (e.chapters?.[0]?.subtitle || e.deck || ""))))));
+        const body = e.id === "codex" ? "Sub-50ms spinal reflexes for instant hardware safety and PC routines, paired with in-memory FAISS candidate vector injection for local LLM routing." : (e.id === "xcode" ? "Strict 3-tier architecture isolating Express routing, domain business logic, and PostgreSQL data access with stateless JWT and RBAC guards." : (e.id === "figma" ? "Bridges a Node.js web GUI with the 7-DoF Sawyer cobot via rosbridge_suite WebSockets. A hierarchical Design Tree enforces safe baseline postures, 5-cycle continuous wave loops, and linear Cartesian waypoints." : (e.id === "cursor" ? "Docling v2 with RapidOCR at 1.5x scale preserves markdown grid tables and visual asset routes, paired with non-blocking HTTP 202 job queues and deterministic MD5 content hashing." : (e.id === "claude-code" ? "Systematic 5-epoch baseline comparison on Oxford-IIIT Pet dataset. ConvNeXt-tiny achieved 95.42% accuracy, outperforming ResNet50 (90.00%) and EfficientNet-B2 (90.00%) via ViT-inspired depthwise kernels." : (e.id === "antigravity" ? "Developed as an academic project at FH Campus Wien to investigate, implement, and benchmark graph-theory algorithms for autonomous warehouse logistics over a discrete 20x20 floor grid." : e.note)))));
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("CHAPTER 01", 54, 166);
@@ -464,9 +539,9 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
       } else if (n === 4) {
         // Chapter 02
-        const title = e.id === "codex" ? "Hardware Safety Guards" : (e.id === "xcode" ? "GIS Mapping & Live Chat" : (e.id === "figma" ? "Vision & Detection Benchmark" : (e.id === "cursor" ? "Stream Concurrency" : (e.id === "claude-code" ? "Temporal Reasoning Graph" : (e.chapters?.[1]?.title || "Chapter 02")))));
-        const sub = e.id === "codex" ? "Sub-Packet Interception & Anti-Dump Guard" : (e.id === "xcode" ? "Interactive Leaflet Pins & Capacity Gating" : (e.id === "figma" ? "YOLOv8 vs Classical HSV Color Filtering" : (e.id === "cursor" ? "Adaptive Backpressure & Redis JobStore" : (e.id === "claude-code" ? "Multi-Step Medical Reasoning Across Longitudinal Records" : (e.chapters?.[1]?.subtitle || e.deck || "")))));
-        const body = e.id === "codex" ? "Direct 33Hz method interception inside PyCozmo packet loops. Multi-modal sensor fusion combining cliff IR flags, IMU pitch tilt (>20°), true deceleration, and OpenCV optical flow visual stasis." : (e.id === "xcode" ? "Synchronizes Vienna-wide event clusters on Leaflet.js with interactive search cards using bidirectional panning, atomic registration, and polling chat." : (e.id === "figma" ? "Rigorous empirical comparison between YOLOv8 deep learning (96% static accuracy) and OpenCV HSV thresholding (100% detection, zero latency), demonstrating that low latency is paramount in fast visual servoing." : (e.id === "cursor" ? "FastAPI async semaphores throttle LPU requests, pull-based token bucket rate limiting prevents worker OOM crashes, and multi-model fallback chains eliminate 429 rate-limit downtime." : (e.id === "claude-code" ? "Reconstructs historical patient records into temporal knowledge graphs, tracing disease progression, biomarker fluctuations, and latent drug interactions across chronologically ordered visits." : e.deck))));
+        const title = e.id === "codex" ? "Hardware Safety Guards" : (e.id === "xcode" ? "GIS Mapping & Live Chat" : (e.id === "figma" ? "Vision & Detection Benchmark" : (e.id === "cursor" ? "Stream Concurrency" : (e.id === "claude-code" ? "Iterative Regularization" : (e.id === "antigravity" ? "The Three Graph Algorithms" : (e.chapters?.[1]?.title || "Chapter 02"))))));
+        const sub = e.id === "codex" ? "Sub-Packet Interception & Anti-Dump Guard" : (e.id === "xcode" ? "Interactive Leaflet Pins & Capacity Gating" : (e.id === "figma" ? "YOLOv8 vs Classical HSV Color Filtering" : (e.id === "cursor" ? "Adaptive Backpressure & Redis JobStore" : (e.id === "claude-code" ? "Overfitting Mitigation & Generalization Pass" : (e.id === "antigravity" ? "Dijkstra Routing, Prim MST & DFS Topological Sort" : (e.chapters?.[1]?.subtitle || e.deck || ""))))));
+        const body = e.id === "codex" ? "Direct 33Hz method interception inside PyCozmo packet loops. Multi-modal sensor fusion combining cliff IR flags, IMU pitch tilt (>20°), true deceleration, and OpenCV optical flow visual stasis." : (e.id === "xcode" ? "Synchronizes Vienna-wide event clusters on Leaflet.js with interactive search cards using bidirectional panning, atomic registration, and polling chat." : (e.id === "figma" ? "Rigorous empirical comparison between YOLOv8 deep learning (96% static accuracy) and OpenCV HSV thresholding (100% detection, zero latency), demonstrating that low latency is paramount in fast visual servoing." : (e.id === "cursor" ? "FastAPI async semaphores throttle LPU requests, pull-based token bucket rate limiting prevents worker OOM crashes, and multi-model fallback chains eliminate 429 rate-limit downtime." : (e.id === "claude-code" ? "Iterated on ConvNeXt-tiny with weight decay (5e-2), dropout (0.4), label smoothing (0.1), and random erasing (p=0.2), boosting validation accuracy to 96.67% and weighted F1 to 0.9666." : (e.id === "antigravity" ? "Integrates Dijkstra's algorithm with priority queues for dynamic shortest-path navigation, Prim's Minimum Spanning Tree for optimal facility cabling costs, and DFS Topological Sort with 3-color node classification for deadlock-free task scheduling." : e.deck)))));
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("CHAPTER 02", 54, 166);
@@ -484,9 +559,9 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
       } else if (n === 6) {
         // Chapter 03
-        const title = e.id === "codex" ? "Dual Memory & Voice" : (e.id === "xcode" ? "PostgreSQL & Cron Outbox" : (e.id === "figma" ? "Kalman MOT & Tethering" : (e.id === "cursor" ? "Semantic Chunking & VLMs" : (e.id === "claude-code" ? "Explainable Interventions" : (e.chapters?.[2]?.title || "Chapter 03")))));
-        const sub = e.id === "codex" ? "PostgresSaver & Kokoro-ONNX Stream" : (e.id === "xcode" ? "7-Entity Schema & Ticket Daemon" : (e.id === "figma" ? "Momentum Vectors & Hungarian Assignment" : (e.id === "cursor" ? "Structural Breakpoints & Qwen-27B" : (e.id === "claude-code" ? "Interactive Diagnostic Decision Trees & Doctor Feedback" : (e.chapters?.[2]?.subtitle || e.deck || "")))));
-        const body = e.id === "codex" ? "PostgresSaver session state with rolling summarization, native PostgreSQL REAL[] array store with 0.82 cosine similarity deduplication, and zero-disk Kokoro-ONNX voice streaming." : (e.id === "xcode" ? "A normalized 7-table schema with foreign-key cascades, array types (tags TEXT[]), and cron-driven 1-hour ticket dispatch via Nodemailer." : (e.id === "figma" ? "Independent 4D Kalman filters ([x,y,dx,dy]) with cosine velocity penalties and dynamic occlusion tethering (80px threshold), slashing Identity Switch rates from 50% down to under 10%." : (e.id === "cursor" ? "Groups text by DOM elements and triggers instant boundaries on section headers (>300 chars) with element-level overlap (N >= 1) to eliminate table fracturing and sentence truncation." : (e.id === "claude-code" ? "Rather than black-box recommendations, the system highlights clinical guideline citations, confidence intervals, and differential diagnostic paths directly in the physician workflow." : e.note))));
+        const title = e.id === "codex" ? "Dual Memory & Voice" : (e.id === "xcode" ? "PostgreSQL & Cron Outbox" : (e.id === "figma" ? "Kalman MOT & Tethering" : (e.id === "cursor" ? "Semantic Chunking & VLMs" : (e.id === "claude-code" ? "Explainability & Grad-CAM" : (e.id === "antigravity" ? "Architecture & Strategy Pattern" : (e.chapters?.[2]?.title || "Chapter 03"))))));
+        const sub = e.id === "codex" ? "PostgresSaver & Kokoro-ONNX Stream" : (e.id === "xcode" ? "7-Entity Schema & Ticket Daemon" : (e.id === "figma" ? "Momentum Vectors & Hungarian Assignment" : (e.id === "cursor" ? "Structural Breakpoints & Qwen-27B" : (e.id === "claude-code" ? "Spatial Attention & Facial Localization" : (e.id === "antigravity" ? "Domain Models, Strategy Interfaces & Service Layer" : (e.chapters?.[2]?.subtitle || e.deck || ""))))));
+        const body = e.id === "codex" ? "PostgresSaver session state with rolling summarization, native PostgreSQL REAL[] array store with 0.82 cosine similarity deduplication, and zero-disk Kokoro-ONNX voice streaming." : (e.id === "xcode" ? "A normalized 7-table schema with foreign-key cascades, array types (tags TEXT[]), and cron-driven 1-hour ticket dispatch via Nodemailer." : (e.id === "figma" ? "Independent 4D Kalman filters ([x,y,dx,dy]) with cosine velocity penalties and dynamic occlusion tethering (80px threshold), slashing Identity Switch rates from 50% down to under 10%." : (e.id === "cursor" ? "Groups text by DOM elements and triggers instant boundaries on section headers (>300 chars) with element-level overlap (N >= 1) to eliminate table fracturing and sentence truncation." : (e.id === "claude-code" ? "Grad-CAM heatmaps consistently localize to the head and facial structures, confirming the network learns genuine morphological cues rather than background correlations." : (e.id === "antigravity" ? "Strict separation of concerns: domain models represent pure data, algorithms are encapsulated via ShortestPathStrategy, MinimumSpanningTreeStrategy, and TopologicalSortStrategy interfaces, and 4 dedicated services orchestrate business logic." : e.note)))));
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("CHAPTER 03", 54, 166);
@@ -504,9 +579,9 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
       } else if (n === 8) {
         // Chapter 04
-        const title = e.id === "codex" ? "Deterministic Sandbox & Tools" : (e.id === "xcode" ? "Geocoding & Calendar Sync" : (e.id === "figma" ? "MoveIt & Gazebo Twin" : (e.id === "cursor" ? "Hybrid Search & Reranking" : (e.id === "claude-code" ? "Multi-Agent Clinical Pipeline" : (e.chapters?.[3]?.title || "Chapter 04")))));
-        const sub = e.id === "codex" ? "Isolated Python Subprocess & Tavily Tools" : (e.id === "xcode" ? "Photon Spatial API & RFC 5545 iCal" : (e.id === "figma" ? "S-Curve Shuffling & RRT-Connect Planning" : (e.id === "cursor" ? "70/30 Dense-Lexical Fusion & Groq LPU" : (e.id === "claude-code" ? "Autonomous Specialist Agents & Real-Time Telemetry" : (e.chapters?.[3]?.subtitle || e.deck || "")))));
-        const body = e.id === "codex" ? "Deterministic code execution in an isolated Python sandbox with 8.0s hard timeouts, Tavily Model Context Protocol integration via stdio, and OpenCV HSV autonomous charger docking." : (e.id === "xcode" ? "Offloads address coordinate resolution to Photon API asynchronously, paired with zero-dependency client-side RFC 5545 iCal generation." : (e.id === "figma" ? "Gazebo digital twin with S-curve velocity profiles and 0.16m radial arc separation. MoveIt RRT-Connect planner generates collision-free hover trajectories in ~1.0s with Intera quaternion pose stabilization." : (e.id === "cursor" ? "Combines cosine dense embeddings (70%) with exact lexical tokens (30%) and Groq GPT-OSS-120B Cross-Encoder reranking over expanded candidate pools (K = max(2k, 16)), doubling top-1 precision." : (e.id === "claude-code" ? "Decouples specialized clinical reasoning across dedicated triage, pharmacology, and oncology agents over shared patient state boards with 100Hz ICU telemetry stream processing." : e.note))));
+        const title = e.id === "codex" ? "Deterministic Sandbox & Tools" : (e.id === "xcode" ? "Geocoding & Calendar Sync" : (e.id === "figma" ? "MoveIt & Gazebo Twin" : (e.id === "cursor" ? "Hybrid Search & Reranking" : (e.id === "claude-code" ? "Fine-Grained Insights" : (e.id === "antigravity" ? "Simulation & Deadlock Safety" : (e.chapters?.[3]?.title || "Chapter 04"))))));
+        const sub = e.id === "codex" ? "Isolated Python Subprocess & Tavily Tools" : (e.id === "xcode" ? "Photon Spatial API & RFC 5545 iCal" : (e.id === "figma" ? "S-Curve Shuffling & RRT-Connect Planning" : (e.id === "cursor" ? "70/30 Dense-Lexical Fusion & Groq LPU" : (e.id === "claude-code" ? "Confusion Analysis & Key Takeaways" : (e.id === "antigravity" ? "Real-Time 20x20 Grid & Dependency Verification" : (e.chapters?.[3]?.subtitle || e.deck || ""))))));
+        const body = e.id === "codex" ? "Deterministic code execution in an isolated Python sandbox with 8.0s hard timeouts, Tavily Model Context Protocol integration via stdio, and OpenCV HSV autonomous charger docking." : (e.id === "xcode" ? "Offloads address coordinate resolution to Photon API asynchronously, paired with zero-dependency client-side RFC 5545 iCal generation." : (e.id === "figma" ? "Gazebo digital twin with S-curve velocity profiles and 0.16m radial arc separation. MoveIt RRT-Connect planner generates collision-free hover trajectories in ~1.0s with Intera quaternion pose stabilization." : (e.id === "cursor" ? "Combines cosine dense embeddings (70%) with exact lexical tokens (30%) and Groq GPT-OSS-120B Cross-Encoder reranking over expanded candidate pools (K = max(2k, 16)), doubling top-1 precision." : (e.id === "claude-code" ? "Near-clean separation across 12 breeds. Ragdoll vs. Birman remains the persistent confusion pair across all models due to genuine biological similarity. Proved architecture choice and regularization trump parameter count." : (e.id === "antigravity" ? "Operators interactively place obstacles, robots, charging stations, and drop zones. The system provides real-time path rerouting upon obstacle placement and flags cyclic dependency deadlocks with visual alert dialogs prior to robot dispatch." : e.note)))));
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("CHAPTER 04", 54, 166);

@@ -310,15 +310,15 @@ export const VOLUMES_DATA: VolumeProject[] = [
   },
   {
     id: "antigravity",
-    title: "Antigravity",
-    subtitle: "Spatial 3D Kinematics & Robotics",
+    title: "Roboflow",
+    subtitle: "Warehouse Routing and Scheduling System",
     roman: "IV",
-    discipline: "Spatial systems",
+    discipline: "Warehouse Routing and Scheduling System",
     note: "Ideas released from the flatness of the page.",
-    deck: "A speculative atlas for Antigravity’s spatial way of working: let agents move across tools, make complex structures visible, and understand the system through motion.",
+    deck: "Warehouse routing and scheduling system optimizing multi-agent autonomous trajectories, collision avoidance, and real-time fleet dispatch.",
     binding: "Cobalt cloth · cool-silver foil",
     format: "162 × 240 mm · FH Campus Wien Edition",
-    theme: "Antigravity · structure in motion",
+    theme: "Roboflow · warehouse routing & scheduling",
     motif: "Suspended orbits",
     motifKey: "orbits",
     paletteLabel: "Cobalt · sky · silver",
@@ -338,46 +338,52 @@ export const VOLUMES_DATA: VolumeProject[] = [
       fill: "#5f85dc"
     },
     projectDetails: {
-      name: "Sawyer 7-DOF Collaborative Robot Digital Twin",
-      category: "Robotics & Spatial Computing",
+      name: "RoboFlow: Graph-Based Warehouse Simulation Engine",
+      category: "Graph Algorithms & Simulation",
       timeframe: "2026",
-      institution: "FH Campus Wien · Robotics Lab",
-      role: "Kinematics & WebGL Visualization Engineer",
-      summary: "A real-time 3D digital twin and inverse kinematics solver for the Sawyer 7-Degree-of-Freedom collaborative robotic arm with collision avoidance and trajectory simulation.",
-      problem: "Testing physical robotic trajectories risks hardware collisions and costly downtime in factory automation environments.",
-      solution: "Built a browser-based WebGL URDF visualizer with WebAssembly-compiled analytical IK solvers, interactive waypoint controllers, and live ROS2 telemetry streaming.",
+      institution: "FH Campus Wien",
+      role: "Algorithm & Software Engineer",
+      summary: "A graph-based warehouse management and simulation system built in Java and JavaFX, simulating autonomous robots on a 20x20 grid with Dijkstra shortest path routing, Prim MST facility cabling, and DFS topological task scheduling.",
+      problem: "Intralogistics and warehouse automation require simultaneous shortest-path robot routing, minimal-cost facility interconnects, and strict dependency-ordered task scheduling without deadlocks.",
+      solution: "Modeled the warehouse as an adjacency list graph and DAG, implementing Dijkstra's algorithm, Prim's MST, and 3-color DFS topological sort wrapped in clean Strategy and Service patterns with a rich JavaFX UI.",
       keyMetrics: [
-        { label: "IK Solve Time", value: "< 0.4ms" },
-        { label: "Framerate", value: "60 FPS solid" },
-        { label: "Collision Tolerance", value: "±0.5mm" }
+        { label: "Grid Size", value: "20 × 20 Cells" },
+        { label: "Graph Solvers", value: "3 Algorithms" },
+        { label: "Tech Stack", value: "Java 21 / JavaFX" }
       ],
-      techStack: ["Three.js", "WebAssembly (C++)", "ROS2 Bridge", "TypeScript", "GLSL Shaders", "URDF Loader"],
-      githubUrl: "https://github.com",
-      liveUrl: "https://sawyer-robot.demo.at",
-      architectureDescription: "WebAssembly-accelerated Jacobian pseudoinverse IK solver piped through WebGL shader pipelines with zero memory allocations per frame."
+      techStack: ["Java 21", "JavaFX", "Graph Theory", "Dijkstra Algorithm", "Prim MST", "Topological Sort", "Strategy Pattern"],
+      githubUrl: "https://github.com/kaschefi/Warehouse-Routing-and-Scheduling-System",
+      liveUrl: "https://github.com/kaschefi/Warehouse-Routing-and-Scheduling-System",
+      architectureDescription: "Decoupled domain models, pluggable algorithmic strategy interfaces, 4-tier service layer, and interactive JavaFX canvas grid."
     },
     chapters: [
       {
         number: "01",
-        title: "7-DOF Inverse Kinematics",
-        subtitle: "Solving Redundant Arm Geometries in Realtime",
-        content: "Sawyer features 7 revolute joints, creating kinematic redundancy. By compiling numerical Damped Least Squares (DLS) Jacobian solvers to WebAssembly, we compute collision-free joint angles in sub-millisecond cycles.",
-        codeSnippet: `// WebAssembly-Accelerated Damped Least Squares IK\nexport function solveSawyerIK(targetPose: Matrix4, currentJoints: Float64Array): Float64Array {\n  const J = computeJacobian(currentJoints);\n  const lambda = 0.05; // Damping factor\n  const deltaTheta = J.transpose().multiply(\n    J.multiply(J.transpose()).add(Matrix.identity(6).scale(lambda * lambda)).inverse()\n  ).multiply(computePoseError(targetPose));\n  return currentJoints.add(deltaTheta);\n}`,
-        highlights: ["Damped Least Squares IK", "Singularity avoidance", "Zero garbage collection overhead"]
+        title: "Academic Origin & Grid Modeling",
+        subtitle: "Graph-Theoretic Warehouse Modeling at FH Campus Wien",
+        content: "Developed as a university project at FH Campus Wien to investigate, implement, and benchmark foundational graph-theory algorithms for autonomous warehouse logistics. The 20x20 floor is modeled as an adjacency list graph where walkable cells are nodes and navigable paths are weighted edges.",
+        highlights: ["20x20 Discrete Graph Model", "FH Campus Wien Academic Project", "Dynamic Obstacle Injection", "Real-time Adjacency List"]
       },
       {
         number: "02",
-        title: "Spatial Digital Twin",
-        subtitle: "Streaming ROS2 Joint States to Three.js",
-        content: "Using lightweight binary WebSocket protocols, the 3D twin mirrors the physical robot with less than 15 milliseconds of end-to-end network lag.",
-        highlights: ["Binary ArrayBuffer streaming", "URDF visual mesh parsing", "Physical gripper state sync"]
+        title: "The Three Graph Algorithms",
+        subtitle: "Dijkstra Routing, Prim MST & DFS Topological Sort",
+        content: "Integrates Dijkstra's algorithm with priority queues for dynamic shortest-path navigation, Prim's Minimum Spanning Tree for optimal facility cabling costs, and DFS Topological Sort with 3-color node classification for deadlock-free task scheduling.",
+        highlights: ["Dijkstra Min-Heap Routing", "Prim Minimum Spanning Tree", "DFS Topological Sort", "3-Color Deadlock Detection"]
       },
       {
         number: "03",
-        title: "Interactive Trajectory Planning",
-        subtitle: "Spatial Waypoint Interpolation",
-        content: "Users can drag 3D Gizmo transforms directly in the browser viewport to construct B-spline trajectories, previewing velocity and torque profiles prior to robot execution.",
-        highlights: ["Cubic B-spline curves", "Torque limit visualization", "Automated safety envelope checks"]
+        title: "Clean Architecture & Strategy Pattern",
+        subtitle: "Domain Models, Strategy Interfaces & Service Layer",
+        content: "Engineered with strict separation of concerns: domain models represent pure data, algorithms are encapsulated via ShortestPathStrategy, MinimumSpanningTreeStrategy, and TopologicalSortStrategy interfaces, and 4 dedicated services orchestrate business logic.",
+        highlights: ["Strategy Pattern Polymorphism", "Decoupled 4-Service Layer", "JavaFX Canvas & Controls", "Modular Extensibility"]
+      },
+      {
+        number: "04",
+        title: "Interactive Simulation & Deadlock Safety",
+        subtitle: "Real-Time 20x20 Grid & Pre-Dispatch Dependency Verification",
+        content: "Operators interactively place obstacles, robots, charging stations, and drop zones. The system provides real-time path rerouting upon obstacle placement and flags cyclic dependency deadlocks with visual alert dialogs prior to robot dispatch.",
+        highlights: ["Dynamic Path Rerouting", "Pre-Dispatch Deadlock Alerts", "Live Terminal Logger Console", "Step-by-Step Robot Motion"]
       }
     ]
   },
@@ -411,46 +417,53 @@ export const VOLUMES_DATA: VolumeProject[] = [
       fill: "#0e2e20"
     },
     projectDetails: {
-      name: "HugoMed Medical Diagnostic & Clinical RAG",
-      category: "Healthcare & AI Knowledge Systems",
-      timeframe: "2026",
-      institution: "FH Campus Wien · Master Project",
-      role: "Full-Stack AI Developer",
-      summary: "A clinical decision support platform utilizing high-density RAG (Retrieval Augmented Generation) over ICD-10 medical ontologies, clinical trial registries, and patient telemetry.",
-      problem: "Physicians face cognitive overload when synthesizing multi-source patient records with continuously updated clinical guidelines.",
-      solution: "Developed an explainable clinical assistant with citation grounding, HIPAA/GDPR-compliant local processing, and dynamic diagnostic decision trees.",
+      name: "Cat Breed Recognition",
+      category: "Computer Vision & Deep Learning",
+      timeframe: "2024",
+      institution: "FH Campus Wien",
+      role: "ML Engineer / Vision Researcher (Team: Stefan Auer, Mohammad Kashefirad, Kilian Lorenz)",
+      summary: "Fine-grained visual classification of 12 cat breeds using transfer learning on the Oxford-IIIT Pet Dataset, systematically benchmarking ResNet50, EfficientNet-B2, and ConvNeXt-tiny with Grad-CAM explainability.",
+      problem: "Cat breed identification is a fine-grained visual classification (FGVC) task where subtle differences in ear shape, fur texture, and facial structure must be distinguished across varying poses, lighting, and backgrounds.",
+      solution: "Benchmarked three ImageNet-pretrained CNN baselines and developed an improved ConvNeXt-tiny pipeline using heavy regularization (label smoothing 0.1, dropout 0.4, random erasing p=0.2, weight decay 5e-2) reaching 96.67% accuracy, verified via Grad-CAM heatmaps.",
       keyMetrics: [
-        { label: "Diagnostic Recall", value: "99.2%" },
-        { label: "Citation Accuracy", value: "100%" },
-        { label: "Query Latency", value: "180ms" }
+        { label: "Val Accuracy", value: "96.67%" },
+        { label: "F1 (Weighted)", value: "0.9666" },
+        { label: "Breeds Classified", value: "12 Classes" }
       ],
-      techStack: ["React", "Python", "LangChain", "Qdrant Vector DB", "PostgreSQL", "Tailwind CSS", "FastAPI"],
-      githubUrl: "https://github.com",
-      liveUrl: "https://hugomed.demo.at",
-      architectureDescription: "Hybrid dense-sparse retrieval pipeline with cross-encoder re-ranking and clinical ontology graph validation."
+      techStack: ["Python", "PyTorch", "timm", "scikit-learn", "Grad-CAM", "Matplotlib", "Seaborn"],
+      githubUrl: "https://github.com/kaschefi/cat-breed-recognition",
+      liveUrl: "",
+      architectureDescription: "ConvNeXt-tiny backbone with custom classification head, trained with AdamW, label smoothing, random erasing, and Grad-CAM spatial explainability."
     },
     chapters: [
       {
         number: "01",
-        title: "Clinical Grounding",
-        subtitle: "Eliminating Hallucinations in High-Stakes Domains",
-        content: "In clinical engineering, hallucination is intolerable. Every LLM assertion must point to an indexed medical source, validated against PubMed and Europe PMC open access ontologies.",
-        codeSnippet: `// Citation-Enforced Clinical Synthesis\nexport async function synthesizeDiagnosis(caseData: PatientCase) {\n  const evidence = await clinicalRetriever.search(caseData.symptoms);\n  return await strictCitationChain.invoke({\n    patient: caseData,\n    evidenceSources: evidence.filter(e => e.score > 0.88)\n  });\n}`,
-        highlights: ["100% verifiable source linking", "Cross-checked contraindications", "Strict structured JSON schemas"]
+        title: "Architecture Benchmarks",
+        subtitle: "ConvNeXt-tiny vs. ResNet50 & EfficientNet-B2",
+        content: "Systematic 5-epoch baseline comparison on Oxford-IIIT Pet dataset. ConvNeXt-tiny achieved 95.42% accuracy, outperforming ResNet50 (90.00%) and EfficientNet-B2 (90.00%) through ViT-inspired depthwise kernels and inverted bottlenecks.",
+        codeSnippet: `// Fine-Grained ConvNeXt-tiny Transfer Learning Head\nimport timm, torch.nn as nn\n\nmodel = timm.create_model('convnext_tiny', pretrained=True, num_classes=12, drop_rate=0.4)\noptimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=5e-2)\ncriterion = nn.CrossEntropyLoss(label_smoothing=0.1)`,
+        highlights: ["ConvNeXt-tiny 95.42% baseline accuracy", "5x parameter efficiency over ResNet50", "ViT-inspired inverted bottleneck design"]
       },
       {
         number: "02",
-        title: "Deliberation & Care",
-        subtitle: "Multi-Step Medical Reasoning",
-        content: "Complex differential diagnosis demands reasoning across chronologically ordered patient notes, lab panels, and imaging reports to uncover latent comorbidities.",
-        highlights: ["Temporal patient graph", "Biomarker threshold tracking", "Differential diagnostic tree"]
+        title: "Iterative Regularization",
+        subtitle: "Overfitting Mitigation & Generalization Pass",
+        content: "Selected ConvNeXt-tiny as the best baseline and iterated with stronger regularization: weight decay 5e-2, dropout 0.4, label smoothing 0.1, random erasing (p=0.2), and 10 epochs. Achieved 96.67% val accuracy and 0.9666 weighted F1.",
+        highlights: ["96.67% top-1 validation accuracy", "0.9666 weighted F1 score", "Label smoothing calibration"]
       },
       {
         number: "03",
-        title: "Explainable Interventions",
-        subtitle: "Empowering Physicians",
-        content: "Rather than providing black-box recommendations, the system highlights clinical guidelines, confidence scores, and potential alternative hypotheses directly in the UI.",
-        highlights: ["Interactive decision support", "GDPR-compliant anonymization", "Real-time doctor feedback loops"]
+        title: "Explainability & Grad-CAM",
+        subtitle: "Spatial Attention & Morphological Feature Localization",
+        content: "Grad-CAM heatmaps consistently localize to the head and facial structures, confirming the model learns genuine morphological features rather than background cues. Attention diffuses in uncertain cases.",
+        highlights: ["Head/facial feature localization", "Visual attribution verification", "Confidence-correlated heatmap diffusion"]
+      },
+      {
+        number: "04",
+        title: "Fine-Grained Analysis",
+        subtitle: "Confusion Topology & Architectural Takeaways",
+        content: "Near-clean separation across all 12 breeds. Ragdoll vs. Birman remains the persistent confusion pair across all models due to genuine biological similarity. Proved architecture choice and regularization trump parameter count.",
+        highlights: ["12-breed confusion matrix analysis", "Ragdoll vs. Birman morphological boundary", "Architecture > raw parameter count"]
       }
     ]
   },

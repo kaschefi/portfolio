@@ -41,8 +41,8 @@ Each of the 6 portfolio volumes represents a real engineering project:
 - **Volume 1 (Codex)**: `MOKA` — Autonomous AI Assistant & Engineering Systems
 - **Volume 2 (Figma)**: `Sawyer Robot` — Waving Task, Shell Game & Vision Tracking
 - **Volume 3 (Cursor)**: ResQ Multi-Agent Emergency Dispatch
-- **Volume 4 (Antigravity)**: Spatial 3D Kinematics & Robotics
-- **Volume 5 (Claude Code)**: Contextual Reasoning & Clinical AI
+- **Volume 4 (Antigravity)**: `RoboFlow` — Graph-Based Warehouse Simulation (Dijkstra, Prim MST & Topological Sort)
+- **Volume 5 (Claude Code)**: `Cat Breed Recognition` — Fine-Grained Classification, CNN Benchmarks & Grad-CAM Explainability
 - **Volume 6 (Xcode)**: JoinApp — Hyperlocal Community Event Hub
 
 Custom book covers, textures, and typography are rendered via `scripts/optimize-renderer.mjs` and configured in `src/data/portfolioData.ts`.

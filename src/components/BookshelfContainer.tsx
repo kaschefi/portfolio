@@ -29,6 +29,7 @@ const TITLE_TO_ID: Record<string, string> = {
   'resq': 'cursor',
   'resq emergency response': 'cursor',
   'antigravity': 'antigravity',
+  'roboflow': 'antigravity',
   'framer': 'framer',
   'xcode': 'xcode',
   'joinapp': 'xcode',

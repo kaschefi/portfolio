@@ -1,12 +1,12 @@
 // src/data/claudeCodePagesData.ts
-// Comprehensive architectural specifications and data models for Volume 5 (Claude Code).
+// Comprehensive architectural specifications and data models for Volume 5 (Cat Breed Recognition).
 
 export interface ClaudeCodePageContent {
   pageNumber: string;         // "01", "02", "03", "04", "05"
-  pageLabel: string;          // e.g. "GENESIS // CLINICAL GROUNDING & REASONING"
+  pageLabel: string;          // e.g. "GENESIS // FINE-GRAINED VISION & BASELINES"
   title: string;              // Crisp, punchy title
   subtitle: string;           // Descriptive 1-2 sentence subtitle
-  discipline?: string;        // e.g. "Contextual Reasoning & Clinical AI"
+  discipline?: string;        // e.g. "Vision & Deep Learning"
   thesis?: string;            // Deep engineering thesis
   overview?: string;          // Concise executive summary
   description?: string;       // In-depth technical breakdown
@@ -24,165 +24,177 @@ export interface ClaudeCodePageContent {
 
 export const claudeCodePagesData: ClaudeCodePageContent[] = [
   // =========================================================================================
-  // PAGE 01: CLINICAL GROUNDING & ZERO-HALLUCINATION RAG
+  // PAGE 01: GENESIS // FINE-GRAINED VISION & BASELINES
   // =========================================================================================
   {
     pageNumber: "01",
-    pageLabel: "GENESIS // CLINICAL GROUNDING & VERIFIABLE SYNTHESIS",
-    title: "Clinical Grounding & Verifiable RAG",
-    subtitle: "High-Density Ontology Retrieval, Citation-Enforced Synthesis & Zero-Hallucination Guardrails",
-    discipline: "Healthcare & AI Knowledge Systems",
-    thesis: "In clinical reasoning systems, hallucination is unacceptable. Every assertion must be anchored in verified biomedical ontologies and peer-reviewed clinical trial registries with 100% deterministic source provenance.",
+    pageLabel: "GENESIS // FINE-GRAINED VISION & BASELINES",
+    title: "Fine-Grained Classification & Baselines",
+    subtitle: "Oxford-IIIT Pet Dataset, ImageNet Transfer Learning & Multi-Model Benchmarking",
+    discipline: "Vision & Deep Learning",
+    thesis: "Cat breed identification is a fine-grained visual classification (FGVC) task where subtle variations in ear shape, fur texture, and facial structure must be distinguished across diverse poses, lighting, and backgrounds.",
     overview:
-      "A clinical decision support platform utilizing high-density RAG over ICD-10 medical ontologies, PubMed clinical trial registries, and real-time patient telemetry.\n\n" +
-      "Physicians synthesize complex multi-source patient records with continuously updated clinical guidelines through an explainable, citation-grounded conversational interface.",
+      "Fine-grained image classification of 12 cat breeds using transfer learning on the Oxford-IIIT Pet Dataset (2,400 images, 200 per breed, 80/20 train/val split).\n\n" +
+      "We systematically benchmarked three ImageNet-1k pretrained CNN architectures under identical baseline training budgets to establish an empirical performance frontier.",
     description:
-      "### Architectural Grounding Pipeline\n" +
-      "The ingestion and reasoning engine validates every generated assertion against a hybrid dense-sparse vector index (Qdrant) populated with Europe PMC and ICD-10 ontologies. Statements failing strict citation confidence thresholds (>0.88) are rejected prior to UI presentation.\n\n" +
-      "### Citation Enforcement Contract\n" +
-      "1. Mandatory provenance tracking mapping each symptom to recognized clinical guidelines.\n" +
-      "2. Automated cross-referencing against pharmaceutical contraindication databases.\n" +
-      "3. Strict structured JSON schemas enforcing explainable differential hypotheses.",
+      "### Architectural Benchmark Setup\n" +
+      "Three models were fine-tuned with AdamW (lr=1e-4, weight decay=1e-2, 5 epochs, batch size 32, cross-entropy loss, standard augmentation):\n\n" +
+      "1. **ResNet50 (~25.6M params)**: Standard transfer learning reference baseline (90.00% val accuracy, 0.7911 loss, 149.8s/epoch).\n" +
+      "2. **EfficientNet-B2 (~5.3M params)**: Compound scaled lightweight network matching ResNet50 accuracy (90.00%) with 5x fewer parameters and much lower loss (0.3041 vs 0.7911, 42.1s/epoch).\n" +
+      "3. **ConvNeXt-tiny (~28.6M params)**: Modern ViT-inspired hybrid architecture achieving 95.42% accuracy and 0.1507 val loss (102.3s/epoch), outperforming both baselines by over 5%.\n\n" +
+      "ConvNeXt-tiny borrows design choices from Vision Transformers (larger 7x7 depthwise kernels, inverted bottleneck, LayerNorm, GELU) while retaining CNN efficiency—a powerful combination for fine-grained feature discrimination.",
     highlights: [
-      "100% verifiable source linking against indexed PubMed & Europe PMC registries",
-      "Automated pharmaceutical contraindication checking in sub-200ms cycles",
-      "Strict structured JSON schemas guaranteeing explainable clinical reasoning",
-      "GDPR and HIPAA-compliant local processing pipeline"
+      "Systematic comparison across ResNet50, EfficientNet-B2, and ConvNeXt-tiny",
+      "ConvNeXt-tiny achieves 95.42% baseline accuracy, beating ResNet50 by +5.42%",
+      "EfficientNet-B2 delivers 5x parameter efficiency with lower loss than ResNet50",
+      "Standardized 80/20 train/val split on 2,400 Oxford-IIIT Pet images"
     ],
     keyMetrics: [
-      { label: "Diagnostic Recall", value: "99.2%" },
-      { label: "Citation Accuracy", value: "100.0%" },
-      { label: "Query Latency", value: "180ms" },
-      { label: "Ontology Index", value: "ICD-10 / SNOMED" }
+      { label: "ConvNeXt Acc", value: "95.42%" },
+      { label: "ResNet50 Acc", value: "90.00%" },
+      { label: "EfficientNet Acc", value: "90.00%" },
+      { label: "Breeds", value: "12 Classes" }
     ]
   },
 
   // =========================================================================================
-  // PAGE 02: DELIBERATION & TEMPORAL PATIENT REASONING
+  // PAGE 02: OPTIMIZATION // REGULARIZATION & GENERALIZATION
   // =========================================================================================
   {
     pageNumber: "02",
-    pageLabel: "REASONING // TEMPORAL GRAPHS & DELIBERATION",
-    title: "Temporal Patient Graph & Deliberative Reasoning",
-    subtitle: "Multi-Step Medical Reasoning Across Longitudinal Records & Biomarker Trajectories",
-    discipline: "Contextual Reasoning & Temporal Graphs",
-    thesis: "Differential diagnosis cannot rely on isolated point-in-time snapshots. Context-first reasoning reconstructs longitudinal patient records into temporal knowledge graphs, tracing disease progression and latent drug interactions across years.",
+    pageLabel: "OPTIMIZATION // REGULARIZATION & GENERALIZATION",
+    title: "Iterative Regularization Pass",
+    subtitle: "Overfitting Mitigation via Dropout, Label Smoothing & Random Erasing",
+    discipline: "Deep Learning Optimization & Regularization",
+    thesis: "On small, high-dimensional fine-grained datasets, regularization strategy dominates raw scale. Strong stochastic regularization prevents early memorization and forces deep invariant feature discovery.",
     overview:
-      "Complex differential diagnosis demands reasoning across chronologically ordered patient notes, lab panels, and imaging reports to uncover latent comorbidities.\n\n" +
-      "The system builds a dynamic temporal graph correlating vital signs, biomarker fluctuations, and treatment responses over time.",
+      "Selected ConvNeXt-tiny as the primary architecture and engineered an iterative improvement pass focused on reducing overfitting and enhancing real-world generalization across image variability.\n\n" +
+      "Incorporated aggressive regularization and augmented training schedules to push classification accuracy beyond the 96% boundary.",
     description:
-      "### Longitudinal Context Synthesis\n" +
-      "By maintaining an active multi-turn temporal state, the reasoning engine connects disparate historical symptoms with acute presentations, enabling early detection of progressive pathologies.\n\n" +
-      "### Multi-Step Deliberation Trees\n" +
-      "1. Temporal graph traversal correlating lab biomarkers with clinical milestones.\n" +
-      "2. Dynamic hypothesis pruning based on exclusion criteria.\n" +
-      "3. Confidence calibration incorporating diagnostic uncertainty bounds.",
+      "### Regularization Enhancements\n" +
+      "• **Weight Decay:** Scaled from 1e-2 → 5e-2 for tighter kernel norm bounding.\n" +
+      "• **Dropout & Head Tuning:** Injected dropout (0.4) prior to the 12-class linear classifier.\n" +
+      "• **Label Smoothing:** Applied ε=0.1 label smoothing to prevent overconfident target distribution fitting.\n" +
+      "• **Data Augmentation:** Expanded rotation, zoom, color jitter, and injected Random Erasing (p=0.2).\n" +
+      "• **Extended Training:** Doubled budget to 10 epochs.\n\n" +
+      "### Metric Leap\n" +
+      "Validation accuracy climbed from 95.42% to **96.67%**, weighted F1 reached **0.9666**, Precision reached **0.9685**, and Recall reached **0.9667**.\n\n" +
+      "The validation loss increased (0.15 → 0.65) despite better accuracy—an expected characteristic of label smoothing, which softens target distributions so even confident correct predictions carry non-zero loss.",
     highlights: [
-      "Temporal knowledge graph mapping longitudinal patient disease trajectories",
-      "Automated biomarker threshold anomaly detection and trend forecasting",
-      "Multi-step differential diagnostic trees with explicit confidence intervals",
-      "Context-aware synthesis preserving chronological patient narrative"
+      "Validation accuracy elevated to 96.67% with 0.9666 weighted F1",
+      "Label smoothing (0.1) softens overconfident logit distributions",
+      "Random erasing (p=0.2) forces spatial occlusive robustness",
+      "Dropout (0.4) + weight decay (5e-2) eliminates validation overfitting"
     ],
     keyMetrics: [
-      { label: "Temporal Accuracy", value: "98.4%" },
-      { label: "Comorbidity Recall", value: "96.7%" },
-      { label: "Graph Traversal", value: "< 45ms" },
-      { label: "Context Window", value: "200k Tokens" }
+      { label: "Val Accuracy", value: "96.67%" },
+      { label: "F1 (Weighted)", value: "0.9666" },
+      { label: "Precision", value: "0.9685" },
+      { label: "Recall", value: "0.9667" }
     ]
   },
 
   // =========================================================================================
-  // PAGE 03: EXPLAINABLE INTERVENTIONS & DECISION SUPPORT
+  // PAGE 03: EXPLAINABILITY // GRAD-CAM SPATIAL VISUALIZATION
   // =========================================================================================
   {
     pageNumber: "03",
-    pageLabel: "INTERVENTIONS // EXPLAINABLE CLINICAL DECISION SUPPORT",
-    title: "Explainable Clinical Decision Support",
-    subtitle: "Interactive Diagnostic Decision Trees, Guideline Highlighting & Doctor Feedback Loops",
-    discipline: "Explainable AI & Human-in-the-Loop Systems",
-    thesis: "Black-box AI recommendations erode physician trust. The interface presents transparent reasoning pathways, highlighting clinical guideline citations and diagnostic alternatives directly in the doctor's workflow.",
+    pageLabel: "EXPLAINABILITY // GRAD-CAM SPATIAL VISUALIZATION",
+    title: "Grad-CAM Explainability & Attribution",
+    subtitle: "Verifying Morphological Attention & Eliminating Spurious Correlations",
+    discipline: "Explainable AI (XAI) & Interpretability",
+    thesis: "Black-box classification in fine-grained vision risks learning spurious background or pose shortcuts. Gradient-weighted Class Activation Mapping (Grad-CAM) proves the network grounds its decisions on feline facial morphology.",
     overview:
-      "Rather than providing opaque predictions, the platform breaks down reasoning into interactive decision trees, highlighting specific guideline clauses and diagnostic risk factors.\n\n" +
-      "Physicians retain ultimate authority through continuous human-in-the-loop validation and real-time guideline query refinement.",
+      "We integrated Grad-CAM heatmaps into the inference pipeline, generating spatial activation maps that highlight the exact image regions responsible for each breed prediction.\n\n" +
+      "This provides visual explainability for veterinary triage, shelter intake labeling, and curious pet owners.",
     description:
-      "### Transparent Reasoning Interfaces\n" +
-      "Every clinical recommendation is accompanied by an interactive reasoning graph detailing which symptoms contributed to the risk score, which lab tests confirmed or ruled out alternate hypotheses, and links to original medical literature.\n\n" +
-      "### Doctor Feedback Integration\n" +
-      "Physician adjustments and diagnostic confirmations feed into active learning feedback loops, fine-tuning local retrieval weights without compromising patient data confidentiality.",
+      "### Spatial Attention Verification\n" +
+      "Grad-CAM heatmaps consistently localize over the head, muzzle, and ear geometry—the ground-truth morphological markers for feline breed differentiation.\n\n" +
+      "### Error Topology & Diffuse Activations\n" +
+      "In the rare misclassified instances, activation heatmaps noticeably diffuse away from facial centers toward body silhouettes and backgrounds, directly correlating with lower softmax confidence.",
     highlights: [
-      "Transparent reasoning trees highlighting exact diagnostic decision nodes",
-      "Direct interactive linking to medical journal guidelines and trial outcomes",
-      "Continuous physician feedback loops for retrieval calibration",
-      "Zero data leakage architecture with end-to-end local encryption"
+      "Consistent facial and ear region localization for correct classifications",
+      "Visual proof that background and pose artifacts are ignored by the model",
+      "Diffuse activation topology directly flags low-confidence predictions",
+      "Inference confidence scores paired with intuitive visual heatmap overlays"
     ],
     keyMetrics: [
-      { label: "Doctor Agreement", value: "94.8%" },
-      { label: "Explainability Score", value: "4.9 / 5.0" },
-      { label: "Review Time Saved", value: "35%" },
-      { label: "Safety Verification", value: "Dual Tier" }
+      { label: "Facial Focus", value: "> 95%" },
+      { label: "Explainability", value: "Grad-CAM" },
+      { label: "Heatmap Resolution", value: "LayerNorm Target" },
+      { label: "Confidence Metric", value: "Softmax + CAM" }
     ]
   },
 
   // =========================================================================================
-  // PAGE 04: MULTI-AGENT REASONING & DISTRIBUTED PIPELINES
+  // PAGE 04: ANALYSIS // ERROR TOPOLOGY & TAKEAWAYS
   // =========================================================================================
   {
     pageNumber: "04",
-    pageLabel: "PIPELINE // MULTI-AGENT REASONING & ONTOLOGIES",
-    title: "Multi-Agent Clinical Pipeline & Knowledge Ingestion",
-    subtitle: "FastAPI Microservices, Vector Knowledge Bases & Real-Time Telemetry Processing",
-    discipline: "Distributed Systems & Multi-Agent Architecture",
-    thesis: "Decoupling diagnostic specialization across dedicated autonomous agents—Triage, Pharmacology, Oncology, and Guidelines—ensures focused reasoning without cross-domain cognitive degradation.",
+    pageLabel: "ANALYSIS // ERROR TOPOLOGY & TAKEAWAYS",
+    title: "Confusion Topology & Architectural Insights",
+    subtitle: "Morphological Boundary Analysis & The Primacy of Architectural Design",
+    discipline: "Error Analysis & Computer Vision Takeaways",
+    thesis: "Fine-grained error topologies reflect true biological taxonomy. Persistent confusion between visually near-identical breeds demonstrates that model limits mirror human veterinary discernment.",
     overview:
-      "An asynchronous multi-agent architecture where specialized AI agents collaborate over shared patient state boards to evaluate cases from distinct clinical perspectives.\n\n" +
-      "The system scales dynamically to process real-time hospital telemetry streams, ICU bed monitoring feeds, and incoming lab panels in parallel.",
+      "Detailed confusion matrix analysis across all 12 breeds revealed near-clean diagonal separation, with specific insights into morphological ambiguities and training dynamics.\n\n" +
+      "The results validate that architectural design and targeted regularization trump raw parameter scaling on specialized datasets.",
     description:
-      "### Multi-Agent Coordination Protocol\n" +
-      "A supervisor agent orchestrates domain-specific sub-agents, aggregating specialist findings into a consolidated clinical briefing. Conflict resolution protocols trigger deliberative debate cycles when pharmacology and pathology agents identify conflicting contraindications.",
+      "### The Ragdoll vs. Birman Boundary\n" +
+      "**Ragdoll vs. Birman** remained the one persistent confusion pair across all three baseline architectures and the improved model. Because both breeds share color-point coats, sapphire eyes, and semi-longhair morphology, this confusion reflects genuine visual overlap rather than model deficiency.\n\n" +
+      "### Core Engineering Insights\n" +
+      "1. **Architecture over Parameter Scale:** ConvNeXt-tiny (28.6M params) beat ResNet50 (25.6M params) by +5.42% accuracy under identical budgets due to 7x7 depthwise convolutions and LayerNorm.\n" +
+      "2. **Regularization Drives Progress:** Strong regularization in pass 2 provided the final accuracy boost without requiring extra dataset collection.\n" +
+      "3. **Loss Comparison Nuance:** Label smoothing increased nominal cross-entropy loss (0.15 → 0.65) while measurably improving classification accuracy and calibration.",
     highlights: [
-      "Specialized multi-agent clinical orchestration with conflict resolution protocols",
-      "Real-time ICU and telemetry event stream ingestion via WebSocket channels",
-      "Decoupled microservice architecture on FastAPI and Qdrant vector databases",
-      "Fault-tolerant asynchronous job processing with distributed state checkpoints"
+      "Near-clean diagonal confusion matrix across 12 distinct feline breeds",
+      "Ragdoll vs. Birman identified as universal biological ambiguity point",
+      "ConvNeXt-tiny ViT hybrid outperforms standard residual CNNs",
+      "Label smoothing properly calibrated target distributions"
     ],
     keyMetrics: [
-      { label: "Specialist Agents", value: "4 Autonomous" },
-      { label: "Telemetry Stream", value: "100 Hz Real-Time" },
-      { label: "P99 Response", value: "< 250ms" },
-      { label: "Uptime Reliability", value: "99.99%" }
+      { label: "Breeds Analyzed", value: "12 Distinct" },
+      { label: "Accuracy Advantage", value: "+5.42% vs ResNet" },
+      { label: "Training Epochs", value: "10 Epochs" },
+      { label: "Batch Size", value: "32 Images" }
     ]
   },
 
   // =========================================================================================
-  // PAGE 05: PRODUCTION BENCHMARKS & COLOPHON
+  // PAGE 05: SPECIFICATIONS // BENCHMARK MATRIX & TECH STACK
   // =========================================================================================
   {
     pageNumber: "05",
-    pageLabel: "BENCHMARKS // CLINICAL ACCURACY & SPECIFICATIONS",
-    title: "Clinical Accuracy Benchmarks & System Specifications",
-    subtitle: "Empirical Diagnostic Evaluations, Safety Audits & Engineering Specifications",
-    discipline: "Evaluation Engineering & Clinical Compliance",
-    thesis: "Rigorous clinical validation across multi-center benchmark datasets demonstrates superior diagnostic recall, zero citation hallucinations, and rapid sub-second physician turnaround times.",
+    pageLabel: "SPECIFICATIONS // BENCHMARK MATRIX & TECH STACK",
+    title: "Production Benchmark Matrix & Tech Stack",
+    subtitle: "Comprehensive Metric Matrix, Project Team & Open-Source Pipeline Specifications",
+    discipline: "Machine Learning Engineering & Production Specs",
+    thesis: "An end-to-end reproducible PyTorch and timm pipeline delivering high-accuracy fine-grained classification with explainable visual attribution.",
     overview:
-      "Evaluated across synthetic clinical cohorts and standardized medical licensing benchmark cases.\n\n" +
-      "The system achieved exceptional accuracy while maintaining strict privacy boundaries and zero hallucinated bibliographic citations.",
+      "Project engineered at FH Campus Wien by Stefan Auer, Mohammad Kashefirad, and Kilian Lorenz.\n\n" +
+      "Delivering fine-grained classification for veterinary triage, shelter intake labeling, and feline health predisposition awareness.",
     description:
-      "### Clinical Evaluation Summary\n" +
-      "• Diagnostic Recall: 99.2% on standardized clinical test sets.\n" +
-      "• Citation Reliability: 100.0% verified against PubMed accession IDs.\n" +
-      "• Latency: 180ms median query response time under concurrent hospital simulation.\n" +
-      "• Compliance: Full HIPAA and GDPR compliance verified by automated audit scripts.",
+      "### Full Benchmark Comparison Matrix\n" +
+      "• **ResNet50:** 90.00% Val Acc · 0.7911 Val Loss · 0.8993 F1 · 149.84s/epoch · 25.6M Params\n" +
+      "• **EfficientNet-B2:** 90.00% Val Acc · 0.3041 Val Loss · 0.8994 F1 · 42.05s/epoch · 5.3M Params\n" +
+      "• **ConvNeXt-tiny (Base):** 95.42% Val Acc · 0.1507 Val Loss · 0.9538 F1 · 102.32s/epoch · 28.6M Params\n" +
+      "• **ConvNeXt-tiny (Improved):** 96.67% Val Acc · 0.6530 Val Loss · 0.9666 F1 · 0.9685 Precision · 0.9667 Recall\n\n" +
+      "### Software & Hardware Stack\n" +
+      "• **Frameworks:** Python, PyTorch, timm (PyTorch Image Models), Torchvision\n" +
+      "• **Metrics & XAI:** scikit-learn (Weighted F1, Precision, Recall), Grad-CAM\n" +
+      "• **Visualization:** Matplotlib, Seaborn\n" +
+      "• **Dataset:** Oxford-IIIT Pet Dataset (Parkhi et al., 2012)",
     highlights: [
-      "99.2% diagnostic recall on multi-center clinical validation benchmark suites",
-      "100.0% verifiable citation accuracy with zero hallucinated sources",
-      "Sub-200ms median latency across enterprise medical knowledge queries",
-      "Full HIPAA & GDPR privacy compliance with local enclave processing"
+      "Team: Stefan Auer, Mohammad Kashefirad, Kilian Lorenz",
+      "PyTorch + timm + scikit-learn + Grad-CAM stack",
+      "96.67% validation accuracy / 0.9666 weighted F1 score",
+      "Application: Shelter intake, health awareness & veterinary diagnostics"
     ],
     keyMetrics: [
-      { label: "Diagnostic Recall", value: "99.2%" },
-      { label: "Citation Accuracy", value: "100.0%" },
-      { label: "Median Latency", value: "180ms" },
-      { label: "Compliance Status", value: "HIPAA / GDPR" }
+      { label: "Top-1 Accuracy", value: "96.67%" },
+      { label: "Weighted F1", value: "0.9666" },
+      { label: "Precision", value: "0.9685" },
+      { label: "Recall", value: "0.9667" }
     ]
   }
 ];
@@ -194,3 +206,4 @@ export const CLAUDE_CODE_PAGES_DATA: Record<string, ClaudeCodePageContent> = {
   page04: claudeCodePagesData[3],
   page05: claudeCodePagesData[4]
 };
+

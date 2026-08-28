@@ -747,7 +747,14 @@ export function applyCoverPatches(code) {
     // Authentic ThreeUI foil layer for Volume 4 (Antigravity)
     t.textAlign = "left", t.textBaseline = "alphabetic", t.font = '500 15px Inter, "Helvetica Neue", Arial, sans-serif', t.letterSpacing = "2.8px", t.fillText("WORKING VOLUMES  /  " + ge(r), 58, 70), t.globalAlpha = 0.7, t.lineWidth = 1, t.beginPath(), t.moveTo(58, 86), t.lineTo(164, 86), t.stroke(), t.globalAlpha = 1;
     const a = e.title.length > 10 ? 64 : 78;
-    return t.font = "400 " + a + 'px "Iowan Old Style", Baskerville, Georgia, serif', t.fillText(e.title, 58, 1020), t.font = '500 14px Inter, "Helvetica Neue", Arial, sans-serif', t.letterSpacing = "2.4px", t.fillText(e.discipline.toUpperCase(), 60, 1066), Q(new l.CanvasTexture(o));
+    t.font = "400 " + a + 'px "Iowan Old Style", Baskerville, Georgia, serif';
+    t.fillText(e.title, 58, 1020);
+    const discSize = e.discipline && e.discipline.length > 25 ? 11 : 14;
+    const discSpacing = e.discipline && e.discipline.length > 25 ? "1.5px" : "2.4px";
+    t.font = '500 ' + discSize + 'px Inter, "Helvetica Neue", Arial, sans-serif';
+    t.letterSpacing = discSpacing;
+    t.fillText(e.discipline ? e.discipline.toUpperCase() : "WAREHOUSE ROUTING AND SCHEDULING SYSTEM", 60, 1066);
+    return Q(new l.CanvasTexture(o));
   }
   `;
 
