@@ -67,10 +67,35 @@ def make_transparent_cat(input_path, output_paths):
         result_img.save(out_path, format='PNG')
         print(f"[OK] Saved transparent PNG to: {out_path}")
 
+def process_image(input_path, output_paths):
+    try:
+        from rembg import remove
+        print(f"Processing with rembg AI: {input_path}")
+        img = Image.open(input_path)
+        result = remove(img)
+        for out in output_paths:
+            os.makedirs(os.path.dirname(out), exist_ok=True)
+            result.save(out, format='PNG')
+            print(f"[OK] Saved: {out}")
+    except Exception as e:
+        print(f"Falling back to algorithmic mask: {e}")
+        make_transparent_cat(input_path, output_paths)
+
 if __name__ == '__main__':
-    make_transparent_cat('src/assets/cat.jpg', [
-        'src/assets/claude_code.png',
-        'public/claude_code.png',
-        'src/assets/cat.png',
-        'public/cat.png'
-    ])
+    if os.path.exists('src/assets/cat.jpg'):
+        process_image('src/assets/cat.jpg', [
+            'src/assets/claude_code.png',
+            'public/claude_code.png',
+            'src/assets/cat.png',
+            'public/cat.png'
+        ])
+    if os.path.exists('src/assets/me.jpg'):
+        process_image('src/assets/me.jpg', [
+            'src/assets/me.png',
+            'public/me.png'
+        ])
+    if os.path.exists('src/assets/robotme.jpg'):
+        process_image('src/assets/robotme.jpg', [
+            'src/assets/robotme.png',
+            'public/robotme.png'
+        ])

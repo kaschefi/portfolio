@@ -84,6 +84,7 @@ export const BookshelfContainer: React.FC<BookshelfContainerProps> = ({
       root.style.setProperty('--ink-soft', vol.palette.inkSoft);
       root.style.setProperty('--accent', vol.accent || vol.foil);
       root.style.setProperty('--foil', vol.foil);
+      root.style.setProperty('--wall', vol.palette.wall);
     }
   };
 
