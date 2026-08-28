@@ -12,12 +12,15 @@ interface BookshelfContainerProps {
 const TITLE_TO_ID: Record<string, string> = {
   'moka': 'codex',
   'codex': 'codex',
-  'claude code': 'claude-code',
-  'cursor': 'cursor',
-  'antigravity': 'antigravity',
+  'sawyer robot': 'figma',
+  'sawyer': 'figma',
+  'shell game': 'figma',
   'figma': 'figma',
   'aegis': 'figma',
   'aegis design system': 'figma',
+  'claude code': 'claude-code',
+  'cursor': 'cursor',
+  'antigravity': 'antigravity',
   'framer': 'framer',
   'xcode': 'xcode',
   'joinapp': 'xcode',
@@ -94,7 +97,17 @@ export const BookshelfContainer: React.FC<BookshelfContainerProps> = ({
 
       if (titleElem && titleElem.textContent) {
         const rawTitle = titleElem.textContent.trim().toLowerCase();
-        const matchedId = TITLE_TO_ID[rawTitle] || 'codex';
+        let matchedId = TITLE_TO_ID[rawTitle];
+        if (!matchedId) {
+          const found = VOLUMES_DATA.find(
+            (v) =>
+              v.title.toLowerCase() === rawTitle ||
+              v.id.toLowerCase() === rawTitle ||
+              v.discipline.toLowerCase() === rawTitle
+          );
+          if (found) matchedId = found.id;
+        }
+        matchedId = matchedId || 'codex';
         if (matchedId !== lastTitle) {
           lastTitle = matchedId;
           applyPalette(matchedId);

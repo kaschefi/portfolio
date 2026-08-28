@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { sound } from '../utils/audio';
 import type { VolumeProject } from '../data/portfolioData';
 import { VOLUMES_DATA } from '../data/portfolioData';
@@ -17,8 +17,6 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
   sceneState,
   volume
 }) => {
-  const [copied, setCopied] = useState(false);
-
   const triggerDomAction = (id: string, soundFn?: () => void) => {
     if (soundFn) soundFn();
     else sound.playClick();
@@ -91,8 +89,10 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
   const handleSelectIndex = (targetIdx: number) => {
     if (targetIdx === currentIdx) return;
     let diff = targetIdx - currentIdx;
-    if (diff > 3) diff -= 7;
-    if (diff < -3) diff += 7;
+    const totalVols = VOLUMES_DATA.length;
+    const half = Math.floor(totalVols / 2);
+    if (diff > half) diff -= totalVols;
+    if (diff < -half) diff += totalVols;
     const action = diff > 0 ? 'next' : 'previous';
     const steps = Math.abs(diff);
     for (let i = 0; i < steps; i++) {
@@ -100,12 +100,6 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
         triggerDomAction(action);
       }, i * 60);
     }
-  };
-
-  const handleCopyCode = (codeText: string) => {
-    navigator.clipboard.writeText(codeText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   // Resolve Active Page Content for MOKA, Xcode, or Figma
@@ -138,7 +132,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
       <header className="editorial-header" aria-label="Collection">
         <div className="editorial-identity">
           <strong>Working Volumes</strong>
-          <span>Seven field guides for making</span>
+          <span>Six field guides for making</span>
         </div>
         <div className="editorial-index">
           <span>Edition 02 · 2026</span>
@@ -150,7 +144,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
       <section className="browse-ui" id="browse-ui" aria-label="Shelf navigation">
         <div className="selection">
           <span className="counter" id="counter">
-            {pad(currentIdx + 1)} / 07
+            {pad(currentIdx + 1)} / {pad(VOLUMES_DATA.length)}
           </span>
           <div className="selection__copy">
             <h1 className="selection__title" id="selection-title">
@@ -248,7 +242,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
         {!sceneState.isOpen && (
           <div className="detail-github-box">
             <a
-              href={volume.id === 'codex' ? 'https://github.com/kaschefi/cozmo_ai_assistant' : (volume.id === 'xcode' ? 'https://github.com/kaschefi/joinApp' : (volume.id === 'figma' ? 'https://github.com/kaschefi/aegis-design-system' : (volume.projectDetails?.githubUrl || 'https://github.com/kaschefi')))}
+              href={volume.id === 'codex' ? 'https://github.com/kaschefi/cozmo_ai_assistant' : (volume.id === 'xcode' ? 'https://github.com/kaschefi/joinApp' : (volume.id === 'figma' ? 'https://github.com/kaschefi/sawyerRobot-ShellGame' : (volume.projectDetails?.githubUrl || 'https://github.com/kaschefi')))}
               target="_blank"
               rel="noopener noreferrer"
               className="detail-github-btn"
@@ -260,7 +254,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
                 </svg>
                 <div className="detail-github-text">
                   <span className="detail-github-repo">
-                    {volume.id === 'codex' ? 'kaschefi/cozmo_ai_assistant' : (volume.id === 'xcode' ? 'kaschefi/joinApp' : (volume.id === 'figma' ? 'kaschefi/aegis-design-system' : 'Repository Source'))}
+                    {volume.id === 'codex' ? 'kaschefi/cozmo_ai_assistant' : (volume.id === 'xcode' ? 'kaschefi/joinApp' : (volume.id === 'figma' ? 'kaschefi/sawyerRobot-ShellGame' : 'Repository Source'))}
                   </span>
                   <span className="detail-github-label">Open on GitHub</span>
                 </div>
@@ -300,24 +294,6 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
                     <span>{h}</span>
                   </div>
                 ))}
-              </div>
-            )}
-
-            {richContent.codeSnippet && (
-              <div className="moka-code-box">
-                <div className="moka-code-header">
-                  <span>EXCERPT // {richContent.pageNumber}</span>
-                  <button
-                    className="moka-code-copy-btn"
-                    onClick={() => handleCopyCode(richContent.codeSnippet!)}
-                    type="button"
-                  >
-                    {copied ? 'Copied' : 'Copy'}
-                  </button>
-                </div>
-                <pre className="moka-code-block">
-                  <code>{richContent.codeSnippet}</code>
-                </pre>
               </div>
             )}
 

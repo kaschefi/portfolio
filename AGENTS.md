@@ -37,13 +37,12 @@ The Three.js Bookshelf Scene must **ALWAYS** operate under **Event-Driven On-Dem
 
 ## 2. Book Customization System
 
-Each of the 7 portfolio volumes represents a real engineering project:
+Each of the 6 portfolio volumes represents a real engineering project:
 - **Volume 1 (Codex)**: `MOKA` — Autonomous AI Assistant & Engineering Systems
-- **Volume 2 (Figma)**: Aegis Cross-Platform Design System
+- **Volume 2 (Figma)**: `Sawyer Robot` — Waving Task, Shell Game & Vision Tracking
 - **Volume 3 (Cursor)**: ResQ Multi-Agent Emergency Dispatch
 - **Volume 4 (Antigravity)**: Spatial 3D Kinematics & Robotics
 - **Volume 5 (Claude Code)**: Contextual Reasoning & Clinical AI
-- **Volume 6 (Framer)**: BookNest 3D Web Application
-- **Volume 7 (Xcode)**: JoinApp — Hyperlocal Community Event Hub
+- **Volume 6 (Xcode)**: JoinApp — Hyperlocal Community Event Hub
 
 Custom book covers, textures, and typography are rendered via `scripts/optimize-renderer.mjs` and configured in `src/data/portfolioData.ts`.

@@ -168,7 +168,7 @@ export function applyCoverPatches(code) {
       t.textBaseline = "alphabetic";
       t.font = '600 15px Inter, "Helvetica Neue", Arial, sans-serif';
       t.letterSpacing = "3px";
-      t.fillText("WORKING VOLUMES  /  07", 64, 88);
+      t.fillText("WORKING VOLUMES  /  06", 64, 88);
 
       t.strokeStyle = "#a3e635";
       t.lineWidth = 2;
@@ -499,7 +499,7 @@ export function applyCoverPatches(code) {
       t.strokeStyle = "#a3e635";
       t.font = '600 15px Inter, "Helvetica Neue", Arial, sans-serif';
       t.letterSpacing = "3px";
-      t.fillText("WORKING VOLUMES  /  07", 64, 88);
+      t.fillText("WORKING VOLUMES  /  06", 64, 88);
 
       t.lineWidth = 2;
       t.beginPath();

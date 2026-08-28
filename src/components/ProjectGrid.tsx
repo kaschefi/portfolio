@@ -26,8 +26,8 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({
   const filteredVolumes = VOLUMES_DATA.filter((vol) => {
     if (activeCategory === 'all') return true;
     if (activeCategory === 'ai') return ['codex', 'claude-code'].includes(vol.id);
-    if (activeCategory === '3d') return ['antigravity', 'framer'].includes(vol.id);
-    if (activeCategory === 'systems') return ['cursor'].includes(vol.id);
+    if (activeCategory === '3d') return ['antigravity', 'figma'].includes(vol.id);
+    if (activeCategory === 'systems') return ['cursor', 'xcode'].includes(vol.id);
     if (activeCategory === 'native') return ['figma', 'xcode'].includes(vol.id);
     return true;
   });
@@ -37,11 +37,11 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({
       <div className="section-header">
         <div className="section-eyebrow">
           <Layers size={14} />
-          <span>Curated Works · Seven Volumes</span>
+          <span>Curated Works · Six Volumes</span>
         </div>
         <h2 className="section-title">Case Studies & Engineering Systems</h2>
         <p className="section-deck">
-          Explore seven authored volumes spanning autonomous agent pipelines, clinical decision support, spatial robotics, and native telemetry networks.
+          Explore six authored volumes spanning autonomous agent pipelines, clinical decision support, spatial robotics, and native telemetry networks.
         </p>
 
         {/* Category Filters */}

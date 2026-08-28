@@ -133,74 +133,91 @@ export const VOLUMES_DATA: VolumeProject[] = [
   },
   {
     id: "figma",
-    title: "Shell Game",
-    subtitle: "Design Systems & Component Architecture",
+    title: "Sawyer Robot",
+    subtitle: "Implementation of Waving Task, Shell Game, and Tracking Methods",
     roman: "II",
-    discipline: "Sawyer Robot",
-    note: "Components, conversations, and systems in common.",
-    deck: "A modular reader on designing in Figma: move from loose frames to shared components, invite critique into the canvas, and leave behind a system others can extend.",
+    discipline: "Robotics & Vision",
+    note: "Dynamic perception, multi-object tracking, and MoveIt motion planning.",
+    deck: "A comprehensive robotics engineering treatise on the 7-DoF Rethink Robotics Sawyer cobot: real-time teleoperation waving routines, high-speed vision tracking for the classic Shell Game, Kalman filter momentum estimation, occlusion tethering, and collision-free MoveIt trajectory generation.",
     binding: "Obsidian cloth · crimson foil",
     format: "150 × 220 mm · FH Campus Wien Edition",
-    theme: "Figma · a shared visual language",
-    motif: "Connected modules",
+    theme: "Sawyer Robot · visual servoing & cobots",
+    motif: "7-DoF Articulator",
     motifKey: "modules",
     paletteLabel: "Obsidian · charcoal · crimson",
     color: "#121417",
     foil: "#ff3344",
     accent: "#ff3344",
     palette: {
-      paper: "#15181c",
-      paperDeep: "#0e1013",
-      paperPale: "#22262c",
+      paper: "#860d0d",
+      paperDeep: "#540808",
+      paperPale: "#ffe0df",
       ink: "#f4eee6",
-      inkSoft: "#a8a29e",
+      inkSoft: "#efb9b4",
       wall: "#860d0d",
-      shelf: "#1c1e22",
-      shelfDark: "#0d0e11",
+      shelf: "#3a1c18",
+      shelfDark: "#1c0d0a",
       light: "#efb0aa",
-      fill: "#383c44"
+      fill: "#a82424"
     },
     projectDetails: {
-      name: "Aegis Enterprise Design System & UI Kit",
-      category: "Design Engineering & Tokens",
-      timeframe: "2025",
-      institution: "FH Campus Wien · UI/UX & Web Engineering",
-      role: "Design Systems Lead",
-      summary: "A unified cross-platform design token architecture supporting web, mobile (Flutter/React Native), and embedded displays with strict WCAG AAA accessibility compliance.",
-      problem: "Inconsistent component APIs and fragmented styling between Figma prototypes and production codebases cause severe design debt.",
-      solution: "Built an automated token synchronization pipeline from Figma Variables to CSS Custom Properties and TypeScript type definitions.",
+      name: "Sawyer Robot: Waving Task & Shell Game",
+      category: "Autonomous Robotics & Visual Servoing",
+      timeframe: "June 2026",
+      institution: "Hochschule Campus Wien · Computer Science and Digital Communications",
+      role: "Robotics Systems & Computer Vision Engineer",
+      summary: "Implementation of interactive collaborative robotic behaviors on the 7-DoF Rethink Robotics Sawyer cobot: a full-stack WebSocket teleoperation waving task and an autonomous vision-driven Shell Game featuring Kalman Filter momentum tracking, occlusion tethering, Gazebo digital twin simulation, and collision-free MoveIt trajectory execution.",
+      problem: "Traditional robotic manipulators operate blindly on pre-programmed joint trajectories, making them incapable of dynamic environmental awareness, real-time object tracking through occlusions, or safe collision-free trajectory planning in human-interactive workspaces.",
+      solution: "Developed a modular ROS 1 Noetic visual servoing architecture combining low-latency HSV color segmentation, a custom Kalman Filter multi-object tracker with cosine momentum penalties and occlusion tethering (<10% ID switch rate), an S-curve Gazebo simulation twin, and MoveIt RRT-Connect motion planning with live Intera SDK quaternion orientation stabilization.",
       keyMetrics: [
-        { label: "Components Built", value: "65+" },
-        { label: "Token Sync Speed", value: "Instant" },
-        { label: "WCAG Rating", value: "AAA 100%" }
+        { label: "Tracking Success", value: "90% (9/10 Trials)" },
+        { label: "ID Switch Rate", value: "< 10% (vs 50% Base)" },
+        { label: "Planning Time", value: "~1.0s (RRT-Connect)" },
+        { label: "Manipulator DoF", value: "7 Degrees of Freedom" }
       ],
-      techStack: ["Figma Plugin API", "Style Dictionary", "Vanilla CSS", "React", "Storybook", "TypeScript"],
-      githubUrl: "https://github.com/kaschefi/aegis-design-system",
-      liveUrl: "https://aegis-design.demo.at",
-      architectureDescription: "Multi-tier design token hierarchy (Global, Semantic, Component) exported via Style Dictionary into CSS variables and TypeScript constants."
+      techStack: ["ROS 1 Noetic", "MoveIt 1", "Gazebo 11", "Python 3", "OpenCV", "YOLOv8", "Intera SDK", "OMPL (RRT-Connect)", "scipy / numpy", "Node.js (rosbridge)", "WSL 2 / Ubuntu 20.04"],
+      githubUrl: "https://github.com/kaschefi/sawyerRobot-ShellGame",
+      liveUrl: "https://github.com/kaschefi/sawyerRobot-ShellGame",
+      architectureDescription: "Modular distributed ROS node ecosystem bridging camera streaming, OpenCV/YOLOv8 perception, Kalman momentum tracking with Hungarian data association, and MoveIt RRT-Connect motion planning with live Intera SDK quaternion pose stabilization."
     },
     chapters: [
       {
         number: "01",
-        title: "Token Architecture",
-        subtitle: "From Primitive Values to Semantic Intent",
-        content: "Tokens are the contract between design and engineering. By structuring tokens into Global, Semantic, and Component tiers, redesigning brand palettes takes seconds without changing component logic.",
-        codeSnippet: `:root {\n  /* Semantic Color Tokens */\n  --color-surface-elevated: hsl(220 15% 12% / 0.85);\n  --color-border-subtle: hsl(220 15% 90% / 0.12);\n  --color-accent-glow: hsl(210 100% 65% / 0.35);\n  --backdrop-blur-hud: blur(24px);\n}`,
-        highlights: ["Automated Figma-to-Code sync", "Sub-pixel layout alignment", "Fluid typography clamp scales"]
+        title: "System Architecture & Waving Task",
+        subtitle: "Distributed ROS Nodes & WebSocket Teleoperation",
+        content: "Bridges a Node.js web interface with the 7-DoF Sawyer cobot via rosbridge_suite WebSockets. A hierarchical Design Tree enforces safe baseline postures, looping containers (5 continuous wave cycles), and linear Cartesian waypoints executed smoothly via standard trajectory controllers.",
+        codeSnippet: `# Waving Task Logic Node & Trajectory Execution\nclass SawyerWavingNode:\n    def on_wave_triggered(self, msg):\n        self.limb.move_to_neutral()\n        for cycle in range(5):\n            self.execute_waypoint_sweep("left", duration=0.8)\n            self.execute_waypoint_sweep("right", duration=0.8)\n        self.limb.move_to_neutral()`,
+        highlights: ["7-DoF Sawyer cobot with series elastic actuators", "Asynchronous rosbridge_suite WebSocket teleoperation", "Hierarchical Design Tree motion architecture"]
       },
       {
         number: "02",
-        title: "Accessibility by Default",
-        subtitle: "WCAG AAA Color Contrast & Focus Rings",
-        content: "Every interactive surface features high-visibility focus indicators, ARIA live region announcements, and full keyboard navigation support.",
-        highlights: ["Contrast ratio > 7:1", "Screen-reader optimized DOM", "Reduced-motion media query hooks"]
+        title: "Object Detection & Vision Benchmark",
+        subtitle: "YOLOv8 Deep Learning vs. Classical HSV Filtering",
+        content: "Evaluated OpenCV HSV color filtering against a custom YOLOv8 model trained on Roboflow's Red Solo Cups dataset. While YOLOv8 achieved 96% static accuracy, inference latency reduced dynamic tracking to 6/10 trials. Classical HSV filtering provided near-zero latency, achieving 100% detection and 9/10 successful tracking runs.",
+        highlights: ["Empirical benchmark: YOLOv8 (96% static) vs. HSV (100% controlled)", "Sub-millisecond HSV contour centroid extraction", "Inference latency analysis in closed-loop visual servoing"]
       },
       {
         number: "03",
-        title: "Micro-Interactions & Haptics",
-        subtitle: "The Psychology of Delight",
-        content: "Spring-physics animations and subtle audio micro-ticks make digital interfaces feel physical and responsive to the user's touch.",
-        highlights: ["Physics-based spring curves", "Haptic touch vibration feedback", "Glassmorphic light refraction"]
+        title: "Kalman MOT & Occlusion Tethering",
+        subtitle: "Momentum State Vectors & Hungarian Assignment",
+        content: "Integrates independent 4D linear Kalman Filters ([x, y, dx, dy]) with Hungarian bipartite matching. An augmented cost matrix introduces a cosine similarity velocity penalty to enforce momentum continuity, while dynamic tethering (80px overlap threshold) prevents identity swaps during close-quarters cup crossings, reducing ID switches from 50% to <10%.",
+        codeSnippet: `# Augmented Hungarian Cost Matrix with Momentum Penalty\nfor trk in trackers:\n    for det in detections:\n        cos_sim = np.dot(trk.vel, det - trk.pos) / (trk.vel_norm * disp_norm)\n        cost[i, j] = dist + lambda_vel * (1.0 - cos_sim)`,
+        highlights: ["4D state vector Kalman filter ([x, y, dx, dy]) with 0.85 velocity decay", "Augmented Hungarian assignment with cosine velocity penalty", "Dynamic occlusion tethering reducing ID switches from 50% to <10%"]
+      },
+      {
+        number: "04",
+        title: "MoveIt Kinematics & Gazebo Twin",
+        subtitle: "S-Curve Shuffling & RRT-Connect Trajectory Planning",
+        content: "Constructed a ROS Noetic / Gazebo 11 digital twin with S-curve velocity profiles and 0.16m radial arc separation. Maps 500x500 pixel camera coordinates to Sawyer's 0.5x0.5m Cartesian frame. MoveIt's RRT-Connect planner computes collision-free trajectories in ~1.0s, with live Intera SDK quaternion injection stabilizing downward gripper orientation.",
+        codeSnippet: `# MoveIt Cartesian Goal with Intera Quaternion Injection\npose_goal = PoseStamped()\npose_goal.pose.position.x, pose_goal.pose.position.y = pixel_to_world(u, v)\npose_goal.pose.position.z = table_z + 0.04 # 4cm hover\npose_goal.pose.orientation = limb.endpoint_pose()['orientation']\ngroup.set_pose_target(pose_goal)\ngroup.execute(group.plan())`,
+        highlights: ["Gazebo digital twin with collision-free S-curve shuffling", "2D pixel to 3D Cartesian base frame transformation matrix", "MoveIt RRT-Connect planning (~1.0s solve time) with quaternion pose stabilization"]
+      },
+      {
+        number: "05",
+        title: "Deployment Pipeline & Reachability",
+        subtitle: "WSL 2 Multi-Node Orchestration & Future Outlook",
+        content: "Documents the 5-terminal deployment runbook for Ubuntu 20.04 WSL 2 environments with explicit IP networking. Proposes a dynamic MoveIt Reachability Filter that pre-validates target coordinates against Sawyer's kinematic reach envelope before motion dispatch, preventing Inverse Kinematics solver failures.",
+        highlights: ["5-terminal synchronized ROS launch sequence on WSL 2", "Python 3 compatibility layer resolving exit code 127 crashes", "Dynamic reachability envelope filter preventing IK solver failures"]
       }
     ]
   },
@@ -424,83 +441,10 @@ export const VOLUMES_DATA: VolumeProject[] = [
     ]
   },
   {
-    id: "framer",
-    title: "Framer",
-    subtitle: "Interactive Web Composition & Animation",
-    roman: "VI",
-    discipline: "Interactive composition",
-    note: "Structure becomes rhythm when the page begins to move.",
-    deck: "A studio notebook for Framer: compose responsive pages directly in the medium, then tune type, layout, and interaction until motion feels native to the structure.",
-    binding: "Coral cloth · copper foil",
-    format: "146 × 224 mm · FH Campus Wien Edition",
-    theme: "Framer · composition through motion",
-    motif: "Folded frames",
-    motifKey: "frames",
-    paletteLabel: "Coral · pink · oxblood",
-    color: "#da3b2f",
-    foil: "#ff8eab",
-    accent: "#ff5252",
-    palette: {
-      paper: "#ae2830",
-      paperDeep: "#7f1822",
-      paperPale: "#ffe0df",
-      ink: "#fff0e9",
-      inkSoft: "#efb9b4",
-      wall: "#ae2830",
-      shelf: "#402016",
-      shelfDark: "#1d0d08",
-      light: "#ffc3bb",
-      fill: "#e46d78"
-    },
-    projectDetails: {
-      name: "BookNest Interactive Literary Discovery Platform",
-      category: "Creative Web & Interactive Experience",
-      timeframe: "2026",
-      institution: "FH Campus Wien · Web Engineering",
-      role: "Creative Developer & Frontend Lead",
-      summary: "A rich 3D and motion-driven web application for discovering rare literature, showcasing dynamic page transitions, audio landscapes, and spatial reading rooms.",
-      problem: "E-commerce book cataloguing is sterile and lacks the tactile joy of browsing physical books in a classic library.",
-      solution: "Created an immersive digital bookstore with Three.js foil shaders, kinetic typography, and fluid layout morphing.",
-      keyMetrics: [
-        { label: "User Engagement", value: "4.8x avg" },
-        { label: "Lighthouse Performance", value: "98/100" },
-        { label: "Bundle Size", value: "< 95kB initial" }
-      ],
-      techStack: ["Next.js", "Three.js", "Framer Motion", "Vanilla CSS", "Tailwind CSS", "Web Audio API"],
-      githubUrl: "https://github.com",
-      liveUrl: "https://booknest.demo.at",
-      architectureDescription: "Progressive Web App with zero-layout-shift image decoding, GPU-accelerated backdrop blur shaders, and custom scroll choreographies."
-    },
-    chapters: [
-      {
-        number: "01",
-        title: "Kinetic Layouts",
-        subtitle: "Orchestrating Motion with CSS & WebGL",
-        content: "Motion is not decorative; it provides spatial orientation. When an element transforms from a shelf thumbnail to an open reading spread, shared layout animations maintain cognitive continuity.",
-        codeSnippet: `// Smooth Viewport Transition Animation\nexport const bookTransition = {\n  type: "spring",\n  stiffness: 280,\n  damping: 32,\n  mass: 0.8\n};`,
-        highlights: ["Shared element layout morphing", "GPU compositor layer isolation", "60fps zero-jank frame timing"]
-      },
-      {
-        number: "02",
-        title: "Tactile Digital Physicality",
-        subtitle: "Simulating Weight and Friction",
-        content: "By coupling inertial drag gestures with procedural paper rustle audio synthesis, user interactions feel grounded in real-world physics.",
-        highlights: ["Inertial deceleration models", "Custom Bezier easing curves", "Dynamic cursor magnetics"]
-      },
-      {
-        number: "03",
-        title: "Responsive Choreography",
-        subtitle: "Seamless Transitions Across Screen Sizes",
-        content: "Using modern CSS Container Queries and dynamic camera perspective scaling, the bookshelf effortlessly adapts from ultrawide 4K monitors to handheld smartphones.",
-        highlights: ["Container query inline sizing", "Viewport aspect ratio compensation", "Touch-optimized pinch-to-zoom"]
-      }
-    ]
-  },
-  {
     id: "xcode",
     title: "JoinApp",
     subtitle: "Scalable Community Event Hub & Distributed Coordination Engine",
-    roman: "VII",
+    roman: "VI",
     discipline: "Full-Stack Web Systems",
     note: "A measured path from blueprint to living platform.",
     deck: "A modern full-stack web platform engineering hyperlocal event discovery, atomic participation lifecycles, and automated transactional dispatch across Vienna's metropolitan districts.",

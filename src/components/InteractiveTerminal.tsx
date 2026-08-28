@@ -24,7 +24,7 @@ export const InteractiveTerminal: React.FC<TerminalProps> = ({ onOpenVolume }) =
           </p>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.2rem' }}>
             Type <span style={{ color: '#fff', fontWeight: 600 }}>help</span> to list commands or{' '}
-            <span style={{ color: '#fff', fontWeight: 600 }}>projects</span> to view all 7 volumes.
+            <span style={{ color: '#fff', fontWeight: 600 }}>projects</span> to view all 6 volumes.
           </p>
         </div>
       )
@@ -55,7 +55,7 @@ export const InteractiveTerminal: React.FC<TerminalProps> = ({ onOpenVolume }) =
     if (cmd === 'help') {
       newHistory.output = (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-          <p><strong style={{ color: '#fff' }}>projects / ls</strong> - List all 7 bookshelf volumes</p>
+          <p><strong style={{ color: '#fff' }}>projects / ls</strong> - List all 6 bookshelf volumes</p>
           <p><strong style={{ color: '#fff' }}>open &lt;id&gt;</strong> - Jump to 3D volume (e.g. open codex, open antigravity)</p>
           <p><strong style={{ color: '#fff' }}>skills</strong> - Display core engineering stack</p>
           <p><strong style={{ color: '#fff' }}>bio / about</strong> - Profile & FH Campus Wien background</p>

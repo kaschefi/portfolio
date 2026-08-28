@@ -69,14 +69,14 @@ export function applyPagePatches(code) {
       }
 
       if (n === 1 && e.id === "figma") {
-        // Spread 2 Left Page: PLATE 01 / TOKEN SYNCHRONIZATION PIPELINE
+        // Spread 2 Left Page: PLATE 01 / VISION DETECTION & BENCHMARK
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
-        s.fillText("PLATE 01  /  TOKEN SYNCHRONIZATION PIPELINE", 54, 146);
+        s.fillText("PLATE 01  /  VISION DETECTION & BENCHMARK", 54, 146);
 
-        // Procedural Obsidian / Rose Gold Blueprint Plate
+        // Procedural Obsidian / Crimson Benchmark Diagram
         const imgX = 54, imgY = 180, imgW = 404, imgH = 250;
-        s.fillStyle = "rgba(18, 20, 23, 0.75)";
+        s.fillStyle = "rgba(18, 20, 23, 0.85)";
         s.fillRect(imgX, imgY, imgW, imgH);
         s.strokeStyle = "rgba(239, 176, 170, 0.4)";
         s.lineWidth = 1.2;
@@ -92,62 +92,70 @@ export function applyPagePatches(code) {
           s.beginPath(); s.moveTo(imgX, gy); s.lineTo(imgX + imgW, gy); s.stroke();
         }
 
-        // Step 1: Figma Variables
+        // Method 1: OpenCV HSV Color Filtering
         s.fillStyle = "#22262c";
-        s.fillRect(imgX + 20, imgY + 35, 95, 50);
-        s.strokeStyle = "#efb0aa";
+        s.fillRect(imgX + 16, imgY + 24, 114, 150);
+        s.strokeStyle = "#4ade80";
         s.lineWidth = 1.2;
-        s.strokeRect(imgX + 20, imgY + 35, 95, 50);
-        s.fillStyle = "#efb0aa";
-        s.font = '600 11px Inter, sans-serif';
+        s.strokeRect(imgX + 16, imgY + 24, 114, 150);
+        s.fillStyle = "#4ade80";
+        s.font = '700 11px Inter, sans-serif';
         s.textAlign = "center";
-        s.fillText("Figma", imgX + 67, imgY + 58);
-        s.fillText("Variables", imgX + 67, imgY + 72);
-
-        // Arrow 1 -> 2
-        s.strokeStyle = "#efb0aa";
-        s.lineWidth = 1.8;
-        s.beginPath(); s.moveTo(imgX + 120, imgY + 60); s.lineTo(imgX + 145, imgY + 60); s.stroke();
-
-        // Step 2: Style Dictionary AST
+        s.fillText("OpenCV HSV", imgX + 73, imgY + 48);
         s.fillStyle = "#efb0aa";
-        s.fillRect(imgX + 150, imgY + 35, 105, 50);
-        s.fillStyle = "#121417";
-        s.fillText("Style", imgX + 202, imgY + 58);
-        s.fillText("Dictionary", imgX + 202, imgY + 72);
+        s.font = '500 10px Inter, sans-serif';
+        s.fillText("Acc: 100%", imgX + 73, imgY + 74);
+        s.fillText("Lat: < 1 ms", imgX + 73, imgY + 96);
+        s.fillStyle = "#4ade80";
+        s.font = '700 11px Inter, sans-serif';
+        s.fillText("Track: 9/10 (90%)", imgX + 73, imgY + 130);
+        s.fillText("✓ Chosen", imgX + 73, imgY + 152);
 
-        // Arrow 2 -> 3
-        s.strokeStyle = "#efb0aa";
-        s.beginPath(); s.moveTo(imgX + 260, imgY + 60); s.lineTo(imgX + 285, imgY + 60); s.stroke();
-
-        // Step 3: Multi-Platform Targets
+        // Method 2: YOLOv8 Deep Learning
         s.fillStyle = "#22262c";
-        s.fillRect(imgX + 290, imgY + 20, 95, 32);
-        s.strokeRect(imgX + 290, imgY + 20, 95, 32);
+        s.fillRect(imgX + 144, imgY + 24, 114, 150);
+        s.strokeStyle = "#f87171";
+        s.lineWidth = 1.2;
+        s.strokeRect(imgX + 144, imgY + 24, 114, 150);
+        s.fillStyle = "#f87171";
+        s.font = '700 11px Inter, sans-serif';
+        s.fillText("YOLOv8 CNN", imgX + 201, imgY + 48);
         s.fillStyle = "#efb0aa";
-        s.fillText("Web CSS / TS", imgX + 337, imgY + 40);
+        s.font = '500 10px Inter, sans-serif';
+        s.fillText("Static: 96%", imgX + 201, imgY + 74);
+        s.fillText("Lat: ~30 ms", imgX + 201, imgY + 96);
+        s.fillStyle = "#f87171";
+        s.font = '700 11px Inter, sans-serif';
+        s.fillText("Track: 6/10 (60%)", imgX + 201, imgY + 130);
+        s.fillText("⚠ Latency Lag", imgX + 201, imgY + 152);
 
+        // Method 3: ArUco Markers
         s.fillStyle = "#22262c";
-        s.fillRect(imgX + 290, imgY + 60, 95, 32);
-        s.strokeRect(imgX + 290, imgY + 60, 95, 32);
+        s.fillRect(imgX + 272, imgY + 24, 116, 150);
+        s.strokeStyle = "#60a5fa";
+        s.lineWidth = 1.2;
+        s.strokeRect(imgX + 272, imgY + 24, 116, 150);
+        s.fillStyle = "#60a5fa";
+        s.font = '700 11px Inter, sans-serif';
+        s.fillText("ArUco Fiducial", imgX + 330, imgY + 48);
         s.fillStyle = "#efb0aa";
-        s.fillText("Flutter Dart", imgX + 337, imgY + 80);
-
-        s.fillStyle = "#22262c";
-        s.fillRect(imgX + 290, imgY + 100, 95, 32);
-        s.strokeRect(imgX + 290, imgY + 100, 95, 32);
-        s.fillStyle = "#efb0aa";
-        s.fillText("iOS Swift", imgX + 337, imgY + 120);
+        s.font = '500 10px Inter, sans-serif';
+        s.fillText("6D Pose Est.", imgX + 330, imgY + 74);
+        s.fillText("Ground Truth", imgX + 330, imgY + 96);
+        s.fillStyle = "#60a5fa";
+        s.font = '700 11px Inter, sans-serif';
+        s.fillText("Calibration", imgX + 330, imgY + 130);
+        s.fillText("✓ Verified", imgX + 330, imgY + 152);
 
         // Lower annotation
         s.textAlign = "left";
         s.fillStyle = "#efb0aa";
         s.font = '500 10px Inter, sans-serif';
-        s.fillText("DTCG SPEC  ·  OKLCH LUMINANCE  ·  ZERO DRIFT", imgX + 20, imgY + 225);
+        s.fillText("ROBOFLOW RED SOLO CUPS  ·  OPENCV HSV  ·  NEAR-ZERO LATENCY", imgX + 16, imgY + 225);
 
         s.globalAlpha = 0.52;
         s.font = '400 16px "Iowan Old Style", Baskerville, Georgia, serif';
-        de(s, "Three-tier token transformation pipeline: Figma Variables to Style Dictionary AST compiler to type-safe TypeScript, CSS Custom Properties, and Flutter ThemeExtensions.", 54, 460, 40, 22, 5);
+        de(s, "Empirical benchmark between classical HSV thresholding and YOLOv8 deep neural networks. Sub-millisecond HSV execution eliminates inference latency, ensuring reliable 90% closed-loop dynamic tracking.", 54, 460, 40, 22, 5);
 
         s.globalAlpha = 0.2;
         s.fillRect(48, d - 48, i - 96, 1);
@@ -191,28 +199,28 @@ export function applyPagePatches(code) {
       }
 
       if (n === 3 && e.id === "figma") {
-        // Spread 3 Left Page: PLATE 02 / ACCESSIBLE COMPONENT MATRIX
+        // Spread 3 Left Page: PLATE 02 / KALMAN MOT & OCCLUSION TETHERING
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
-        s.fillText("PLATE 02  /  WCAG 2.2 AAA CONTRAST MATRIX", 54, 146);
+        s.fillText("PLATE 02  /  KALMAN MOT & OCCLUSION TETHERING", 54, 146);
 
-        // Procedural WCAG Matrix diagram (Obsidian / Rose-Gold)
+        // Procedural MOT Architecture Diagram (Obsidian / Crimson)
         const imgX = 54, imgY = 176, imgW = 404, imgH = 260;
-        s.fillStyle = "rgba(18, 20, 23, 0.75)";
+        s.fillStyle = "rgba(18, 20, 23, 0.85)";
         s.fillRect(imgX, imgY, imgW, imgH);
         s.strokeStyle = "rgba(239, 176, 170, 0.35)";
         s.lineWidth = 1.2;
         s.strokeRect(imgX, imgY, imgW, imgH);
 
-        // Contrast Badges
-        const badges = [
-          { label: "Normal Text", req: "> 7.0:1", actual: "8.42:1" },
-          { label: "Large Headings", req: "> 4.5:1", actual: "11.20:1" },
-          { label: "UI Controls", req: "> 4.5:1", actual: "6.85:1" },
-          { label: "Focus Ring", req: "Dual-Ring 3px", actual: "100% Vis" }
+        // Tracking Features List
+        const features = [
+          { label: "Kalman State", req: "[x, y, dx, dy] 4D Vector", actual: "0.85 Decay" },
+          { label: "Data Association", req: "Hungarian Algorithm", actual: "Cosine Sim" },
+          { label: "Occlusion Logic", req: "80px Overlap Threshold", actual: "Tethering" },
+          { label: "Identity Switch Rate", req: "Baseline ~50%", actual: "< 10% (Pass)" }
         ];
 
-        badges.forEach((b, bIdx) => {
+        features.forEach((b, bIdx) => {
           const by = imgY + 25 + bIdx * 52;
           s.fillStyle = "rgba(34, 38, 44, 0.85)";
           s.fillRect(imgX + 16, by, imgW - 32, 42);
@@ -223,24 +231,20 @@ export function applyPagePatches(code) {
           s.textAlign = "left";
           s.fillStyle = "#efb0aa";
           s.font = '600 12px Inter, sans-serif';
-          s.fillText(b.label, imgX + 30, by + 26);
+          s.fillText(b.label, imgX + 26, by + 26);
 
           s.fillStyle = "#a8a29e";
           s.font = '500 11px Inter, sans-serif';
-          s.fillText("Req: " + b.req, imgX + 165, by + 26);
+          s.fillText(b.req, imgX + 160, by + 26);
 
           s.fillStyle = "#ffd1bc";
           s.font = '700 12px Inter, sans-serif';
-          s.fillText(b.actual, imgX + 270, by + 26);
-
-          s.fillStyle = "#4ade80";
-          s.font = '700 11px Inter, sans-serif';
-          s.fillText("✓ AAA", imgX + 340, by + 26);
+          s.fillText(b.actual, imgX + 300, by + 26);
         });
 
         s.globalAlpha = 0.52;
         s.font = '400 16px "Iowan Old Style", Baskerville, Georgia, serif';
-        de(s, "Automated relative luminance calculations embedded into Style Dictionary CI checks. Asserts >7:1 contrast ratios and renders dual-layer high-visibility focus indicators.", 54, 510, 40, 22, 5);
+        de(s, "Independent 4D Kalman filters with cosine velocity penalties and leader-follower occlusion tethering, reducing identity switches by over 80% during dynamic shuffles.", 54, 510, 40, 22, 5);
 
         s.globalAlpha = 0.2;
         s.fillRect(48, d - 48, i - 96, 1);
@@ -275,9 +279,9 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
       } else if (n === 2) {
         // Chapter 01
-        const title = e.id === "codex" ? "The Two-Tier Router" : (e.id === "xcode" ? "Clean Architecture & RBAC" : (e.id === "figma" ? "Token Architecture & Sync" : (e.chapters?.[0] || "Chapter 01")));
-        const sub = e.id === "codex" ? "50ms FastEmbed Reflexes & Dynamic Tool RAG" : (e.id === "xcode" ? "Decoupled Express 5 Services & JWT" : (e.id === "figma" ? "From Primitive Values to Semantic Intent" : (e.deck || "")));
-        const body = e.id === "codex" ? "Sub-50ms spinal reflexes for instant hardware safety and PC routines, paired with in-memory FAISS candidate vector injection for local LLM routing." : (e.id === "xcode" ? "Strict 3-tier architecture isolating Express routing, domain business logic, and PostgreSQL data access with stateless JWT and RBAC guards." : (e.id === "figma" ? "A strict 3-tier hierarchy separating Global Primitives, Semantic Intent, and Component Scoping, transforming Figma Variables to CSS and TypeScript." : e.note));
+        const title = e.id === "codex" ? "The Two-Tier Router" : (e.id === "xcode" ? "Clean Architecture & RBAC" : (e.id === "figma" ? "Architecture & Waving" : (e.chapters?.[0] || "Chapter 01")));
+        const sub = e.id === "codex" ? "50ms FastEmbed Reflexes & Dynamic Tool RAG" : (e.id === "xcode" ? "Decoupled Express 5 Services & JWT" : (e.id === "figma" ? "7-DoF Cobot & WebSocket Teleoperation" : (e.deck || "")));
+        const body = e.id === "codex" ? "Sub-50ms spinal reflexes for instant hardware safety and PC routines, paired with in-memory FAISS candidate vector injection for local LLM routing." : (e.id === "xcode" ? "Strict 3-tier architecture isolating Express routing, domain business logic, and PostgreSQL data access with stateless JWT and RBAC guards." : (e.id === "figma" ? "Bridges a Node.js web GUI with the 7-DoF Sawyer cobot via rosbridge_suite WebSockets. A hierarchical Design Tree enforces safe baseline postures, 5-cycle continuous wave loops, and linear Cartesian waypoints." : e.note));
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("CHAPTER 01", 54, 166);
@@ -295,9 +299,9 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
       } else if (n === 4) {
         // Chapter 02
-        const title = e.id === "codex" ? "Hardware Safety Guards" : (e.id === "xcode" ? "GIS Mapping & Live Chat" : (e.id === "figma" ? "Accessible Component Matrix" : (e.chapters?.[1] || "Chapter 02")));
-        const sub = e.id === "codex" ? "Sub-Packet Interception & Anti-Dump Guard" : (e.id === "xcode" ? "Interactive Leaflet Pins & Capacity Gating" : (e.id === "figma" ? "WCAG 2.2 AAA Contrast & Focus Systems" : (e.deck || "")));
-        const body = e.id === "codex" ? "Direct 33Hz method interception inside PyCozmo packet loops. Multi-modal sensor fusion combining cliff IR flags, IMU pitch tilt (>20°), true deceleration, and OpenCV optical flow visual stasis." : (e.id === "xcode" ? "Synchronizes Vienna-wide event clusters on Leaflet.js with interactive search cards using bidirectional panning, atomic registration, and polling chat." : (e.id === "figma" ? "Strict WCAG 2.2 AAA relative luminance contrast assertions, dual-layer high-visibility focus indicators, and screen-reader ARIA live region handlers." : e.deck));
+        const title = e.id === "codex" ? "Hardware Safety Guards" : (e.id === "xcode" ? "GIS Mapping & Live Chat" : (e.id === "figma" ? "Vision & Detection Benchmark" : (e.chapters?.[1] || "Chapter 02")));
+        const sub = e.id === "codex" ? "Sub-Packet Interception & Anti-Dump Guard" : (e.id === "xcode" ? "Interactive Leaflet Pins & Capacity Gating" : (e.id === "figma" ? "YOLOv8 vs Classical HSV Color Filtering" : (e.deck || "")));
+        const body = e.id === "codex" ? "Direct 33Hz method interception inside PyCozmo packet loops. Multi-modal sensor fusion combining cliff IR flags, IMU pitch tilt (>20°), true deceleration, and OpenCV optical flow visual stasis." : (e.id === "xcode" ? "Synchronizes Vienna-wide event clusters on Leaflet.js with interactive search cards using bidirectional panning, atomic registration, and polling chat." : (e.id === "figma" ? "Rigorous empirical comparison between YOLOv8 deep learning (96% static accuracy) and OpenCV HSV thresholding (100% detection, zero latency), demonstrating that low latency is paramount in fast visual servoing." : e.deck));
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("CHAPTER 02", 54, 166);
@@ -315,9 +319,9 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
       } else if (n === 6) {
         // Chapter 03
-        const title = e.id === "codex" ? "Dual Memory & Voice" : (e.id === "xcode" ? "PostgreSQL & Cron Outbox" : (e.id === "figma" ? "Cross-Platform Emitters" : (e.chapters?.[2] || "Chapter 03")));
-        const sub = e.id === "codex" ? "PostgresSaver & Kokoro-ONNX Stream" : (e.id === "xcode" ? "7-Entity Schema & Ticket Daemon" : (e.id === "figma" ? "Web, Mobile & Embedded Runtimes" : (e.deck || "")));
-        const body = e.id === "codex" ? "PostgresSaver session state with rolling summarization, native PostgreSQL REAL[] array store with 0.82 cosine similarity deduplication, and zero-disk Kokoro-ONNX voice streaming." : (e.id === "xcode" ? "A normalized 7-table schema with foreign-key cascades, array types (tags TEXT[]), and cron-driven 1-hour ticket dispatch via Nodemailer." : (e.id === "figma" ? "Custom Style Dictionary compiler generating type-safe TypeScript interfaces, CSS Custom Properties, Flutter Dart extensions, and Swift struct bindings." : e.note));
+        const title = e.id === "codex" ? "Dual Memory & Voice" : (e.id === "xcode" ? "PostgreSQL & Cron Outbox" : (e.id === "figma" ? "Kalman MOT & Tethering" : (e.chapters?.[2] || "Chapter 03")));
+        const sub = e.id === "codex" ? "PostgresSaver & Kokoro-ONNX Stream" : (e.id === "xcode" ? "7-Entity Schema & Ticket Daemon" : (e.id === "figma" ? "Momentum Vectors & Hungarian Assignment" : (e.deck || "")));
+        const body = e.id === "codex" ? "PostgresSaver session state with rolling summarization, native PostgreSQL REAL[] array store with 0.82 cosine similarity deduplication, and zero-disk Kokoro-ONNX voice streaming." : (e.id === "xcode" ? "A normalized 7-table schema with foreign-key cascades, array types (tags TEXT[]), and cron-driven 1-hour ticket dispatch via Nodemailer." : (e.id === "figma" ? "Independent 4D Kalman filters ([x,y,dx,dy]) with cosine velocity penalties and dynamic occlusion tethering (80px threshold), slashing Identity Switch rates from 50% down to under 10%." : e.note));
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("CHAPTER 03", 54, 166);
@@ -335,9 +339,9 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
       } else if (n === 8) {
         // Chapter 04
-        const title = e.id === "codex" ? "Deterministic Sandbox & Tools" : (e.id === "xcode" ? "Geocoding & Calendar Sync" : (e.id === "figma" ? "Automated Design CI/CD" : (e.chapters?.[3] || "Chapter 04")));
-        const sub = e.id === "codex" ? "Isolated Python Subprocess & Tavily Tools" : (e.id === "xcode" ? "Photon Spatial API & RFC 5545 iCal" : (e.id === "figma" ? "Figma Webhooks & Chromatic Regressions" : (e.deck || "")));
-        const body = e.id === "codex" ? "Deterministic code execution in an isolated Python sandbox with 8.0s hard timeouts, Tavily Model Context Protocol integration via stdio, and OpenCV HSV autonomous charger docking." : (e.id === "xcode" ? "Offloads address coordinate resolution to Photon API asynchronously, paired with zero-dependency client-side RFC 5545 iCal generation." : (e.id === "figma" ? "Continuous visual integration running Figma webhook handshakes, 320+ Storybook component stories, and sub-pixel visual regression verification." : e.note));
+        const title = e.id === "codex" ? "Deterministic Sandbox & Tools" : (e.id === "xcode" ? "Geocoding & Calendar Sync" : (e.id === "figma" ? "MoveIt & Gazebo Twin" : (e.chapters?.[3] || "Chapter 04")));
+        const sub = e.id === "codex" ? "Isolated Python Subprocess & Tavily Tools" : (e.id === "xcode" ? "Photon Spatial API & RFC 5545 iCal" : (e.id === "figma" ? "S-Curve Shuffling & RRT-Connect Planning" : (e.deck || "")));
+        const body = e.id === "codex" ? "Deterministic code execution in an isolated Python sandbox with 8.0s hard timeouts, Tavily Model Context Protocol integration via stdio, and OpenCV HSV autonomous charger docking." : (e.id === "xcode" ? "Offloads address coordinate resolution to Photon API asynchronously, paired with zero-dependency client-side RFC 5545 iCal generation." : (e.id === "figma" ? "Gazebo digital twin with S-curve velocity profiles and 0.16m radial arc separation. MoveIt RRT-Connect planner generates collision-free hover trajectories in ~1.0s with Intera quaternion pose stabilization." : e.note));
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("CHAPTER 04", 54, 166);

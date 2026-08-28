@@ -142,16 +142,16 @@ export function applyEnginePatches(rawCode) {
       color: "#121417",
       foil: "#860d0d",
       palette: {
-        paper: "#15181c",
-        paperDeep: "#0e1013",
-        paperPale: "#22262c",
+        paper: "#860d0d",
+        paperDeep: "#540808",
+        paperPale: "#ffe0df",
         ink: "#f4eee6",
-        inkSoft: "#a8a29e",
+        inkSoft: "#efb9b4",
         wall: "#860d0d",
-        shelf: "#1c1e22",
-        shelfDark: "#0d0e11",
+        shelf: "#3a1c18",
+        shelfDark: "#1c0d0a",
         light: "#efb0aa",
-        fill: "#383c44"
+        fill: "#a82424"
       },
       width: 1,
       height: 1.48,
@@ -259,42 +259,9 @@ export function applyEnginePatches(rawCode) {
       seed: 22
     },
     {
-      id: "framer",
-      title: "Framer",
-      roman: "VI",
-      discipline: "Interactive composition",
-      note: "Structure becomes rhythm when the page begins to move.",
-      deck: "A studio notebook for Framer: compose responsive pages directly in the medium, then tune type, layout, and interaction until motion feels native to the structure.",
-      binding: "Coral cloth · copper foil",
-      format: "146 × 224 mm · imagined edition",
-      theme: "Framer · composition through motion",
-      motif: "Folded frames",
-      motifKey: "frames",
-      paletteLabel: "Coral · pink · oxblood",
-      color: "#da3b2f",
-      foil: "#ff8eab",
-      palette: {
-        paper: "#ae2830",
-        paperDeep: "#7f1822",
-        paperPale: "#ffe0df",
-        ink: "#fff0e9",
-        inkSoft: "#efb9b4",
-        wall: "#ae2830",
-        shelf: "#402015",
-        shelfDark: "#1d0d08",
-        light: "#ffc3bb",
-        fill: "#e46d78"
-      },
-      width: 0.96,
-      height: 1.57,
-      depth: 0.24,
-      chapters: ["Structure", "Rhythm", "Responsive motion"],
-      seed: 66
-    },
-    {
       id: "xcode",
       title: "JoinApp",
-      roman: "VII",
+      roman: "VI",
       discipline: "Full-Stack Web Systems",
       note: "Hyperlocal event coordination with 3-tier architecture & transactional outbox.",
       deck: "A modern full-stack web platform engineering hyperlocal event discovery, atomic participation lifecycles, and automated transactional dispatch across Vienna's metropolitan districts.",
@@ -340,7 +307,6 @@ export function applyEnginePatches(rawCode) {
     [1024, 0, 512, 768],
     [1536, 0, 512, 768],
     [512, 0, 512, 768],
-    [2560, 0, 512, 768],
     [3072, 0, 512, 768]
   ]`;
     code = code.slice(0, grStartIdx) + newGrBlock + code.slice(grEndIdx + 1);
@@ -356,6 +322,16 @@ export function applyEnginePatches(rawCode) {
   code = code.replace(
     'b === "detail" && (Ke(), Te(), b = "closing"',
     '(b === "detail" || b === "opening") && (Ke(), Te(), b = "closing"'
+  );
+
+  // 14. Perfectly balanced 5-book shelf view (fade out the 6th book beyond distance 2)
+  code = code.replace(
+    'const F = A((n - 2.55) / 0.7, 0, 1), N = 1 - Ze(F);',
+    'const F = A((n - 2.02) / 0.45, 0, 1), N = 1 - Ze(F);'
+  );
+  code = code.replace(
+    't.contactShadow.visible = !0, t.contactShadow.material.opacity = t.opacity * 0.24, t.hit.visible = t.opacity > 0.12;',
+    't.root.visible = t.opacity > 0.005, t.contactShadow.visible = t.opacity > 0.005, t.contactShadow.material.opacity = t.opacity * 0.24, t.hit.visible = t.opacity > 0.12;'
   );
 
   return code;

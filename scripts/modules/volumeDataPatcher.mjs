@@ -6,8 +6,8 @@
 const VOLUME_OVERRIDES = [
   {
     id: 'figma',
-    title: 'Shell Game',
-    discipline: 'Sawyer Robot',
+    title: 'Sawyer Robot',
+    discipline: 'Shell Game',
   },
 ];
 

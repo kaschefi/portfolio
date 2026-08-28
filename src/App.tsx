@@ -64,8 +64,10 @@ export function App() {
     const currentIdx = VOLUMES_DATA.findIndex((v) => v.id === currentVolumeId);
     if (targetIdx !== -1 && currentIdx !== -1) {
       let diff = targetIdx - currentIdx;
-      if (diff > 3) diff -= 7;
-      if (diff < -3) diff += 7;
+      const totalVols = VOLUMES_DATA.length;
+      const half = Math.floor(totalVols / 2);
+      if (diff > half) diff -= totalVols;
+      if (diff < -half) diff += totalVols;
       const action = diff > 0 ? 'next' : 'previous';
       const steps = Math.abs(diff);
       for (let i = 0; i < steps; i++) {
