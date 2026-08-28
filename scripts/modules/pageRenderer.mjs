@@ -250,7 +250,172 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
         s.globalAlpha = 1;
         const x = Q(new l.CanvasTexture(c), { anisotropy: 16 });
-        x.name = \`\${e.id}-interior-page-\${n + 1}\`;
+        x.name = e.id + "-interior-page-" + (n + 1);
+        return x;
+      }
+
+      if (n === 1 && e.id === "cursor") {
+        // Spread 2 Left Page: PLATE 01 / MULTI-MODAL SEMANTIC PIPELINE TOPOLOGY
+        s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
+        s.letterSpacing = "2px";
+        s.fillText("PLATE 01  /  MULTI-MODAL SEMANTIC PIPELINE TOPOLOGY", 54, 146);
+
+        const imgX = 54, imgY = 180, imgW = 404, imgH = 250;
+        s.fillStyle = "rgba(23, 25, 20, 0.85)";
+        s.fillRect(imgX, imgY, imgW, imgH);
+        s.strokeStyle = "rgba(197, 223, 19, 0.4)";
+        s.lineWidth = 1.2;
+        s.strokeRect(imgX, imgY, imgW, imgH);
+
+        // Box 1: Docling v2 Layout Engine
+        s.fillStyle = "#1e2216";
+        s.fillRect(imgX + 16, imgY + 24, 114, 150);
+        s.strokeStyle = "#c5df13";
+        s.lineWidth = 1.2;
+        s.strokeRect(imgX + 16, imgY + 24, 114, 150);
+        s.fillStyle = "#c5df13";
+        s.font = '700 11px Inter, sans-serif';
+        s.textAlign = "center";
+        s.fillText("Docling v2 Engine", imgX + 73, imgY + 48);
+        s.fillStyle = "#f0f2c9";
+        s.font = '500 10px Inter, sans-serif';
+        s.fillText("RapidOCR 1.5x", imgX + 73, imgY + 74);
+        s.fillText("Markdown Grid", imgX + 73, imgY + 96);
+        s.fillStyle = "#c5df13";
+        s.fillText("0 Fractures", imgX + 73, imgY + 130);
+
+        // Box 2: Groq LPU Vision VLM
+        s.fillStyle = "#1e2216";
+        s.fillRect(imgX + 144, imgY + 24, 114, 150);
+        s.strokeStyle = "#c5df13";
+        s.lineWidth = 1.2;
+        s.strokeRect(imgX + 144, imgY + 24, 114, 150);
+        s.fillStyle = "#c5df13";
+        s.font = '700 11px Inter, sans-serif';
+        s.fillText("Groq Vision VLM", imgX + 201, imgY + 48);
+        s.fillStyle = "#f0f2c9";
+        s.font = '500 10px Inter, sans-serif';
+        s.fillText("Qwen-27B Vision", imgX + 201, imgY + 74);
+        s.fillText("Chart / Diagram", imgX + 201, imgY + 96);
+        s.fillStyle = "#c5df13";
+        s.fillText("Dense Summary", imgX + 201, imgY + 130);
+
+        // Box 3: Hybrid Retrieval & Rerank
+        s.fillStyle = "#1e2216";
+        s.fillRect(imgX + 272, imgY + 24, 114, 150);
+        s.strokeStyle = "#4ade80";
+        s.lineWidth = 1.2;
+        s.strokeRect(imgX + 272, imgY + 24, 114, 150);
+        s.fillStyle = "#4ade80";
+        s.font = '700 11px Inter, sans-serif';
+        s.fillText("Hybrid + Rerank", imgX + 329, imgY + 48);
+        s.fillStyle = "#f0f2c9";
+        s.font = '500 10px Inter, sans-serif';
+        s.fillText("70/30 Pinecone", imgX + 329, imgY + 74);
+        s.fillText("Cross-Encoder", imgX + 329, imgY + 96);
+        s.fillStyle = "#4ade80";
+        s.fillText("+50% Recall@5", imgX + 329, imgY + 130);
+
+        s.globalAlpha = 0.52;
+        s.textAlign = "left";
+        s.font = '400 16px "Iowan Old Style", Baskerville, Georgia, serif';
+        de(s, "End-to-end multi-modal ETL: Deep layout detection with Docling v2, parallel Vision Language Model diagram transcription on Groq LPUs, and calibrated 70/30 hybrid vector retrieval with Cross-Encoder reranking.", 54, 460, 40, 22, 5);
+
+        s.globalAlpha = 0.2;
+        s.fillRect(48, d - 48, i - 96, 1);
+        s.globalAlpha = 1;
+        const x = Q(new l.CanvasTexture(c), { anisotropy: 16 });
+        x.name = e.id + "-interior-page-" + (n + 1);
+        return x;
+      }
+
+      if (n === 1 && e.id === "claude-code") {
+        // Spread 2 Left Page: PLATE 01 / CLINICAL ONTOLOGY & REASONING TOPOLOGY
+        s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
+        s.letterSpacing = "2px";
+        s.fillText("PLATE 01  /  CLINICAL ONTOLOGY & REASONING TOPOLOGY", 54, 146);
+
+        if (typeof customClaudeDiagramImg !== "undefined" && customClaudeDiagramImg && (customClaudeDiagramImg.complete || customClaudeDiagramImg.naturalWidth > 0)) {
+          const imgW = 404;
+          const imgH = Math.round((imgW / (customClaudeDiagramImg.naturalWidth || 404)) * (customClaudeDiagramImg.naturalHeight || 240));
+          const imgX = 54;
+          const imgY = 180;
+
+          s.fillStyle = "rgba(40, 16, 10, 0.9)";
+          s.fillRect(imgX - 4, imgY - 4, imgW + 8, imgH + 8);
+          s.strokeStyle = "rgba(239, 193, 109, 0.4)";
+          s.lineWidth = 1;
+          s.strokeRect(imgX - 4, imgY - 4, imgW + 8, imgH + 8);
+
+          s.drawImage(customClaudeDiagramImg, imgX, imgY, imgW, imgH);
+        } else {
+          const imgX = 54, imgY = 180, imgW = 404, imgH = 250;
+          s.fillStyle = "rgba(14, 38, 27, 0.88)";
+          s.fillRect(imgX, imgY, imgW, imgH);
+          s.strokeStyle = "rgba(167, 243, 208, 0.4)";
+          s.lineWidth = 1.2;
+          s.strokeRect(imgX, imgY, imgW, imgH);
+
+          // Box 1: Medical Ontology & RAG
+          s.fillStyle = "#133827";
+          s.fillRect(imgX + 16, imgY + 24, 114, 150);
+          s.strokeStyle = "#34d399";
+          s.lineWidth = 1.2;
+          s.strokeRect(imgX + 16, imgY + 24, 114, 150);
+          s.fillStyle = "#34d399";
+          s.font = '700 11px Inter, sans-serif';
+          s.textAlign = "center";
+          s.fillText("Ontology RAG", imgX + 73, imgY + 48);
+          s.fillStyle = "#e6f4ed";
+          s.font = '500 10px Inter, sans-serif';
+          s.fillText("ICD-10 / SNOMED", imgX + 73, imgY + 74);
+          s.fillText("Europe PMC Index", imgX + 73, imgY + 96);
+          s.fillStyle = "#34d399";
+          s.fillText("99.2% Recall", imgX + 73, imgY + 130);
+
+          // Box 2: Contextual Reasoner
+          s.fillStyle = "#133827";
+          s.fillRect(imgX + 144, imgY + 24, 114, 150);
+          s.strokeStyle = "#10b981";
+          s.lineWidth = 1.2;
+          s.strokeRect(imgX + 144, imgY + 24, 114, 150);
+          s.fillStyle = "#10b981";
+          s.font = '700 11px Inter, sans-serif';
+          s.fillText("Context Engine", imgX + 201, imgY + 48);
+          s.fillStyle = "#e6f4ed";
+          s.font = '500 10px Inter, sans-serif';
+          s.fillText("Temporal Graph", imgX + 201, imgY + 74);
+          s.fillText("Drug Conflicts", imgX + 201, imgY + 96);
+          s.fillStyle = "#10b981";
+          s.fillText("200k Context", imgX + 201, imgY + 130);
+
+          // Box 3: Verifiable Citations
+          s.fillStyle = "#133827";
+          s.fillRect(imgX + 272, imgY + 24, 114, 150);
+          s.strokeStyle = "#6ee7b7";
+          s.lineWidth = 1.2;
+          s.strokeRect(imgX + 272, imgY + 24, 114, 150);
+          s.fillStyle = "#6ee7b7";
+          s.font = '700 11px Inter, sans-serif';
+          s.fillText("Citation Guard", imgX + 329, imgY + 48);
+          s.fillStyle = "#e6f4ed";
+          s.font = '500 10px Inter, sans-serif';
+          s.fillText("PubMed Linking", imgX + 329, imgY + 74);
+          s.fillText("HIPAA / GDPR", imgX + 329, imgY + 96);
+          s.fillStyle = "#6ee7b7";
+          s.fillText("100% Verified", imgX + 329, imgY + 130);
+        }
+
+        s.globalAlpha = 0.52;
+        s.textAlign = "left";
+        s.font = '400 16px "Iowan Old Style", Baskerville, Georgia, serif';
+        de(s, "Context-first clinical reasoning pipeline: High-density ICD-10 ontology retrieval, longitudinal temporal knowledge graph traversal, and strict citation provenance verification.", 54, 460, 40, 22, 5);
+
+        s.globalAlpha = 0.2;
+        s.fillRect(48, d - 48, i - 96, 1);
+        s.globalAlpha = 1;
+        const x = Q(new l.CanvasTexture(c), { anisotropy: 16 });
+        x.name = e.id + "-interior-page-" + (n + 1);
         return x;
       }
 
@@ -259,7 +424,7 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
         s.globalAlpha = 1;
         const x = Q(new l.CanvasTexture(c), { anisotropy: 16 });
-        x.name = \`\${e.id}-interior-page-\${n + 1}\`;
+        x.name = e.id + "-interior-page-" + (n + 1);
         return x;
       }
 
@@ -269,7 +434,7 @@ export function applyPagePatches(code) {
         s.font = '500 12px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2.3px";
         s.fillText(e.discipline.toUpperCase(), 54, 174);
-        s.font = \`400 \${e.title.length > 10 ? 48 : 58}px "Iowan Old Style", Baskerville, Georgia, serif\`;
+        s.font = (e.title.length > 10 ? '400 48px "Iowan Old Style", Baskerville, Georgia, serif' : '400 58px "Iowan Old Style", Baskerville, Georgia, serif');
         s.letterSpacing = "0px";
         de(s, e.title, 52, 246, 18, 58, 2);
         s.globalAlpha = 0.55;
@@ -279,9 +444,9 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
       } else if (n === 2) {
         // Chapter 01
-        const title = e.id === "codex" ? "The Two-Tier Router" : (e.id === "xcode" ? "Clean Architecture & RBAC" : (e.id === "figma" ? "Architecture & Waving" : (e.chapters?.[0] || "Chapter 01")));
-        const sub = e.id === "codex" ? "50ms FastEmbed Reflexes & Dynamic Tool RAG" : (e.id === "xcode" ? "Decoupled Express 5 Services & JWT" : (e.id === "figma" ? "7-DoF Cobot & WebSocket Teleoperation" : (e.deck || "")));
-        const body = e.id === "codex" ? "Sub-50ms spinal reflexes for instant hardware safety and PC routines, paired with in-memory FAISS candidate vector injection for local LLM routing." : (e.id === "xcode" ? "Strict 3-tier architecture isolating Express routing, domain business logic, and PostgreSQL data access with stateless JWT and RBAC guards." : (e.id === "figma" ? "Bridges a Node.js web GUI with the 7-DoF Sawyer cobot via rosbridge_suite WebSockets. A hierarchical Design Tree enforces safe baseline postures, 5-cycle continuous wave loops, and linear Cartesian waypoints." : e.note));
+        const title = e.id === "codex" ? "The Two-Tier Router" : (e.id === "xcode" ? "Clean Architecture & RBAC" : (e.id === "figma" ? "Architecture & Waving" : (e.id === "cursor" ? "Multi-Modal Ingestion" : (e.id === "claude-code" ? "Clinical Grounding & RAG" : (e.chapters?.[0]?.title || "Chapter 01")))));
+        const sub = e.id === "codex" ? "50ms FastEmbed Reflexes & Dynamic Tool RAG" : (e.id === "xcode" ? "Decoupled Express 5 Services & JWT" : (e.id === "figma" ? "7-DoF Cobot & WebSocket Teleoperation" : (e.id === "cursor" ? "Layout-Aware Parsing & Async HTTP 202" : (e.id === "claude-code" ? "ICD-10 Ontologies & Citation-Enforced Synthesis" : (e.chapters?.[0]?.subtitle || e.deck || "")))));
+        const body = e.id === "codex" ? "Sub-50ms spinal reflexes for instant hardware safety and PC routines, paired with in-memory FAISS candidate vector injection for local LLM routing." : (e.id === "xcode" ? "Strict 3-tier architecture isolating Express routing, domain business logic, and PostgreSQL data access with stateless JWT and RBAC guards." : (e.id === "figma" ? "Bridges a Node.js web GUI with the 7-DoF Sawyer cobot via rosbridge_suite WebSockets. A hierarchical Design Tree enforces safe baseline postures, 5-cycle continuous wave loops, and linear Cartesian waypoints." : (e.id === "cursor" ? "Docling v2 with RapidOCR at 1.5x scale preserves markdown grid tables and visual asset routes, paired with non-blocking HTTP 202 job queues and deterministic MD5 content hashing." : (e.id === "claude-code" ? "Every assertion is validated against high-density medical vector indices (Qdrant) populated with Europe PMC and ICD-10 ontologies. Statements failing strict citation confidence (>0.88) are rejected prior to UI presentation." : e.note))));
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("CHAPTER 01", 54, 166);
@@ -299,9 +464,9 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
       } else if (n === 4) {
         // Chapter 02
-        const title = e.id === "codex" ? "Hardware Safety Guards" : (e.id === "xcode" ? "GIS Mapping & Live Chat" : (e.id === "figma" ? "Vision & Detection Benchmark" : (e.chapters?.[1] || "Chapter 02")));
-        const sub = e.id === "codex" ? "Sub-Packet Interception & Anti-Dump Guard" : (e.id === "xcode" ? "Interactive Leaflet Pins & Capacity Gating" : (e.id === "figma" ? "YOLOv8 vs Classical HSV Color Filtering" : (e.deck || "")));
-        const body = e.id === "codex" ? "Direct 33Hz method interception inside PyCozmo packet loops. Multi-modal sensor fusion combining cliff IR flags, IMU pitch tilt (>20°), true deceleration, and OpenCV optical flow visual stasis." : (e.id === "xcode" ? "Synchronizes Vienna-wide event clusters on Leaflet.js with interactive search cards using bidirectional panning, atomic registration, and polling chat." : (e.id === "figma" ? "Rigorous empirical comparison between YOLOv8 deep learning (96% static accuracy) and OpenCV HSV thresholding (100% detection, zero latency), demonstrating that low latency is paramount in fast visual servoing." : e.deck));
+        const title = e.id === "codex" ? "Hardware Safety Guards" : (e.id === "xcode" ? "GIS Mapping & Live Chat" : (e.id === "figma" ? "Vision & Detection Benchmark" : (e.id === "cursor" ? "Stream Concurrency" : (e.id === "claude-code" ? "Temporal Reasoning Graph" : (e.chapters?.[1]?.title || "Chapter 02")))));
+        const sub = e.id === "codex" ? "Sub-Packet Interception & Anti-Dump Guard" : (e.id === "xcode" ? "Interactive Leaflet Pins & Capacity Gating" : (e.id === "figma" ? "YOLOv8 vs Classical HSV Color Filtering" : (e.id === "cursor" ? "Adaptive Backpressure & Redis JobStore" : (e.id === "claude-code" ? "Multi-Step Medical Reasoning Across Longitudinal Records" : (e.chapters?.[1]?.subtitle || e.deck || "")))));
+        const body = e.id === "codex" ? "Direct 33Hz method interception inside PyCozmo packet loops. Multi-modal sensor fusion combining cliff IR flags, IMU pitch tilt (>20°), true deceleration, and OpenCV optical flow visual stasis." : (e.id === "xcode" ? "Synchronizes Vienna-wide event clusters on Leaflet.js with interactive search cards using bidirectional panning, atomic registration, and polling chat." : (e.id === "figma" ? "Rigorous empirical comparison between YOLOv8 deep learning (96% static accuracy) and OpenCV HSV thresholding (100% detection, zero latency), demonstrating that low latency is paramount in fast visual servoing." : (e.id === "cursor" ? "FastAPI async semaphores throttle LPU requests, pull-based token bucket rate limiting prevents worker OOM crashes, and multi-model fallback chains eliminate 429 rate-limit downtime." : (e.id === "claude-code" ? "Reconstructs historical patient records into temporal knowledge graphs, tracing disease progression, biomarker fluctuations, and latent drug interactions across chronologically ordered visits." : e.deck))));
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("CHAPTER 02", 54, 166);
@@ -319,9 +484,9 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
       } else if (n === 6) {
         // Chapter 03
-        const title = e.id === "codex" ? "Dual Memory & Voice" : (e.id === "xcode" ? "PostgreSQL & Cron Outbox" : (e.id === "figma" ? "Kalman MOT & Tethering" : (e.chapters?.[2] || "Chapter 03")));
-        const sub = e.id === "codex" ? "PostgresSaver & Kokoro-ONNX Stream" : (e.id === "xcode" ? "7-Entity Schema & Ticket Daemon" : (e.id === "figma" ? "Momentum Vectors & Hungarian Assignment" : (e.deck || "")));
-        const body = e.id === "codex" ? "PostgresSaver session state with rolling summarization, native PostgreSQL REAL[] array store with 0.82 cosine similarity deduplication, and zero-disk Kokoro-ONNX voice streaming." : (e.id === "xcode" ? "A normalized 7-table schema with foreign-key cascades, array types (tags TEXT[]), and cron-driven 1-hour ticket dispatch via Nodemailer." : (e.id === "figma" ? "Independent 4D Kalman filters ([x,y,dx,dy]) with cosine velocity penalties and dynamic occlusion tethering (80px threshold), slashing Identity Switch rates from 50% down to under 10%." : e.note));
+        const title = e.id === "codex" ? "Dual Memory & Voice" : (e.id === "xcode" ? "PostgreSQL & Cron Outbox" : (e.id === "figma" ? "Kalman MOT & Tethering" : (e.id === "cursor" ? "Semantic Chunking & VLMs" : (e.id === "claude-code" ? "Explainable Interventions" : (e.chapters?.[2]?.title || "Chapter 03")))));
+        const sub = e.id === "codex" ? "PostgresSaver & Kokoro-ONNX Stream" : (e.id === "xcode" ? "7-Entity Schema & Ticket Daemon" : (e.id === "figma" ? "Momentum Vectors & Hungarian Assignment" : (e.id === "cursor" ? "Structural Breakpoints & Qwen-27B" : (e.id === "claude-code" ? "Interactive Diagnostic Decision Trees & Doctor Feedback" : (e.chapters?.[2]?.subtitle || e.deck || "")))));
+        const body = e.id === "codex" ? "PostgresSaver session state with rolling summarization, native PostgreSQL REAL[] array store with 0.82 cosine similarity deduplication, and zero-disk Kokoro-ONNX voice streaming." : (e.id === "xcode" ? "A normalized 7-table schema with foreign-key cascades, array types (tags TEXT[]), and cron-driven 1-hour ticket dispatch via Nodemailer." : (e.id === "figma" ? "Independent 4D Kalman filters ([x,y,dx,dy]) with cosine velocity penalties and dynamic occlusion tethering (80px threshold), slashing Identity Switch rates from 50% down to under 10%." : (e.id === "cursor" ? "Groups text by DOM elements and triggers instant boundaries on section headers (>300 chars) with element-level overlap (N >= 1) to eliminate table fracturing and sentence truncation." : (e.id === "claude-code" ? "Rather than black-box recommendations, the system highlights clinical guideline citations, confidence intervals, and differential diagnostic paths directly in the physician workflow." : e.note))));
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("CHAPTER 03", 54, 166);
@@ -339,9 +504,9 @@ export function applyPagePatches(code) {
         s.fillRect(48, d - 48, i - 96, 1);
       } else if (n === 8) {
         // Chapter 04
-        const title = e.id === "codex" ? "Deterministic Sandbox & Tools" : (e.id === "xcode" ? "Geocoding & Calendar Sync" : (e.id === "figma" ? "MoveIt & Gazebo Twin" : (e.chapters?.[3] || "Chapter 04")));
-        const sub = e.id === "codex" ? "Isolated Python Subprocess & Tavily Tools" : (e.id === "xcode" ? "Photon Spatial API & RFC 5545 iCal" : (e.id === "figma" ? "S-Curve Shuffling & RRT-Connect Planning" : (e.deck || "")));
-        const body = e.id === "codex" ? "Deterministic code execution in an isolated Python sandbox with 8.0s hard timeouts, Tavily Model Context Protocol integration via stdio, and OpenCV HSV autonomous charger docking." : (e.id === "xcode" ? "Offloads address coordinate resolution to Photon API asynchronously, paired with zero-dependency client-side RFC 5545 iCal generation." : (e.id === "figma" ? "Gazebo digital twin with S-curve velocity profiles and 0.16m radial arc separation. MoveIt RRT-Connect planner generates collision-free hover trajectories in ~1.0s with Intera quaternion pose stabilization." : e.note));
+        const title = e.id === "codex" ? "Deterministic Sandbox & Tools" : (e.id === "xcode" ? "Geocoding & Calendar Sync" : (e.id === "figma" ? "MoveIt & Gazebo Twin" : (e.id === "cursor" ? "Hybrid Search & Reranking" : (e.id === "claude-code" ? "Multi-Agent Clinical Pipeline" : (e.chapters?.[3]?.title || "Chapter 04")))));
+        const sub = e.id === "codex" ? "Isolated Python Subprocess & Tavily Tools" : (e.id === "xcode" ? "Photon Spatial API & RFC 5545 iCal" : (e.id === "figma" ? "S-Curve Shuffling & RRT-Connect Planning" : (e.id === "cursor" ? "70/30 Dense-Lexical Fusion & Groq LPU" : (e.id === "claude-code" ? "Autonomous Specialist Agents & Real-Time Telemetry" : (e.chapters?.[3]?.subtitle || e.deck || "")))));
+        const body = e.id === "codex" ? "Deterministic code execution in an isolated Python sandbox with 8.0s hard timeouts, Tavily Model Context Protocol integration via stdio, and OpenCV HSV autonomous charger docking." : (e.id === "xcode" ? "Offloads address coordinate resolution to Photon API asynchronously, paired with zero-dependency client-side RFC 5545 iCal generation." : (e.id === "figma" ? "Gazebo digital twin with S-curve velocity profiles and 0.16m radial arc separation. MoveIt RRT-Connect planner generates collision-free hover trajectories in ~1.0s with Intera quaternion pose stabilization." : (e.id === "cursor" ? "Combines cosine dense embeddings (70%) with exact lexical tokens (30%) and Groq GPT-OSS-120B Cross-Encoder reranking over expanded candidate pools (K = max(2k, 16)), doubling top-1 precision." : (e.id === "claude-code" ? "Decouples specialized clinical reasoning across dedicated triage, pharmacology, and oncology agents over shared patient state boards with 100Hz ICU telemetry stream processing." : e.note))));
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("CHAPTER 04", 54, 166);

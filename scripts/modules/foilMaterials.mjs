@@ -11,7 +11,7 @@ export function applyFoilAndMaterialPatches(rawCode) {
     const o = document.createElement("canvas");
     o.width = 384, o.height = 1536;
     const t = o.getContext("2d");
-    const foilColor = (e.id === "xcode" || e.id === "codex") ? (e.foil || "#ffffff") : "#ffffff";
+    const foilColor = (e.id === "xcode" || e.id === "codex" || e.id === "claude-code") ? (e.foil || "#efc16d") : "#ffffff";
     t.clearRect(0, 0, o.width, o.height);
     t.fillStyle = foilColor;
     t.strokeStyle = foilColor;
@@ -64,7 +64,7 @@ export function applyFoilAndMaterialPatches(rawCode) {
     const o = document.createElement("canvas");
     o.width = 768, o.height = 1152;
     const t = o.getContext("2d");
-    const foilColor = (e.id === "xcode" || e.id === "codex") ? (e.foil || "#ffffff") : "#ffffff";
+    const foilColor = (e.id === "xcode" || e.id === "codex" || e.id === "claude-code") ? (e.foil || "#efc16d") : "#ffffff";
     t.clearRect(0, 0, o.width, o.height);
     t.fillStyle = foilColor;
     t.strokeStyle = foilColor;
@@ -123,13 +123,13 @@ export function applyFoilAndMaterialPatches(rawCode) {
   code = code.replace(
     /po\s*=\s*new l\.MeshPhysicalMaterial\(\{[\s\S]*?polygonOffsetFactor:\s*-2\s*\}\)/,
     `po = new l.MeshPhysicalMaterial({
-      color: e.id === "figma" ? 0x860d0d : 0xffffff,
+      color: e.id === "cursor" ? 0x111310 : (e.id === "figma" ? 0x860d0d : (e.id === "claude-code" ? 0xefc16d : 0xffffff)),
       map: N,
       alphaMap: N,
       bumpMap: Dr,
       bumpScale: 0.016,
-      roughness: e.id === "cursor" ? 0.22 : 0.18,
-      metalness: e.id === "cursor" ? 0.34 : 0.94,
+      roughness: e.id === "cursor" ? 0.35 : 0.18,
+      metalness: e.id === "cursor" ? 0.05 : 0.94,
       clearcoat: 0.22,
       clearcoatRoughness: 0.10,
       sheen: 0.25,
@@ -144,13 +144,13 @@ export function applyFoilAndMaterialPatches(rawCode) {
   code = code.replace(
     /ho\s*=\s*new l\.MeshPhysicalMaterial\(\{[\s\S]*?side:\s*l\.DoubleSide\s*\}\)/,
     `ho = new l.MeshPhysicalMaterial({
-      color: e.id === "figma" ? 0x860d0d : 0xffffff,
+      color: e.id === "cursor" ? 0x111310 : (e.id === "figma" ? 0x860d0d : (e.id === "claude-code" ? 0xefc16d : 0xffffff)),
       map: je,
       alphaMap: je,
       bumpMap: Kr,
       bumpScale: 0.017,
-      roughness: e.id === "cursor" ? 0.22 : 0.18,
-      metalness: e.id === "cursor" ? 0.34 : 0.92,
+      roughness: e.id === "cursor" ? 0.35 : 0.18,
+      metalness: e.id === "cursor" ? 0.05 : 0.92,
       clearcoat: 0.20,
       clearcoatRoughness: 0.10,
       sheen: 0.25,
@@ -166,13 +166,13 @@ export function applyFoilAndMaterialPatches(rawCode) {
   code = code.replace(
     /go\s*=\s*new l\.MeshPhysicalMaterial\(\{[\s\S]*?side:\s*l\.DoubleSide\s*\}\)/,
     `go = new l.MeshPhysicalMaterial({
-      color: e.id === "figma" ? 0x860d0d : 0xffffff,
+      color: e.id === "cursor" ? 0x111310 : (e.id === "figma" ? 0x860d0d : (e.id === "claude-code" ? 0xefc16d : 0xffffff)),
       map: xt,
       alphaMap: xt,
       bumpMap: kr,
       bumpScale: 0.016,
-      roughness: e.id === "cursor" ? 0.22 : 0.20,
-      metalness: e.id === "cursor" ? 0.34 : 0.90,
+      roughness: e.id === "cursor" ? 0.35 : 0.20,
+      metalness: e.id === "cursor" ? 0.05 : 0.90,
       clearcoat: 0.18,
       clearcoatRoughness: 0.12,
       sheen: 0.25,

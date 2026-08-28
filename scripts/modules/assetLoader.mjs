@@ -94,13 +94,65 @@ export function getAssetDataUris() {
     }
   }
 
+  // 7. Claude Code cover image candidates
+  const claudeCodeCandidates = [
+    path.resolve('src/assets/claude_code.png'),
+    path.resolve('public/claude_code.png'),
+    path.resolve('src/assets/claude_code.jpg'),
+    path.resolve('public/claude_code.jpg'),
+    path.resolve('src/assets/claudeCode.png'),
+    path.resolve('public/claudeCode.png'),
+    path.resolve('src/assets/claudeCode.jpg'),
+    path.resolve('public/claudeCode.jpg'),
+    path.resolve('src/assets/claude.png'),
+    path.resolve('public/claude.png'),
+    path.resolve('src/assets/claude.jpg'),
+    path.resolve('public/claude.jpg'),
+    path.resolve('src/assets/hugomed.png'),
+    path.resolve('public/hugomed.png'),
+    path.resolve('src/assets/hugo_med.png'),
+    path.resolve('public/hugo_med.png')
+  ];
+  let claudeCodeDataUri = '';
+  for (const p of claudeCodeCandidates) {
+    if (fs.existsSync(p)) {
+      const isPng = p.endsWith('.png');
+      const claudeBase64 = fs.readFileSync(p).toString('base64');
+      claudeCodeDataUri = `data:image/${isPng ? 'png' : 'jpeg'};base64,${claudeBase64}`;
+      break;
+    }
+  }
+
+  // 8. Claude Code diagram / medical architecture image
+  const claudeDiagramCandidates = [
+    path.resolve('src/assets/claude_code_diagram.png'),
+    path.resolve('public/claude_code_diagram.png'),
+    path.resolve('src/assets/claude_diagram.png'),
+    path.resolve('public/claude_diagram.png'),
+    path.resolve('src/assets/hugomed_diagram.png'),
+    path.resolve('public/hugomed_diagram.png'),
+    path.resolve('src/assets/clinical_rag_diagram.png'),
+    path.resolve('public/clinical_rag_diagram.png')
+  ];
+  let claudeCodeDiagramDataUri = '';
+  for (const p of claudeDiagramCandidates) {
+    if (fs.existsSync(p)) {
+      const isPng = p.endsWith('.png');
+      const claudeDiagBase64 = fs.readFileSync(p).toString('base64');
+      claudeCodeDiagramDataUri = `data:image/${isPng ? 'png' : 'jpeg'};base64,${claudeDiagBase64}`;
+      break;
+    }
+  }
+
   return {
     mokaDataUri,
     benchDataUri,
     cozmoSketchDataUri,
     joinAppDataUri,
     figmaDataUri,
-    figmaDiagramDataUri
+    figmaDiagramDataUri,
+    claudeCodeDataUri,
+    claudeCodeDiagramDataUri
   };
 }
 
@@ -111,7 +163,9 @@ export function injectAssetDeclarations(code, assets) {
     .replace(/const customCozmoSketchImg =[\s\S]*?;\s*}/g, '')
     .replace(/const customJoinAppImg =[\s\S]*?;\s*}/g, '')
     .replace(/const customFigmaImg =[\s\S]*?;\s*}/g, '')
-    .replace(/const customFigmaDiagramImg =[\s\S]*?;\s*}/g, '');
+    .replace(/const customFigmaDiagramImg =[\s\S]*?;\s*}/g, '')
+    .replace(/const customClaudeCodeImg =[\s\S]*?;\s*}/g, '')
+    .replace(/const customClaudeDiagramImg =[\s\S]*?;\s*}/g, '');
 
   let declarations = '';
   if (assets.mokaDataUri) {
@@ -131,6 +185,12 @@ export function injectAssetDeclarations(code, assets) {
   }
   if (assets.figmaDiagramDataUri) {
     declarations += `const customFigmaDiagramImg = typeof Image !== "undefined" ? new Image() : null;\n  if (customFigmaDiagramImg) { customFigmaDiagramImg.src = "${assets.figmaDiagramDataUri}"; }\n`;
+  }
+  if (assets.claudeCodeDataUri) {
+    declarations += `const customClaudeCodeImg = typeof Image !== "undefined" ? new Image() : null;\n  if (customClaudeCodeImg) { customClaudeCodeImg.src = "${assets.claudeCodeDataUri}"; }\n`;
+  }
+  if (assets.claudeCodeDiagramDataUri) {
+    declarations += `const customClaudeDiagramImg = typeof Image !== "undefined" ? new Image() : null;\n  if (customClaudeDiagramImg) { customClaudeDiagramImg.src = "${assets.claudeCodeDiagramDataUri}"; }\n`;
   }
 
   if (declarations) {

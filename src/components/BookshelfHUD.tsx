@@ -5,6 +5,8 @@ import { VOLUMES_DATA } from '../data/portfolioData';
 import { MOKA_PAGES_DATA, type MokaPageContent } from '../data/mokaPagesData';
 import { XCODE_PAGES_DATA, type XcodePageContent } from '../data/xcodePagesData';
 import { FIGMA_PAGES_DATA, type FigmaPageContent } from '../data/figmaPagesData';
+import { CURSOR_PAGES_DATA, type CursorPageContent } from '../data/cursorPagesData';
+import { CLAUDE_CODE_PAGES_DATA, type ClaudeCodePageContent } from '../data/claudeCodePagesData';
 
 interface BookshelfHUDProps {
   sceneState: { isOpen: boolean; isInspecting: boolean; page: number };
@@ -102,15 +104,19 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
     }
   };
 
-  // Resolve Active Page Content for MOKA, Xcode, or Figma
+  // Resolve Active Page Content for MOKA, Xcode, Figma, Cursor, or Claude Code
   const activePageKey = `page0${Math.min(Math.max(sceneState.page, 1), 5)}`;
-  const richContent: MokaPageContent | XcodePageContent | FigmaPageContent | undefined =
+  const richContent: MokaPageContent | XcodePageContent | FigmaPageContent | CursorPageContent | ClaudeCodePageContent | undefined =
     volume.id === 'codex'
       ? MOKA_PAGES_DATA[activePageKey]
       : volume.id === 'xcode'
       ? XCODE_PAGES_DATA[activePageKey]
       : volume.id === 'figma'
       ? FIGMA_PAGES_DATA[activePageKey]
+      : volume.id === 'cursor'
+      ? CURSOR_PAGES_DATA[activePageKey]
+      : volume.id === 'claude-code'
+      ? CLAUDE_CODE_PAGES_DATA[activePageKey]
       : undefined;
 
   const getPageTitle = (page: number) => {
@@ -254,7 +260,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
                 </svg>
                 <div className="detail-github-text">
                   <span className="detail-github-repo">
-                    {volume.id === 'codex' ? 'kaschefi/cozmo_ai_assistant' : (volume.id === 'xcode' ? 'kaschefi/joinApp' : (volume.id === 'figma' ? 'kaschefi/sawyerRobot-ShellGame' : 'Repository Source'))}
+                    {volume.id === 'codex' ? 'kaschefi/cozmo_ai_assistant' : (volume.id === 'xcode' ? 'kaschefi/joinApp' : (volume.id === 'figma' ? 'kaschefi/sawyerRobot-ShellGame' : (volume.projectDetails?.githubUrl?.replace('https://github.com/', '') || 'kaschefi/claude-code')))}
                   </span>
                   <span className="detail-github-label">Open on GitHub</span>
                 </div>
