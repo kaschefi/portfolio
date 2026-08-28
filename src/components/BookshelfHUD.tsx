@@ -4,6 +4,7 @@ import type { VolumeProject } from '../data/portfolioData';
 import { VOLUMES_DATA } from '../data/portfolioData';
 import { MOKA_PAGES_DATA, type MokaPageContent } from '../data/mokaPagesData';
 import { XCODE_PAGES_DATA, type XcodePageContent } from '../data/xcodePagesData';
+import { FIGMA_PAGES_DATA, type FigmaPageContent } from '../data/figmaPagesData';
 
 interface BookshelfHUDProps {
   sceneState: { isOpen: boolean; isInspecting: boolean; page: number };
@@ -107,13 +108,15 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Resolve Active Page Content for MOKA or Xcode
+  // Resolve Active Page Content for MOKA, Xcode, or Figma
   const activePageKey = `page0${Math.min(Math.max(sceneState.page, 1), 5)}`;
-  const richContent: MokaPageContent | XcodePageContent | undefined =
+  const richContent: MokaPageContent | XcodePageContent | FigmaPageContent | undefined =
     volume.id === 'codex'
       ? MOKA_PAGES_DATA[activePageKey]
       : volume.id === 'xcode'
       ? XCODE_PAGES_DATA[activePageKey]
+      : volume.id === 'figma'
+      ? FIGMA_PAGES_DATA[activePageKey]
       : undefined;
 
   const getPageTitle = (page: number) => {
@@ -245,7 +248,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
         {!sceneState.isOpen && (
           <div className="detail-github-box">
             <a
-              href={volume.id === 'codex' ? 'https://github.com/kaschefi/cozmo_ai_assistant' : (volume.projectDetails?.githubUrl || 'https://github.com/kaschefi')}
+              href={volume.id === 'codex' ? 'https://github.com/kaschefi/cozmo_ai_assistant' : (volume.id === 'xcode' ? 'https://github.com/kaschefi/joinApp' : (volume.id === 'figma' ? 'https://github.com/kaschefi/aegis-design-system' : (volume.projectDetails?.githubUrl || 'https://github.com/kaschefi')))}
               target="_blank"
               rel="noopener noreferrer"
               className="detail-github-btn"
@@ -257,7 +260,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
                 </svg>
                 <div className="detail-github-text">
                   <span className="detail-github-repo">
-                    {volume.id === 'codex' ? 'kaschefi/cozmo_ai_assistant' : (volume.id === 'xcode' ? 'kaschefi/joinApp' : 'Repository Source')}
+                    {volume.id === 'codex' ? 'kaschefi/cozmo_ai_assistant' : (volume.id === 'xcode' ? 'kaschefi/joinApp' : (volume.id === 'figma' ? 'kaschefi/aegis-design-system' : 'Repository Source'))}
                   </span>
                   <span className="detail-github-label">Open on GitHub</span>
                 </div>

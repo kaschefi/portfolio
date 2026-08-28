@@ -16,6 +16,8 @@ const TITLE_TO_ID: Record<string, string> = {
   'cursor': 'cursor',
   'antigravity': 'antigravity',
   'figma': 'figma',
+  'aegis': 'figma',
+  'aegis design system': 'figma',
   'framer': 'framer',
   'xcode': 'xcode',
   'joinapp': 'xcode',
