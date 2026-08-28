@@ -3,9 +3,10 @@ import { ArrowDown, Mail, Sparkles, Terminal as TerminalIcon } from 'lucide-reac
 
 interface HeroFluidRevealProps {
   onExploreBookshelf?: () => void;
+  onOpenAbout?: () => void;
 }
 
-export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBookshelf }) => {
+export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBookshelf, onOpenAbout }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -318,17 +319,27 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       uniform vec2 uResolution;
       uniform vec2 uImageResolution;
       uniform float uTime;
+      uniform float uIntroProgress; // 0.0 = starts at human (Layer 2), transitions smoothly to 1.0 (cybernetic Layer 1)
 
       vec2 getFitUV(vec2 uvCoord, vec2 screenRes, vec2 imgRes) {
         float screenAspect = screenRes.x / screenRes.y;
         float imgAspect = imgRes.x / imgRes.y;
-        float scale = 0.92;
-        vec2 centered = uvCoord - 0.5;
+
+        // Desktop Widescreen: Right-anchor (0.72x, 0.48y) to leave clean negative space for Left Typography Column
+        // Mobile / Portrait: Center-aligned (0.50x, 0.44y)
+        bool isWidescreen = screenAspect > 1.10;
+        float targetCenterX = isWidescreen ? 0.72 : 0.50;
+        float targetCenterY = isWidescreen ? 0.48 : 0.44;
+        float scale = isWidescreen ? 0.90 : 0.95;
+
+        vec2 centered = uvCoord - vec2(targetCenterX, targetCenterY);
+
         if (screenAspect > imgAspect) {
           centered.x *= (screenAspect / imgAspect);
         } else {
           centered.y *= (imgAspect / screenAspect);
         }
+
         return (centered / scale) + 0.5;
       }
 
@@ -354,7 +365,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         float fluidB = texture2D(uDensity, vUV - vec2(0.0, eps.y)).r;
         vec2 fluidGrad = vec2(fluidR - fluidL, fluidT - fluidB);
 
-        // Smooth liquid reveal mask (cleanly resolves to Layer 1 when density < 0.05)
+        // Smooth liquid reveal mask (cleanly resolves to base state when density < 0.05)
         float revealAmount = smoothstep(0.05, 0.70, fluidDensity);
 
         // Transition boundary (peaks strictly at the active tearing edge: 1.0 at edge, 0.0 in interior)
@@ -366,11 +377,10 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
 
         bool inBounds = (fitUV.x >= 0.0 && fitUV.x <= 1.0 && fitUV.y >= 0.0 && fitUV.y <= 1.0);
 
-        // Sample Layer 1: Resting cybernetic portrait (robotme.png)
+        // Sample Layer 1: Cybernetic portrait (robotme.png)
         vec4 col1 = inBounds ? texture2D(uLayer1, fitUV) : vec4(0.0);
 
         // Sample Layer 2: Revealed human engineer portrait (me.png)
-        // In the revealed interior (where transitionBoundary == 0), edgeDistort is 0 so the face is 100% razor sharp!
         vec2 uv2 = fitUV + edgeDistort;
         bool inBounds2 = (uv2.x >= 0.0 && uv2.x <= 1.0 && uv2.y >= 0.0 && uv2.y <= 1.0);
 
@@ -384,19 +394,24 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
           col2 = vec4(r, g, b, a);
         }
 
-        // Clean subject composition: dissolve Layer 1 to reveal Layer 2
-        vec4 subject = mix(col1, col2, revealAmount);
+        // Base resting state: starts at Layer 2 (human) upon initial load, then smoothly transitions to Layer 1 (cybernetic)
+        // uIntroProgress goes from 0.0 (Layer 2) to 1.0 (Layer 1)
+        vec4 basePortrait = mix(col2, col1, uIntroProgress);
 
-        // Edge curl energy glow strictly at transition boundaries
+        // Fluid reveal layer: hovering / dragging dissolves whatever is on top to reveal Layer 2 (human engineer)
+        vec4 subject = mix(basePortrait, col2, revealAmount);
+
+        // Refined ink / drafting bleed at transition boundaries
         float edgeStrength = smoothstep(0.01, 0.18, length(fluidGrad)) * transitionBoundary;
-        vec3 edgeGlow = vec3(0.25, 0.7, 1.0) * edgeStrength * 0.35;
+        vec3 edgeGlow = vec3(0.72, 0.68, 0.60) * edgeStrength * 0.25;
         subject.rgb += edgeGlow * subject.a;
 
-        // Dark atmosphere backdrop
-        vec3 bg = vec3(0.039, 0.051, 0.078);
-        float centerDist = length(vUV - vec2(0.5, 0.5));
-        float spotGlow = exp(-centerDist * 2.2) * 0.08;
-        bg += vec3(0.12, 0.18, 0.28) * spotGlow;
+        // Archival deep slate backdrop (#16181d) matching the 3D bookshelf scene
+        vec3 bg = vec3(0.086, 0.094, 0.114);
+        float spotX = (uResolution.x / uResolution.y > 1.05) ? 0.72 : 0.50;
+        float centerDist = length(vUV - vec2(spotX, 0.48));
+        float spotGlow = exp(-centerDist * 2.2) * 0.06;
+        bg += vec3(0.04, 0.04, 0.045) * spotGlow;
 
         vec3 finalRGB = mix(bg, subject.rgb, subject.a);
         gl_FragColor = vec4(finalRGB, 1.0);
@@ -519,10 +534,62 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
 
     let imageDimensions = { width: 1952, height: 2150 };
     let loadedCount = 0;
+
+    // 7. Mouse Physics & Splat Queue
+    interface SplatItem {
+      x: number;
+      y: number;
+      dx: number;
+      dy: number;
+      color: [number, number, number];
+      radiusMultiplier?: number;
+    }
+
+    const splats: SplatItem[] = [];
+    let lastX = 0;
+    let lastY = 0;
+    let lastMoveTime = performance.now();
+    let hasMoved = false;
+    let motionFrames = 60; // Initial render frames
+
+    const addSplat = (
+      x: number,
+      y: number,
+      dx: number,
+      dy: number,
+      customColor?: [number, number, number],
+      multiplier = 4.2,
+      radiusMultiplier = 1.0,
+      frames = 360
+    ) => {
+      const rect = canvas.getBoundingClientRect();
+      const nx = (x - rect.left) / rect.width;
+      const ny = 1.0 - (y - rect.top) / rect.height;
+
+      splats.push({
+        x: nx,
+        y: ny,
+        dx: dx * multiplier,
+        dy: -dy * multiplier,
+        color: customColor || [1.4, 1.4, 1.4],
+        radiusMultiplier
+      });
+
+      motionFrames = Math.max(motionFrames, frames);
+    };
+
+    // Intro state: starts displaying human Layer 2, then smoothly dissolves into cybernetic Layer 1
+    let introStartTime: number | null = null;
+    let introProgress = 0.0;
+    const INTRO_DELAY_MS = 600; // Hold on human layer for 600ms so user clearly registers it
+    const INTRO_DURATION_MS = 1400; // 1.4s smooth dissolve to cybernetic layer
+
     const checkLoaded = () => {
       loadedCount++;
       if (loadedCount >= 2) {
         setIsLoaded(true);
+        introStartTime = performance.now();
+        motionFrames = Math.max(motionFrames, 240); // Keep loop rendering through the intro transition
       }
     };
 
@@ -536,41 +603,6 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
     const layer2Texture = loadTexture(`${baseUrl}me.png`, () => {
       checkLoaded();
     });
-
-    // 7. Mouse Physics & Splat Queue
-    interface SplatItem {
-      x: number;
-      y: number;
-      dx: number;
-      dy: number;
-      color: [number, number, number];
-    }
-
-    const splats: SplatItem[] = [];
-    let lastX = 0;
-    let lastY = 0;
-    let lastMoveTime = performance.now();
-    let hasMoved = false;
-    let motionFrames = 60; // Initial render frames
-
-    const addSplat = (x: number, y: number, dx: number, dy: number) => {
-      const rect = canvas.getBoundingClientRect();
-      const nx = (x - rect.left) / rect.width;
-      const ny = 1.0 - (y - rect.top) / rect.height;
-
-      // Scaling momentum multiplier for high-velocity mouse flicks
-      const momentumMultiplier = 4.2;
-
-      splats.push({
-        x: nx,
-        y: ny,
-        dx: dx * momentumMultiplier,
-        dy: -dy * momentumMultiplier,
-        color: [1.4, 1.4, 1.4]
-      });
-
-      motionFrames = Math.max(motionFrames, 360);
-    };
 
     const onPointerMove = (e: MouseEvent | TouchEvent) => {
       let clientX = 0;
@@ -599,7 +631,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       lastX = clientX;
       lastY = clientY;
 
-      // Dynamic flick momentum boost
+      // Dynamic flick momentum boost for real cursor hover
       const flickBoost = Math.min(Math.hypot(dx, dy) / (dt * 1200), 2.2);
       if (Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3) {
         addSplat(clientX, clientY, dx * (1.0 + flickBoost), dy * (1.0 + flickBoost));
@@ -634,8 +666,24 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       const dt = Math.min((now - lastTime) / 1000, 0.032);
       lastTime = now;
 
+      // Compute smooth intro transition from Layer 2 (human) to Layer 1 (cybernetic)
+      if (introStartTime !== null) {
+        const elapsed = now - introStartTime;
+        if (elapsed < INTRO_DELAY_MS) {
+          introProgress = 0.0;
+          motionFrames = Math.max(motionFrames, 60);
+        } else if (elapsed < INTRO_DELAY_MS + INTRO_DURATION_MS) {
+          const t = (elapsed - INTRO_DELAY_MS) / INTRO_DURATION_MS;
+          // Smooth cubic ease-in-out
+          introProgress = t * t * (3.0 - 2.0 * t);
+          motionFrames = Math.max(motionFrames, 60);
+        } else {
+          introProgress = 1.0;
+        }
+      }
+
       // Only simulate while active motion or active fluid remains (Zero-load idle: 0 FPS / 0% GPU)
-      if (motionFrames > 0 || splats.length > 0) {
+      if (motionFrames > 0 || splats.length > 0 || introProgress < 1.0) {
         if (motionFrames > 0) motionFrames--;
 
         const texelSize = [1.0 / simRes, 1.0 / simRes];
@@ -644,8 +692,9 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         // --- Step 1: Ingest mouse impulses / splats into Velocity and Dye Density ---
         while (splats.length > 0) {
           const s = splats.pop()!;
+          const radMul = s.radiusMultiplier || 1.0;
 
-          // Velocity Splat (100% bigger brush radius)
+          // Velocity Splat
           gl.viewport(0, 0, simRes, simRes);
           bindQuad(progSplat);
           gl.bindFramebuffer(gl.FRAMEBUFFER, velocity.write.fbo);
@@ -655,11 +704,11 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
           gl.uniform1f(gl.getUniformLocation(progSplat, 'uAspectRatio'), aspect);
           gl.uniform2f(gl.getUniformLocation(progSplat, 'uPoint'), s.x, s.y);
           gl.uniform3f(gl.getUniformLocation(progSplat, 'uColor'), s.dx, s.dy, 0.0);
-          gl.uniform1f(gl.getUniformLocation(progSplat, 'uRadius'), 0.015); // Doubled radius
+          gl.uniform1f(gl.getUniformLocation(progSplat, 'uRadius'), 0.015 * radMul);
           gl.drawArrays(gl.TRIANGLES, 0, 6);
           velocity.swap();
 
-          // Density Splat (100% bigger brush radius)
+          // Density Splat
           gl.bindFramebuffer(gl.FRAMEBUFFER, density.write.fbo);
           gl.activeTexture(gl.TEXTURE0);
           gl.bindTexture(gl.TEXTURE_2D, density.read.tex);
@@ -667,7 +716,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
           gl.uniform1f(gl.getUniformLocation(progSplat, 'uAspectRatio'), aspect);
           gl.uniform2f(gl.getUniformLocation(progSplat, 'uPoint'), s.x, s.y);
           gl.uniform3f(gl.getUniformLocation(progSplat, 'uColor'), s.color[0], s.color[1], s.color[2]);
-          gl.uniform1f(gl.getUniformLocation(progSplat, 'uRadius'), 0.019); // Doubled radius
+          gl.uniform1f(gl.getUniformLocation(progSplat, 'uRadius'), 0.019 * radMul);
           gl.drawArrays(gl.TRIANGLES, 0, 6);
           density.swap();
         }
@@ -802,6 +851,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
           imageDimensions.height
         );
         gl.uniform1f(gl.getUniformLocation(progComposite, 'uTime'), now * 0.001);
+        gl.uniform1f(gl.getUniformLocation(progComposite, 'uIntroProgress'), introProgress);
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
       }
@@ -834,13 +884,9 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
 
       {/* Foreground Accessibility & Portfolio Typography Overlay */}
       <div className="hero-overlay-wrapper">
-        {/* Top Navigation Bar */}
-        <header className="hero-top-nav">
-          <div className="hero-badge">
-            <span className="hero-badge-dot" />
-            <span className="hero-badge-text">
-              Autonomous Systems & ML Engineer
-            </span>
+
+        <header className="hero-top-nav" style={{ justifyContent: 'space-between' }}>
+          <div className="hero-top-left">
           </div>
 
           <div className="hero-social-links">
@@ -876,59 +922,49 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
           </div>
         </header>
 
+
         {/* Center / Lower Hero Headline & Narrative */}
         <div className="hero-center-content">
-          <div className="hero-kicker">
-            <Sparkles className="hero-kicker-icon" />
-            <span>Interactive Navier-Stokes Fluid Reveal</span>
+          <div className="hero-eyebrow">
+            <span>FOLIO // 2026</span>
           </div>
 
-          <h1 className="hero-title">
+          <h1 className="hero-title hero-title--serif">
             Mohammad <br />
-            <span className="hero-title-gradient">
+            <span className="hero-title-name">
               Kashefirad
             </span>
           </h1>
 
+          <div className="hero-subhead">
+            <span>Student at Hochschule Campus Wien</span>
+          </div>
+
           <p className="hero-description">
-            Pioneering autonomous AI agents, robotics kinematics, and fine-grained vision models. Move your cursor to dissolve the cybernetic layer and reveal the engineer behind the code.
+            I'm an engineer working at the intersection of autonomous agents, robotics kinematics, backend infrastructure and website development.
           </p>
 
           <div className="hero-cta-row">
             <button
               onClick={onExploreBookshelf}
-              className="hero-primary-btn"
+              className="hero-outline-btn hero-outline-btn--primary"
             >
-              <span>Explore 3D Bookshelf</span>
+              <span>Explore Projects</span>
               <ArrowDown className="hero-btn-arrow" />
             </button>
+
 
             <a
               href="https://github.com/kaschefi"
               target="_blank"
               rel="noopener noreferrer"
-              className="hero-secondary-btn"
+              className="hero-outline-btn"
             >
               <TerminalIcon className="hero-btn-terminal" />
               <span>Repositories</span>
             </a>
           </div>
         </div>
-
-        {/* Bottom Hint */}
-        <footer className="hero-footer">
-          <div className="hero-footer-left">
-            <span className="hero-ping-dot" />
-            <span>Interactive Cursor: Hover over portrait to reveal human layer</span>
-          </div>
-          <button
-            onClick={onExploreBookshelf}
-            className="hero-footer-right"
-          >
-            <span>Scroll for Case Studies</span>
-            <ArrowDown className="hero-footer-arrow" />
-          </button>
-        </footer>
       </div>
     </div>
   );

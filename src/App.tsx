@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { HeroFluidReveal } from './components/HeroFluidReveal';
+import { AboutSection } from './components/AboutSection';
 import { BookshelfContainer } from './components/BookshelfContainer';
 import { BookshelfHUD } from './components/BookshelfHUD';
 import { ProjectDetailModal } from './components/ProjectDetailModal';
+import { ContactFooter } from './components/ContactFooter';
 import type { VolumeProject } from './data/portfolioData';
 import { VOLUMES_DATA } from './data/portfolioData';
 
@@ -37,10 +39,10 @@ export function App() {
     setSelectedModalVolume(null);
   };
 
-  const handleScrollToBookshelf = () => {
-    const shelf = document.getElementById('bookshelf');
-    if (shelf) {
-      shelf.scrollIntoView({ behavior: 'smooth' });
+  const handleScrollToSection = (sectionId: string) => {
+    const el = document.getElementById(sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -64,12 +66,20 @@ export function App() {
 
   return (
     <div className="portfolio-app">
-      {/* Hero Section with Interactive Fluid Reveal */}
+      {/* 1. Hero Section with Interactive Fluid Reveal */}
       <section className="hero-section" id="hero">
-        <HeroFluidReveal onExploreBookshelf={handleScrollToBookshelf} />
+        <HeroFluidReveal 
+          onExploreBookshelf={() => handleScrollToSection('about')} 
+          onOpenAbout={() => handleScrollToSection('about')}
+        />
       </section>
 
-      {/* 3D Bookshelf Viewport */}
+      {/* 2. Editorial About / Technical Philosophy Dossier Section */}
+      <AboutSection 
+        onExploreProjects={() => handleScrollToSection('bookshelf')} 
+      />
+
+      {/* 3. Interactive 3D Bookshelf Viewport */}
       <main className="bookshelf-section" id="bookshelf">
         <BookshelfContainer
           onVolumeChange={handleVolumeChange}
@@ -81,6 +91,9 @@ export function App() {
           />
         </BookshelfContainer>
       </main>
+
+      {/* 4. Frictionless Contact & Availability Callout Footer */}
+      <ContactFooter />
 
       {/* Project Case Study Drawer Modal */}
       <ProjectDetailModal
