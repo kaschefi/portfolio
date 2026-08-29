@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowDown, Mail, Sparkles, Terminal as TerminalIcon } from 'lucide-react';
+import { ArrowDown, Mail, Terminal as TerminalIcon } from 'lucide-react';
 
 interface HeroFluidRevealProps {
   onExploreBookshelf?: () => void;
   onOpenAbout?: () => void;
 }
 
-export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBookshelf, onOpenAbout }) => {
+export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBookshelf }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 

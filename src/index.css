@@ -2499,7 +2499,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* Right Column: Architectural Matrix & Shelf Cue */
+/* Right Column: Skills Grid & Shelf Cue */
 .about-right-col {
   display: flex;
   flex-direction: column;
@@ -2520,50 +2520,86 @@ body {
   border-bottom: 1px solid color-mix(in srgb, var(--ink, #f4eee6) 14%, transparent);
 }
 
-.about-cards-matrix {
+@keyframes anim-shimmer-sweep {
+  0% { transform: translateX(-100%) rotate(25deg); opacity: 0; }
+  30% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateX(250%) rotate(25deg); opacity: 0; }
+}
+
+.about-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.55rem;
+}
+
+.about-skill-card {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  justify-content: space-between;
+  padding: 0.75rem 0.9rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(244, 238, 230, 0.08);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.about-card {
-  display: grid;
-  grid-template-columns: 36px 1fr;
-  gap: 1rem;
-  padding: 1.15rem 1.35rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid color-mix(in srgb, var(--ink, #f4eee6) 12%, transparent);
-  transition: all 0.22s var(--ease-smooth);
+.about-skill-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  pointer-events: none;
+  opacity: 0;
 }
 
-.about-card:hover {
-  background: rgba(255, 255, 255, 0.045);
-  border-color: color-mix(in srgb, var(--ink, #f4eee6) 26%, transparent);
-  transform: translateX(3px);
+.about-skill-card:hover::after {
+  animation: anim-shimmer-sweep 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.about-card-number {
+.about-skill-card:hover {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(244, 238, 230, 0.25);
+  transform: translateY(-2px);
+}
+
+.about-skill-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.about-skill-icon {
+  display: flex;
+  align-items: center;
+  opacity: 0.75;
+  color: #d1cbc2;
+}
+
+.about-skill-category {
   font-family: var(--font-mono, monospace);
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--ink-soft, #8d8984);
-  padding-top: 2px;
+  font-size: 0.58rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #716e6a;
+  transition: letter-spacing 0.2s ease, color 0.2s ease;
 }
 
-.about-card-title {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--ink, #f4eee6);
-  margin: 0 0 0.35rem;
-  letter-spacing: -0.01em;
+.about-skill-card:hover .about-skill-category {
+  letter-spacing: 0.09em;
+  color: #9da9be;
 }
 
-.about-card-desc {
-  font-size: 0.8rem;
-  line-height: 1.55;
-  color: color-mix(in srgb, var(--ink, #f4eee6) 70%, transparent);
-  margin: 0;
+.about-skill-name {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #e8e2d8;
 }
 
 /* Shelf Cue Bottom Bar */
@@ -2614,6 +2650,12 @@ body {
   .about-dossier-grid {
     grid-template-columns: 1fr;
     gap: 3rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .about-skills-grid {
+    grid-template-columns: 1fr;
   }
 }
 

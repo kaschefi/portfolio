@@ -81,6 +81,11 @@ components:
     textColor: "{colors.text-primary}"
     rounded: "{rounded.lg}"
     padding: "1.5rem"
+  skill-card:
+    backgroundColor: "rgba(255, 255, 255, 0.025)"
+    textColor: "{colors.text-primary}"
+    rounded: "10px"
+    padding: "0.75rem 0.95rem"
 ---
 
 # Design System
@@ -114,6 +119,7 @@ A dark, high-craft editorial monograph engineered for technical evaluators. The 
 - **Viewport Fill Hero**: Full viewport height (`100vh`) with fluid simulation reveal layer beneath floating glass HUD elements.
 - **Bookshelf Stage**: Centered 3D viewport with bottom navigation dock and volume pagination controls.
 - **Chapter Spread Modal**: Split-pane editorial layout simulating physical open book spreads with left-hand architecture/highlights and right-hand narrative/code snippets.
+- **Dossier Editorial Grid**: 2-column split with narrative monograph on left and compact skills matrix on right.
 - **Responsive Padding**: Fluid clamps (`clamp(1.5rem, 4vw, 3.5rem)`) providing robust edge margins across desktop and mobile.
 
 ## Elevation & Depth
@@ -126,12 +132,14 @@ A dark, high-craft editorial monograph engineered for technical evaluators. The 
 
 - **HUD Pills & Badges**: Fully rounded (`border-radius: 9999px`) for status indicators, filter tabs, and action triggers.
 - **Cards & Modals**: Smooth medium/large corner radii (`12px` to `20px`) matching modern macOS and iOS tactile surfaces.
+- **Skills Matrix Cards**: Compact `10px` rounded cards with top micro-tags and icon drop-shadow illumination.
 - **Action Buttons & Icon Triggers**: Square with rounded squircle corners (`12px`) or circular (`50%`).
 
 ## Components
 
 - **Status Pill (`.hero-badge`)**: Monospace live status indicator with pulsing emerald LED dot.
 - **Hero Title**: Multi-stop gradient text (`#ffffff` -> `#cbd5e1` -> `#94a3b8`) over deep dark background.
+- **Skills Matrix (`.about-skill-card`)**: 2-column micro-card grid with domain badges, colored icons, and `-2px` hover lift.
 - **Nav Dock**: Floating pill container with smooth tab pill indicators and glass hover states.
 - **Book 3D Canvas**: Three.js viewport clamped to DPR 1.0, rendering on-demand.
 - **Spread Reader**: Dual-page open book reader with serif titles, syntax-highlighted code blocks, and key metric badges.
