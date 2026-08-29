@@ -37,17 +37,19 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
     }
   }, [sceneState.isInspecting]);
 
-  // Sync expanded class to .bookshelf-wrapper
+  // Sync with bookshelf:view-spine and bookshelf:reset-view events
   React.useEffect(() => {
-    const wrapper = document.querySelector('.bookshelf-wrapper');
-    if (wrapper) {
-      if (isExpanded && sceneState.isInspecting) {
-        wrapper.classList.add('is-expanded');
-      } else {
-        wrapper.classList.remove('is-expanded');
-      }
-    }
-  }, [isExpanded, sceneState.isInspecting]);
+    const handleViewSpine = () => setIsExpanded(true);
+    const handleResetView = () => setIsExpanded(false);
+
+    window.addEventListener('bookshelf:view-spine', handleViewSpine);
+    window.addEventListener('bookshelf:reset-view', handleResetView);
+
+    return () => {
+      window.removeEventListener('bookshelf:view-spine', handleViewSpine);
+      window.removeEventListener('bookshelf:reset-view', handleResetView);
+    };
+  }, []);
 
   const handleToggleExpand = () => {
     sound.playClick();

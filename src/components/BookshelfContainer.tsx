@@ -181,9 +181,30 @@ export const BookshelfContainer: React.FC<BookshelfContainerProps> = ({
     };
   }, [onVolumeChange, onStateChange]);
 
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleViewSpine = () => setIsExpanded(true);
+    const handleResetView = () => setIsExpanded(false);
+
+    window.addEventListener('bookshelf:view-spine', handleViewSpine);
+    window.addEventListener('bookshelf:reset-view', handleResetView);
+
+    return () => {
+      window.removeEventListener('bookshelf:view-spine', handleViewSpine);
+      window.removeEventListener('bookshelf:reset-view', handleResetView);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isInspecting) {
+      setIsExpanded(false);
+    }
+  }, [isInspecting]);
+
   return (
     <div
-      className={`experience bookshelf-wrapper ${isInspecting ? 'mode-detail' : 'mode-hero'}`}
+      className={`experience bookshelf-wrapper ${isInspecting ? 'mode-detail' : 'mode-hero'} ${isExpanded && isInspecting ? 'is-expanded' : ''}`}
       ref={containerRef}
     >
       <div

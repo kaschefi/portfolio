@@ -20,14 +20,24 @@ export function applyEnginePatches(rawCode) {
   if (!code.includes('const heroDrag = {')) {
     code = code.replace(
       'function fa(Nr, m, He = {}) {',
-      'function fa(Nr, m, He = {}) {\n  let __motionFrames = 60;\n  const __wake = (frames = 60) => { __motionFrames = Math.max(__motionFrames, frames); U(); };\n  const heroDrag = { active: false, pointerId: null, startX: 0, startY: 0, lastX: 0, lastY: 0, lastTime: 0, velocityX: 0, hasDragged: false, isVerticalScroll: false, dragDistance: 0, startV: 0 };\n'
+      'function fa(Nr, m, He = {}) {\n  let __motionFrames = 60;\n  const __wake = (frames = 60) => { __motionFrames = Math.max(__motionFrames, frames); U(); };\n  const spineAnim = { active: false, progress: 0, duration: 0.62, fromQuat: new l.Quaternion(), toQuat: new l.Quaternion() };\n  const heroDrag = { active: false, pointerId: null, startX: 0, startY: 0, lastX: 0, lastY: 0, lastTime: 0, velocityX: 0, hasDragged: false, isVerticalScroll: false, dragDistance: 0, startV: 0 };\n'
     );
   }
 
   // 5. Update the render loop $n to universally sleep across EVERY 3D state (0 FPS Idle)
   const loopRegex = /const a = Math\.abs\(oe - V\) > 5e-4 \|\| Ne > 0;\s*[\s\S]*?!Ae && U\(\);/;
-  const replacementLoop = `const a = Math.abs(oe - V) > 5e-4 || Ne > 0;
-    const shouldKeepRendering = (__motionFrames > 0) || b === "opening" || b === "closing" || a || r || (p && p.active) || (typeof Ne !== "undefined" && Ne > 0) || (typeof te !== "undefined" && te < 1 && te > 0) || (typeof ft !== "undefined" && ft);
+  const replacementLoop = `if (spineAnim.active && u) {
+      spineAnim.progress += o / spineAnim.duration;
+      const st = ct(A(spineAnim.progress, 0, 1));
+      u.root.quaternion.slerpQuaternions(spineAnim.fromQuat, spineAnim.toQuat, st);
+      if (spineAnim.progress >= 1) {
+        spineAnim.active = false;
+        u.root.quaternion.copy(spineAnim.toQuat);
+      }
+      __wake(5);
+    }
+    const a = Math.abs(oe - V) > 5e-4 || Ne > 0;
+    const shouldKeepRendering = (__motionFrames > 0) || spineAnim.active || b === "opening" || b === "closing" || a || r || (p && p.active) || (typeof Ne !== "undefined" && Ne > 0) || (typeof te !== "undefined" && te < 1 && te > 0) || (typeof ft !== "undefined" && ft);
     if (__motionFrames > 0) __motionFrames--;
     shouldKeepRendering && !Ae && U();`;
 
@@ -453,7 +463,7 @@ export function applyEnginePatches(rawCode) {
     't.root.visible = t.opacity > 0.005, t.contactShadow.visible = t.opacity > 0.005, t.contactShadow.material.opacity = t.opacity * 0.24, t.hit.visible = t.opacity > 0.12;'
   );
 
-  // 15. Add view-spine and reset-view handlers via document delegation & custom window events
+  // 15. Add view-spine and reset-view handlers with smooth 3D slerp transition
   if (code.includes(', Ko.addEventListener("click", Lr), D.render(R, L)')) {
     code = code.replace(
       ', Ko.addEventListener("click", Lr), D.render(R, L)',
@@ -461,7 +471,11 @@ export function applyEnginePatches(rawCode) {
       const applyViewSpine = () => {
         if (b === "detail" && u) {
           ve(!1);
-          u.root.quaternion.setFromEuler(new l.Euler(-0.02, Math.PI * 0.40, 0.01, "YXZ"));
+          const targetQ = new l.Quaternion().setFromEuler(new l.Euler(-0.02, Math.PI * 0.40, 0.01, "YXZ"));
+          spineAnim.active = true;
+          spineAnim.progress = 0;
+          spineAnim.fromQuat.copy(u.root.quaternion);
+          spineAnim.toQuat.copy(targetQ);
           L.position.copy(ht);
           z.target.copy(Je);
           z.update();
@@ -471,7 +485,10 @@ export function applyEnginePatches(rawCode) {
       };
       const applyResetView = () => {
         if (b === "detail" && u) {
-          u.root.quaternion.copy(fn);
+          spineAnim.active = true;
+          spineAnim.progress = 0;
+          spineAnim.fromQuat.copy(u.root.quaternion);
+          spineAnim.toQuat.copy(fn);
           Lr();
           __wake(90);
           U();
@@ -488,11 +505,17 @@ export function applyEnginePatches(rawCode) {
     );
   }
 
-  // 16. Ensure Lr() restores book orientation when collapsing
-  if (code.includes('function Lr() { __wake(60);') && !code.includes('u.root.quaternion.copy(fn);')) {
+  // 16. Ensure Lr() smoothly slerps book orientation when collapsing
+  if (code.includes('function Lr() { __wake(60);') && !code.includes('spineAnim.fromQuat.copy(u.root.quaternion)')) {
     code = code.replace(
       'function Lr() { __wake(60);',
-      'function Lr() { __wake(60); if (b === "detail" && u) { u.root.quaternion.copy(fn); }'
+      `function Lr() { __wake(60);
+      if (b === "detail" && u) {
+        spineAnim.active = true;
+        spineAnim.progress = 0;
+        spineAnim.fromQuat.copy(u.root.quaternion);
+        spineAnim.toQuat.copy(fn);
+      }`
     );
   }
 

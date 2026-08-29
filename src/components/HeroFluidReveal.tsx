@@ -1055,7 +1055,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       />
 
       {/* Circle Loader (Shown while Layer 1 & 2 textures load) */}
-      <div 
+      <div
         className={`hero-loader-overlay ${isLoaded ? 'hero-loader-overlay--hidden' : ''}`}
         aria-hidden={isLoaded}
       >
