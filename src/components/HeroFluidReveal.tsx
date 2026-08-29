@@ -553,6 +553,16 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
     let lastMoveTime = performance.now();
     let hasMoved = false;
     let motionFrames = 60; // Initial render frames
+    let isRendering = false;
+    let isInView = true;
+
+    const wake = (frames = 90) => {
+      motionFrames = Math.max(motionFrames, frames);
+      if (!isRendering && isRunning && isInView) {
+        isRendering = true;
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
 
     const addSplat = (
       x: number,
@@ -577,7 +587,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         radiusMultiplier
       });
 
-      motionFrames = Math.max(motionFrames, frames);
+      wake(frames);
     };
 
     // Intro state: starts displaying human Layer 2, then smoothly dissolves into cybernetic Layer 1
@@ -681,7 +691,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       if (loadedCount >= 2) {
         setIsLoaded(true);
         introStartTime = performance.now();
-        motionFrames = Math.max(motionFrames, 240); // Keep loop rendering through the intro transition
+        wake(240); // Keep loop rendering through the intro transition
         if (!isCaptionDismissed && captionTimer === null) {
           captionTimer = window.setTimeout(dismissCaption, 4500);
         }
@@ -778,7 +788,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
       gl.viewport(0, 0, width, height);
-      motionFrames = Math.max(motionFrames, 60);
+      wake(60);
     };
 
     window.addEventListener('resize', onResize);
@@ -789,7 +799,10 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
     let isRunning = true;
 
     const render = () => {
-      if (!isRunning) return;
+      if (!isRunning || !isInView) {
+        isRendering = false;
+        return;
+      }
 
       const now = performance.now();
       const dt = Math.min((now - lastTime) / 1000, 0.032);
@@ -986,15 +999,35 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         gl.uniform1f(gl.getUniformLocation(progComposite, 'uIntroProgress'), introProgress);
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
+        animationFrameId = requestAnimationFrame(render);
+      } else {
+        isRendering = false;
       }
-
-      animationFrameId = requestAnimationFrame(render);
     };
 
-    render();
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isInView = entry.isIntersecting;
+        if (isInView) {
+          wake(90);
+        } else {
+          isRendering = false;
+          cancelAnimationFrame(animationFrameId);
+        }
+      },
+      { threshold: 0.05 }
+    );
+
+    if (canvas) {
+      observer.observe(canvas);
+    }
+
+    wake(180);
 
     return () => {
       isRunning = false;
+      isRendering = false;
+      observer.disconnect();
       cancelAnimationFrame(animationFrameId);
       if (idleTimer !== null) clearTimeout(idleTimer);
       if (captionTimer !== null) clearTimeout(captionTimer);

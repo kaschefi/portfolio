@@ -702,6 +702,12 @@ body {
   transform: translateX(-18%);
 }
 
+.bookshelf-wrapper.is-expanded.mode-detail .bookshelf-stage,
+.bookshelf-wrapper.is-expanded .bookshelf-stage {
+  width: 180%;
+  transform: translateX(-43.5%);
+}
+
 .bookshelf {
   width: 100% !important;
   height: 100% !important;
@@ -2081,26 +2087,100 @@ body {
   transform: translateY(-6px);
 }
 
-.close-button {
+.detail-panel-actions {
   position: absolute;
   top: 0;
   right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+}
+
+.expand-button,
+.close-button {
   display: grid;
   width: 38px;
   height: 38px;
   padding: 0;
   border: 1px solid color-mix(in srgb, var(--ink, #f4eee6) 38%, transparent);
   border-radius: 50%;
+  background: transparent;
+  color: var(--ink, #f4eee6);
+  cursor: pointer;
   place-items: center;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms var(--ease-out);
 }
 
+.expand-button:hover,
 .close-button:hover {
   color: var(--paper, #171a24);
+  border-color: var(--ink, #f4eee6);
   background: var(--ink, #f4eee6);
+  transform: translateY(-1px);
+}
+
+.expand-button svg,
+.close-button svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.35;
+}
+
+/* 4. Expanded Reader Mode: Book in blue margin, description in expansive red area */
+.bookshelf-wrapper.is-expanded .detail-panel {
+  position: absolute;
+  top: 78px;
+  bottom: 24px;
+  left: clamp(230px, 21vw, 310px);
+  right: clamp(24px, 3vw, 48px);
+  width: auto;
+  max-width: 1440px;
+  max-height: calc(100vh - 108px);
+  transform: none;
+  background: color-mix(in srgb, var(--paper-deep, #10131b) 90%, transparent);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  padding: 34px 44px 40px 44px;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--ink, #f4eee6) 16%, transparent);
+  box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.bookshelf-wrapper.is-expanded .detail-panel .detail-panel-actions {
+  top: 30px;
+  right: 36px;
+}
+
+.bookshelf-wrapper.is-expanded .moka-rich-content {
+  margin-top: 24px;
+}
+
+.bookshelf-wrapper.is-expanded .moka-description-block {
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.bookshelf-wrapper.is-expanded .moka-highlights-block {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.bookshelf-wrapper.is-expanded .moka-metrics-row {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 }
 
 .eyebrow {
-  margin: 0 46px 14px 0;
+  margin: 0 92px 14px 0;
   color: var(--ink-soft, #b9b4ae);
   font-family: var(--font-mono);
   font-size: 0.66rem;
@@ -2539,6 +2619,12 @@ body {
 
   .mode-detail .detail-panel {
     transform: translateY(0);
+  }
+
+  .bookshelf-wrapper.is-expanded .detail-panel {
+    max-height: 72vh;
+    padding: 22px 24px;
+    width: auto;
   }
 
   .mode-detail .bookshelf-stage {

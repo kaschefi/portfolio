@@ -20,12 +20,57 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
   sceneState,
   volume
 }) => {
+  const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
+  const [expandedPage, setExpandedPage] = React.useState<number>(1);
+
+  // Sync expandedPage when entering inspect mode
+  React.useEffect(() => {
+    if (sceneState.isInspecting) {
+      setExpandedPage(sceneState.page || 1);
+    }
+  }, [sceneState.isInspecting, sceneState.page]);
+
+  // Reset expanded if user exits inspecting mode
+  React.useEffect(() => {
+    if (!sceneState.isInspecting) {
+      setIsExpanded(false);
+    }
+  }, [sceneState.isInspecting]);
+
+  // Sync expanded class to .bookshelf-wrapper
+  React.useEffect(() => {
+    const wrapper = document.querySelector('.bookshelf-wrapper');
+    if (wrapper) {
+      if (isExpanded && sceneState.isInspecting) {
+        wrapper.classList.add('is-expanded');
+      } else {
+        wrapper.classList.remove('is-expanded');
+      }
+    }
+  }, [isExpanded, sceneState.isInspecting]);
+
+  const handleToggleExpand = () => {
+    sound.playClick();
+    if (!isExpanded) {
+      if (sceneState.isOpen) {
+        triggerDomAction('toggle-book', () => sound.playBookClose());
+      }
+      window.dispatchEvent(new CustomEvent('bookshelf:view-spine'));
+      setIsExpanded(true);
+    } else {
+      window.dispatchEvent(new CustomEvent('bookshelf:reset-view'));
+      setIsExpanded(false);
+    }
+  };
+
   const triggerDomAction = (id: string, soundFn?: () => void) => {
     if (soundFn) soundFn();
     else sound.playClick();
 
     // Trigger internal ThreeUI bookshelf action buttons in DOM
-    const elem = document.querySelector(`.bookshelf__source-controls #${id}`) as HTMLButtonElement | null;
+    const elem = (document.querySelector(`.bookshelf__source-controls #${id}`) ||
+      document.querySelector(`.bookshelf #${id}`) ||
+      document.querySelector(`#${id}`)) as HTMLButtonElement | null;
     if (elem) {
       elem.click();
     }
@@ -81,8 +126,19 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
     triggerDomAction('previous-page');
   };
 
+  const handleNextExpandedPage = () => {
+    sound.playPageTurn();
+    setExpandedPage((prev) => Math.min(5, prev + 1));
+  };
+
+  const handlePrevExpandedPage = () => {
+    sound.playPageTurn();
+    setExpandedPage((prev) => Math.max(1, prev - 1));
+  };
+
   const handleResetCamera = () => {
     sound.playClick();
+    window.dispatchEvent(new CustomEvent('bookshelf:reset-view'));
     triggerDomAction('reset-view');
   };
 
@@ -106,7 +162,8 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
   };
 
   // Resolve Active Page Content for MOKA, Xcode, Figma, Cursor, Claude Code, or Antigravity (RoboFlow)
-  const activePageKey = `page0${Math.min(Math.max(sceneState.page, 1), 5)}`;
+  const activePageNumber = isExpanded ? expandedPage : sceneState.page;
+  const activePageKey = `page0${Math.min(Math.max(activePageNumber, 1), 5)}`;
   const richContent: MokaPageContent | XcodePageContent | FigmaPageContent | CursorPageContent | ClaudeCodePageContent | AntigravityPageContent | undefined =
     volume.id === 'codex'
       ? MOKA_PAGES_DATA[activePageKey]
@@ -219,36 +276,55 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
 
       {/* 3. Detail Mode Panel (Right Side Inspection) */}
       <aside
-        className="detail-panel"
+        className={`detail-panel ${isExpanded ? 'is-expanded-panel' : ''}`}
         id="detail-panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby="detail-title"
         aria-hidden={!sceneState.isInspecting}
       >
-        <button
-          className="close-button"
-          onClick={handleCloseDetail}
-          type="button"
-          aria-label="Return volume to shelf"
-        >
-          <svg viewBox="0 0 16 16" aria-hidden="true">
-            <path d="m4 4 8 8M12 4l-8 8" />
-          </svg>
-        </button>
+        <div className="detail-panel-actions">
+          <button
+            className="expand-button"
+            onClick={handleToggleExpand}
+            type="button"
+            aria-label={isExpanded ? 'Collapse description' : 'Expand description'}
+            title={isExpanded ? 'Collapse reading panel' : 'Expand reading panel'}
+          >
+            {isExpanded ? (
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M5.5 1.5v4H1.5M10.5 1.5v4h4M5.5 14.5v-4H1.5M10.5 14.5v-4h4" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M1.5 5.5V1.5h4M14.5 5.5V1.5h-4M1.5 10.5v4h4M14.5 10.5v4h-4" />
+              </svg>
+            )}
+          </button>
+          <button
+            className="close-button"
+            onClick={handleCloseDetail}
+            type="button"
+            aria-label="Return volume to shelf"
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="m4 4 8 8M12 4l-8 8" />
+            </svg>
+          </button>
+        </div>
 
         <p className="eyebrow" id="detail-eyebrow">
-          Volume {volume.roman} · {sceneState.isOpen && richContent?.discipline ? richContent.discipline : volume.discipline}
+          Volume {volume.roman} · {(sceneState.isOpen || isExpanded) && richContent?.discipline ? richContent.discipline : volume.discipline}
         </p>
         <h2 className="detail-title" id="detail-title">
-          {sceneState.isOpen && richContent ? richContent.title : volume.title}
+          {(sceneState.isOpen || isExpanded) && richContent ? richContent.title : volume.title}
         </h2>
         <p className="detail-deck" id="detail-deck">
-          {sceneState.isOpen && richContent ? richContent.subtitle : volume.deck}
+          {(sceneState.isOpen || isExpanded) && richContent ? richContent.subtitle : volume.deck}
         </p>
 
         {/* Closed State Actions / GitHub Repository Link */}
-        {!sceneState.isOpen && (
+        {!sceneState.isOpen && !isExpanded && (
           <div className="detail-github-box">
             <a
               href={volume.id === 'codex' ? 'https://github.com/kaschefi/cozmo_ai_assistant' : (volume.id === 'xcode' ? 'https://github.com/kaschefi/joinApp' : (volume.id === 'figma' ? 'https://github.com/kaschefi/sawyerRobot-ShellGame' : (volume.projectDetails?.githubUrl || 'https://github.com/kaschefi')))}
@@ -275,8 +351,8 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
           </div>
         )}
 
-        {/* Rich Page Content (Extended Description, Highlights, Code snippet, Diagrams, Metrics) - ONLY WHEN OPEN */}
-        {sceneState.isOpen && richContent && (
+        {/* Rich Page Content (Extended Description, Highlights, Code snippet, Diagrams, Metrics) - SHOWN WHEN OPEN OR IN EXPAND MODE */}
+        {(sceneState.isOpen || isExpanded) && richContent && (
           <div className="moka-rich-content">
             {richContent.thesis && (
               <div className="moka-thesis-block" style={{ borderLeftColor: volume.accent || '#c87046' }}>
@@ -334,8 +410,8 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
           <button
             className="page-button"
             id="previous-page"
-            onClick={handlePrevPage}
-            disabled={!sceneState.isOpen || sceneState.page <= 1}
+            onClick={isExpanded ? handlePrevExpandedPage : handlePrevPage}
+            disabled={isExpanded ? expandedPage <= 1 : (!sceneState.isOpen || sceneState.page <= 1)}
             type="button"
             aria-label="Previous sample page"
           >
@@ -345,17 +421,17 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
           </button>
           <p className="page-status" aria-live="off">
             <strong id="page-label">
-              {sceneState.isOpen ? getPageTitle(sceneState.page) : 'Closed'}
+              {(sceneState.isOpen || isExpanded) ? getPageTitle(activePageNumber) : 'Closed'}
             </strong>
             <span id="page-counter">
-              {sceneState.isOpen ? `Spread 0${sceneState.page} / 05` : 'Click book to open'}
+              {(sceneState.isOpen || isExpanded) ? `Spread 0${activePageNumber} / 05` : 'Click book to open'}
             </span>
           </p>
           <button
             className="page-button"
             id="next-page"
-            onClick={handleNextPage}
-            disabled={!sceneState.isOpen || sceneState.page >= 5}
+            onClick={isExpanded ? handleNextExpandedPage : handleNextPage}
+            disabled={isExpanded ? expandedPage >= 5 : (!sceneState.isOpen || sceneState.page >= 5)}
             type="button"
             aria-label="Next sample page"
           >
@@ -386,6 +462,12 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
             >
               Reset view
             </button>
+            <button
+              id="view-spine"
+              style={{ display: 'none' }}
+              type="button"
+              aria-hidden="true"
+            />
           </div>
         </div>
       </aside>

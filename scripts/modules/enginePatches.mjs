@@ -453,5 +453,48 @@ export function applyEnginePatches(rawCode) {
     't.root.visible = t.opacity > 0.005, t.contactShadow.visible = t.opacity > 0.005, t.contactShadow.material.opacity = t.opacity * 0.24, t.hit.visible = t.opacity > 0.12;'
   );
 
+  // 15. Add view-spine and reset-view handlers via document delegation & custom window events
+  if (code.includes(', Ko.addEventListener("click", Lr), D.render(R, L)')) {
+    code = code.replace(
+      ', Ko.addEventListener("click", Lr), D.render(R, L)',
+      `; Ko.addEventListener("click", Lr);
+      const applyViewSpine = () => {
+        if (b === "detail" && u) {
+          ve(!1);
+          u.root.quaternion.setFromEuler(new l.Euler(-0.02, Math.PI * 0.40, 0.01, "YXZ"));
+          L.position.copy(ht);
+          z.target.copy(Je);
+          z.update();
+          __wake(90);
+          U();
+        }
+      };
+      const applyResetView = () => {
+        if (b === "detail" && u) {
+          u.root.quaternion.copy(fn);
+          Lr();
+          __wake(90);
+          U();
+        }
+      };
+      document.addEventListener("click", (evt) => {
+        if (evt.target?.closest?.("#view-spine")) {
+          applyViewSpine();
+        }
+      });
+      window.addEventListener("bookshelf:view-spine", applyViewSpine);
+      window.addEventListener("bookshelf:reset-view", applyResetView);
+      D.render(R, L)`
+    );
+  }
+
+  // 16. Ensure Lr() restores book orientation when collapsing
+  if (code.includes('function Lr() { __wake(60);') && !code.includes('u.root.quaternion.copy(fn);')) {
+    code = code.replace(
+      'function Lr() { __wake(60);',
+      'function Lr() { __wake(60); if (b === "detail" && u) { u.root.quaternion.copy(fn); }'
+    );
+  }
+
   return code;
 }
