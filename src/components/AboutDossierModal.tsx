@@ -126,11 +126,11 @@ export const AboutDossierModal: React.FC<AboutDossierModalProps> = ({ isOpen, on
           {/* Contact & Outbound Links */}
           <div className="about-footer-actions">
             <a 
-              href="mailto:contact@kaschefi.dev" 
+              href="mailto:mohammad.kashefirad@stud.hcw.ac.at" 
               className="about-contact-btn about-contact-btn--primary"
             >
               <Mail size={15} />
-              <span>contact@kaschefi.dev</span>
+              <span>mohammad.kashefirad@stud.hcw.ac.at</span>
               <ArrowUpRight size={14} />
             </a>
 

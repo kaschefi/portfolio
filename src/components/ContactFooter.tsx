@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { Mail, Check, Copy, ArrowUpRight, Terminal, Sparkles } from 'lucide-react';
+import { Mail, Check, Copy, ArrowUpRight, Sparkles } from 'lucide-react';
 
-export const ContactFooter: React.FC = () => {
+interface ContactFooterProps {
+  onOpenEmail?: () => void;
+}
+
+export const ContactFooter: React.FC<ContactFooterProps> = ({ onOpenEmail }) => {
   const [copied, setCopied] = useState(false);
-  const email = 'contact@kaschefi.dev';
+  const email = 'mohammad.kashefirad@stud.hcw.ac.at';
 
   const handleCopyEmail = async () => {
     try {
@@ -23,13 +27,17 @@ export const ContactFooter: React.FC = () => {
   return (
     <footer className="contact-footer-section" id="contact">
       <div className="contact-footer-wrapper">
-        
+
         {/* Availability & Callout Banner */}
+
+
+
         <div className="contact-callout-card">
           <div className="contact-callout-header">
             <div className="contact-status-pill">
               <span className="contact-status-dot" />
-              <span className="contact-status-text">AVAILABLE FOR ROLES & COLLABORATIONS</span>
+              <span className="contact-status-text">AVAILABLE FOR ROLES & COLLABORATION
+              </span>
             </div>
             <span className="contact-meta-year">VIENNA · REMOTE // 2026</span>
           </div>
@@ -37,27 +45,28 @@ export const ContactFooter: React.FC = () => {
           <div className="contact-callout-body">
             <div className="contact-callout-main">
               <h2 className="contact-callout-title">
-                Let’s build intelligent systems together.
+                Let’s build cool things together.
               </h2>
               <p className="contact-callout-subtitle">
-                Open to discussions around autonomous AI orchestration, physical robotics kinematics, backend architecture, and technical research.
+                Let's talk about what you're building.
               </p>
             </div>
 
             {/* Frictionless 1-Click Actions */}
             <div className="contact-actions-cluster">
               <div className="contact-email-box">
-                <a 
-                  href={`mailto:${email}`} 
+                <button
+                  type="button"
+                  onClick={onOpenEmail || (() => window.location.href = `mailto:${email}`)}
                   className="contact-primary-email-btn"
-                  aria-label={`Send direct email to ${email}`}
+                  aria-label={`Open email picker for ${email}`}
                 >
                   <Mail size={16} />
                   <span>{email}</span>
                   <ArrowUpRight size={15} className="contact-btn-arrow" />
-                </a>
+                </button>
 
-                <button 
+                <button
                   onClick={handleCopyEmail}
                   className="contact-copy-btn"
                   aria-label="Copy email address to clipboard"
@@ -78,9 +87,9 @@ export const ContactFooter: React.FC = () => {
               </div>
 
               <div className="contact-links-row">
-                <a 
-                  href="https://github.com/kaschefi" 
-                  target="_blank" 
+                <a
+                  href="https://github.com/kaschefi"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="contact-network-pill"
                 >
@@ -90,9 +99,9 @@ export const ContactFooter: React.FC = () => {
                   <span>GitHub</span>
                 </a>
 
-                <a 
-                  href="https://linkedin.com" 
-                  target="_blank" 
+                <a
+                  href="https://www.linkedin.com/in/mkashefirad/"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="contact-network-pill"
                 >
@@ -101,20 +110,13 @@ export const ContactFooter: React.FC = () => {
                   </svg>
                   <span>LinkedIn</span>
                 </a>
-
-                <a 
-                  href="https://github.com/kaschefi?tab=repositories" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="contact-network-pill"
-                >
-                  <Terminal size={14} />
-                  <span>All Repos</span>
-                </a>
               </div>
             </div>
           </div>
         </div>
+
+
+
 
         {/* Colophon & Bottom Bar */}
         <div className="contact-colophon-bar">
@@ -132,7 +134,7 @@ export const ContactFooter: React.FC = () => {
           </div>
 
           <div className="contact-colophon-right">
-            <button 
+            <button
               onClick={handleScrollTop}
               className="contact-back-top-btn"
               aria-label="Back to top of page"

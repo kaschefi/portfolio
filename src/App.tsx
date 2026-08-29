@@ -5,6 +5,7 @@ import { BookshelfContainer } from './components/BookshelfContainer';
 import { BookshelfHUD } from './components/BookshelfHUD';
 import { ProjectDetailModal } from './components/ProjectDetailModal';
 import { ContactFooter } from './components/ContactFooter';
+import { EmailPickerModal } from './components/EmailPickerModal';
 import type { VolumeProject } from './data/portfolioData';
 import { VOLUMES_DATA } from './data/portfolioData';
 
@@ -16,6 +17,7 @@ export function App() {
     page: 1
   });
   const [selectedModalVolume, setSelectedModalVolume] = useState<VolumeProject | null>(null);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState<boolean>(false);
 
   // Ensure initial load / refresh always starts at the top
   useEffect(() => {
@@ -56,13 +58,15 @@ export function App() {
       if (e.key === 'Escape') {
         if (selectedModalVolume) {
           handleCloseModal();
+        } else if (isEmailModalOpen) {
+          setIsEmailModalOpen(false);
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedModalVolume]);
+  }, [selectedModalVolume, isEmailModalOpen]);
 
   return (
     <div className="portfolio-app">
@@ -71,6 +75,7 @@ export function App() {
         <HeroFluidReveal 
           onExploreBookshelf={() => handleScrollToSection('about')} 
           onOpenAbout={() => handleScrollToSection('about')}
+          onOpenEmail={() => setIsEmailModalOpen(true)}
         />
       </section>
 
@@ -93,13 +98,21 @@ export function App() {
       </main>
 
       {/* 4. Frictionless Contact & Availability Callout Footer */}
-      <ContactFooter />
+      <ContactFooter 
+        onOpenEmail={() => setIsEmailModalOpen(true)}
+      />
 
       {/* Project Case Study Drawer Modal */}
       <ProjectDetailModal
         volume={selectedModalVolume}
         isOpen={Boolean(selectedModalVolume)}
         onClose={handleCloseModal}
+      />
+
+      {/* Webmail & Direct Client Picker Modal */}
+      <EmailPickerModal
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
       />
     </div>
   );

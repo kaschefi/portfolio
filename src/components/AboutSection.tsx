@@ -1,9 +1,6 @@
 import React from 'react';
 import {
-  GraduationCap,
   Layers,
-  Mail,
-  ArrowUpRight,
   ExternalLink,
   Code2,
   BrainCircuit,

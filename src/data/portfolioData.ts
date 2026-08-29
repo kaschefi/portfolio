@@ -556,9 +556,9 @@ export const STUDENT_PROFILE = {
   degree: "BSc / MSc Software Engineering & Autonomous Systems",
   location: "Vienna, Austria",
   bio: "Passionate engineer specializing in 3D WebGL graphics, autonomous agent architectures, robotics kinematics, distributed systems, and native mobile computing. Crafting high-performance digital experiences that merge technical rigor with visual excellence.",
-  email: "m.kashefirad@gmail.com",
-  github: "https://github.com",
-  linkedin: "https://linkedin.com",
+  email: "mohammad.kashefirad@stud.hcw.ac.at",
+  github: "https://github.com/kaschefi",
+  linkedin: "https://www.linkedin.com/in/mkashefirad/",
   skills: {
     languages: ["TypeScript / JavaScript", "Python", "Rust", "C / C++", "Swift", "GLSL / WGSL", "SQL", "Dart / Flutter"],
     threeD_creative: ["Three.js (r165)", "WebGL & WebGPU", "GLSL Shaders", "Blender 3D", "Figma Design Systems", "Framer Motion", "Canvas API"],
