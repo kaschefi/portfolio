@@ -11,6 +11,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const captionRef = useRef<HTMLDivElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -558,7 +559,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       ? import.meta.env.BASE_URL
       : `${import.meta.env.BASE_URL}/`;
 
-    const loadTexture = (url: string, onLoad?: (img: HTMLImageElement) => void) => {
+    const loadTexture = (url: string, onLoad?: (bitmap: ImageBitmap) => void) => {
       const tex = gl.createTexture();
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -567,40 +568,21 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA,
-        1,
-        1,
-        0,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        new Uint8Array([0, 0, 0, 0])
-      );
+      // 1x1 placeholder
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
 
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.src = url;
-
-      const onImageSuccess = () => {
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-        motionFrames = Math.max(motionFrames, 120);
-        if (onLoad) onLoad(img);
-      };
-
-      if (img.complete && img.naturalWidth > 0) {
-        // Image was cached by browser; trigger synchronously/next tick
-        setTimeout(onImageSuccess, 0);
-      } else {
-        img.onload = onImageSuccess;
-        img.onerror = (err) => {
-          console.error('Failed to load texture:', url, err);
-        };
-      }
+      fetch(url)
+        .then((res) => res.blob())
+        .then((blob) => createImageBitmap(blob, { imageOrientation: 'flipY', premultiplyAlpha: 'none' }))
+        .then((bitmap) => {
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, tex);
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); // already flipped via createImageBitmap
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmap);
+          motionFrames = Math.max(motionFrames, 120);
+          if (onLoad) onLoad(bitmap);
+        })
+        .catch((err) => console.error('Failed to load texture via ImageBitmap:', url, err));
 
       return tex;
     };
@@ -623,7 +605,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
     let lastY = 0;
     let lastMoveTime = performance.now();
     let hasMoved = false;
-    let motionFrames = 60; // Initial render frames
+    let motionFrames = 0; // Starts rendering only when textures finish loading
     let isRendering = false;
     let isInView = true;
 
@@ -641,7 +623,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       dx: number,
       dy: number,
       customColor?: [number, number, number],
-      multiplier = 4000,
+      multiplier = 4200,
       radiusMultiplier = 1.0,
       frames = 360
     ) => {
@@ -664,8 +646,8 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
     // Intro state: starts displaying cybernetic Layer 1, then organically transforms into human Layer 2
     let introStartTime: number | null = null;
     let introProgress = 0.0;
-    const INTRO_DELAY_MS = 350; // Snappy 350ms hold on Layer 1 so user registers initial state
-    const INTRO_DURATION_MS = 1400; // 1.4s fluid energy wave transition transforming Layer 1 to Layer 2
+    const INTRO_DELAY_MS = 800; // Snappy 350ms hold on Layer 1 so user registers initial state
+    const INTRO_DURATION_MS = 1500; // 1.4s fluid energy wave transition transforming Layer 1 to Layer 2
 
     // Interaction Hint & Caption Orchestration
     let hasPlayedHint = false;
@@ -749,29 +731,50 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       idleTimer = window.setTimeout(() => {
         idleTimer = null;
         playPhantomSplatSequence();
-      }, 8000);
+      }, 2500);
     };
+
+    let currentProgress = 0;
+    let progressTimer: number | null = null;
+    let texturesReady = false;
+
+    const updateProgress = () => {
+      if (!isRunning) return;
+
+      if (!texturesReady) {
+        if (currentProgress < 85) {
+          currentProgress += 3;
+          setProgress(currentProgress);
+          progressTimer = window.setTimeout(updateProgress, 16);
+        } else {
+          progressTimer = window.setTimeout(updateProgress, 30);
+        }
+      } else {
+        // Instant jump to completion once ready
+        setProgress(100);
+        setIsLoaded(true);
+        introStartTime = performance.now();
+        wake(240);
+      }
+    };
+
+    progressTimer = window.setTimeout(updateProgress, 30);
 
     const checkLoaded = () => {
       loadedCount++;
       if (loadedCount >= 2) {
-        setIsLoaded(true);
-        introStartTime = performance.now();
-        wake(360); // Keep loop rendering through the intro transition
-        if (!isCaptionDismissed && captionTimer === null) {
-          captionTimer = window.setTimeout(dismissCaption, 4500);
-        }
+        texturesReady = true;
       }
     };
 
-    // Layer 1: me.png (human engineer portrait at initial load)
-    const layer1Texture = loadTexture(`${baseUrl}me.png`, (img) => {
+    // Layer 1: me.webp (human engineer portrait at initial load)
+    const layer1Texture = loadTexture(`${baseUrl}me.webp`, (img) => {
       imageDimensions = { width: img.naturalWidth || 1952, height: img.naturalHeight || 2150 };
       checkLoaded();
     });
 
-    // Layer 2: robotme.png (cybernetic portrait transformed via fluid/FBM wave)
-    const layer2Texture = loadTexture(`${baseUrl}robotme.png`, () => {
+    // Layer 2: robotme.webp (cybernetic portrait transformed via fluid/FBM wave)
+    const layer2Texture = loadTexture(`${baseUrl}robotme.webp`, () => {
       checkLoaded();
     });
 
@@ -881,7 +884,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
           introProgress = 0.0;
           motionFrames = Math.max(motionFrames, 60);
         } else if (elapsed < INTRO_DELAY_MS + INTRO_DURATION_MS) {
-          const t = (elapsed - INTRO_DELAY_MS) / INTRO_DURATION_MS;
+          const t = Math.min(Math.max((elapsed - INTRO_DELAY_MS) / INTRO_DURATION_MS, 0.0), 1.0);
           // Smooth cubic ease-in-out
           introProgress = t * t * (3.0 - 2.0 * t);
           motionFrames = Math.max(motionFrames, 60);
@@ -1088,8 +1091,6 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       observer.observe(canvas);
     }
 
-    wake(180);
-
     return () => {
       isRunning = false;
       isRendering = false;
@@ -1097,6 +1098,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       cancelAnimationFrame(animationFrameId);
       if (idleTimer !== null) clearTimeout(idleTimer);
       if (captionTimer !== null) clearTimeout(captionTimer);
+      if (progressTimer !== null) clearTimeout(progressTimer);
       for (const tid of hintTimeouts) {
         clearTimeout(tid);
       }
@@ -1120,12 +1122,31 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         className="hero-fluid-canvas"
       />
 
-      {/* Circle Loader (Shown while Layer 1 & 2 textures load) */}
+      {/* Progress Loader (Shows 0-100% until textures are ready) */}
       <div
         className={`hero-loader-overlay ${isLoaded ? 'hero-loader-overlay--hidden' : ''}`}
         aria-hidden={isLoaded}
       >
-        <div className="hero-spinner" />
+        <div className="hero-progress-spinner-wrap">
+          <svg className="hero-progress-svg" viewBox="0 0 44 44">
+            <circle
+              className="hero-progress-bg"
+              cx="22"
+              cy="22"
+              r="19"
+            />
+            <circle
+              className="hero-progress-bar"
+              cx="22"
+              cy="22"
+              r="19"
+              style={{
+                strokeDashoffset: 119.38 - (119.38 * progress) / 100
+              }}
+            />
+          </svg>
+          <span className="hero-progress-text">{progress}%</span>
+        </div>
       </div>
 
       {/* Mobile/Touch Interaction Micro-Copy Caption */}
