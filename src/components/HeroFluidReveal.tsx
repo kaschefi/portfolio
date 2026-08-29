@@ -9,6 +9,7 @@ interface HeroFluidRevealProps {
 
 export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBookshelf, onOpenEmail }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const captionRef = useRef<HTMLDivElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -559,7 +560,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       dx: number,
       dy: number,
       customColor?: [number, number, number],
-      multiplier = 4.2,
+      multiplier = 4000,
       radiusMultiplier = 1.0,
       frames = 360
     ) => {
@@ -585,12 +586,105 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
     const INTRO_DELAY_MS = 600; // Hold on human layer for 600ms so user clearly registers it
     const INTRO_DURATION_MS = 1400; // 1.4s smooth dissolve to cybernetic layer
 
+    // Interaction Hint & Caption Orchestration
+    let hasPlayedHint = false;
+    let isCaptionDismissed = false;
+    let idleTimer: number | null = null;
+    let captionTimer: number | null = null;
+    const hintTimeouts: number[] = [];
+
+    const dismissCaption = () => {
+      if (isCaptionDismissed) return;
+      isCaptionDismissed = true;
+      if (captionTimer !== null) {
+        clearTimeout(captionTimer);
+        captionTimer = null;
+      }
+      if (captionRef.current) {
+        captionRef.current.classList.add('hero-touch-hint--hidden');
+      }
+    };
+
+    const playPhantomSplatSequence = () => {
+      if (hasPlayedHint || !isRunning) return;
+      hasPlayedHint = true;
+
+      const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+      if (prefersReducedMotion) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const screenAspect = rect.width / rect.height;
+      const isWidescreen = screenAspect > 1.10;
+
+      // Diagonal stroke coordinates replicating the exact red line gesture
+      // Widescreen: sweeps from top-left above the title (u=0.245, v=0.915) down-right into the portrait edge (u=0.505, v=0.215)
+      // Mobile: sweeps diagonally across the centered portrait
+      const startU = isWidescreen ? 0.245 : 0.22;
+      const startV = isWidescreen ? 0.915 : 0.82;
+      const endU = isWidescreen ? 0.505 : 0.62;
+      const endV = isWidescreen ? 0.215 : 0.28;
+
+      // Realistic continuous mouse drag: 18 steps spaced 25ms apart (~425ms total swipe)
+      const steps = 25;
+      const stepIntervalMs = 1;
+
+      for (let i = 0; i < steps; i++) {
+        const t = i / (steps - 1);
+        // Slight natural ergonomic curvature along the diagonal stroke
+        const u = startU + (endU - startU) * t + (isWidescreen ? 0.012 : 0.008) * Math.sin(Math.PI * t);
+        const v = startV + (endV - startV) * t - (isWidescreen ? 0.015 : 0.010) * Math.sin(Math.PI * t);
+
+        // Instantaneous tangent velocity vector along the stroke
+        const tangentU = (endU - startU) / (steps - 1) + (isWidescreen ? 0.012 : 0.008) * Math.PI * Math.cos(Math.PI * t) / (steps - 1);
+        const tangentV = (endV - startV) / (steps - 1) - (isWidescreen ? 0.015 : 0.010) * Math.PI * Math.cos(Math.PI * t) / (steps - 1);
+
+        const clientX = rect.left + u * rect.width;
+        const clientY = rect.top + (1.0 - v) * rect.height;
+        const deltaX = tangentU;
+        const deltaY = -tangentV; // screen Y increases downward
+
+        const tid = window.setTimeout(() => {
+          if (!isRunning) return;
+          addSplat(
+            clientX,
+            clientY,
+            deltaX,
+            deltaY,
+            [1.45, 1.45, 1.45],
+            10200, // natural flick momentum boost matching mouse physics
+            1.15, // crisp reveal radius creating fluid wave into portrait
+            360   // frame persistence for smooth decay
+          );
+        }, i * stepIntervalMs);
+
+        hintTimeouts.push(tid);
+      }
+    };
+
+    const scheduleIdleHint = () => {
+      if (hasPlayedHint || idleTimer !== null) return;
+      const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+      if (prefersReducedMotion) {
+        hasPlayedHint = true;
+        return;
+      }
+
+      // Idle delay before triggering the mouse swipe hint
+      idleTimer = window.setTimeout(() => {
+        idleTimer = null;
+        playPhantomSplatSequence();
+      }, 2500);
+    };
+
     const checkLoaded = () => {
       loadedCount++;
       if (loadedCount >= 2) {
         setIsLoaded(true);
         introStartTime = performance.now();
         motionFrames = Math.max(motionFrames, 240); // Keep loop rendering through the intro transition
+        if (!isCaptionDismissed && captionTimer === null) {
+          captionTimer = window.setTimeout(dismissCaption, 4500);
+        }
       }
     };
 
@@ -606,6 +700,8 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
     });
 
     const onPointerMove = (e: MouseEvent | TouchEvent) => {
+      dismissCaption();
+
       let clientX = 0;
       let clientY = 0;
       if ('touches' in e && e.touches.length > 0) {
@@ -627,20 +723,32 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         return;
       }
 
-      const dx = clientX - lastX;
-      const dy = clientY - lastY;
+      const rawDx = clientX - lastX;
+      const rawDy = clientY - lastY;
       lastX = clientX;
       lastY = clientY;
 
+      // Normalize pixel deltas into the same 0-1 UV space positions use, so a
+      // given mouse speed produces an equal-feeling push in x and y regardless
+      // of the canvas's aspect ratio (the sim grid itself is square).
+      const rect = canvas.getBoundingClientRect();
+
+      let deltaX = rawDx / rect.width;
+      let deltaY = rawDy / rect.height;
+
+
+
       // Dynamic flick momentum boost for real cursor hover
-      const flickBoost = Math.min(Math.hypot(dx, dy) / (dt * 1200), 2.2);
-      if (Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3) {
-        addSplat(clientX, clientY, dx * (1.0 + flickBoost), dy * (1.0 + flickBoost));
+      const flickBoost = Math.min(Math.hypot(rawDx, rawDy) / (dt * 1200), 2.2);
+      if (Math.abs(rawDx) > 0.3 || Math.abs(rawDy) > 0.3) {
+        addSplat(clientX, clientY, deltaX * (1.0 + flickBoost), deltaY * (1.0 + flickBoost));
       }
     };
 
     window.addEventListener('mousemove', onPointerMove, { passive: true });
     window.addEventListener('touchmove', onPointerMove, { passive: true });
+    window.addEventListener('pointerdown', dismissCaption, { passive: true });
+    window.addEventListener('touchstart', dismissCaption, { passive: true });
 
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
@@ -679,7 +787,10 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
           introProgress = t * t * (3.0 - 2.0 * t);
           motionFrames = Math.max(motionFrames, 60);
         } else {
-          introProgress = 1.0;
+          if (introProgress < 1.0) {
+            introProgress = 1.0;
+            scheduleIdleHint();
+          }
         }
       }
 
@@ -865,8 +976,15 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
     return () => {
       isRunning = false;
       cancelAnimationFrame(animationFrameId);
+      if (idleTimer !== null) clearTimeout(idleTimer);
+      if (captionTimer !== null) clearTimeout(captionTimer);
+      for (const tid of hintTimeouts) {
+        clearTimeout(tid);
+      }
       window.removeEventListener('mousemove', onPointerMove);
       window.removeEventListener('touchmove', onPointerMove);
+      window.removeEventListener('pointerdown', dismissCaption);
+      window.removeEventListener('touchstart', dismissCaption);
       window.removeEventListener('resize', onResize);
     };
   }, []);
@@ -882,6 +1000,12 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         }}
         className="hero-fluid-canvas"
       />
+
+      {/* Mobile/Touch Interaction Micro-Copy Caption */}
+      <div ref={captionRef} className="hero-touch-hint" aria-hidden="true">
+        <span className="hero-touch-hint-pulse" />
+        <span>Touch &amp; drag to reveal</span>
+      </div>
 
       {/* Foreground Accessibility & Portfolio Typography Overlay */}
       <div className="hero-overlay-wrapper">

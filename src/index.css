@@ -110,8 +110,83 @@ body {
   width: 100%;
   height: 100%;
   display: block;
-  cursor: crosshair;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='8' stroke='rgba(244,238,230,0.55)' stroke-width='1' stroke-dasharray='3 3'/%3E%3Ccircle cx='12' cy='12' r='3.5' fill='rgba(22,24,29,0.9)' stroke='rgba(244,238,230,0.95)' stroke-width='1.2'/%3E%3Ccircle cx='12' cy='12' r='1.2' fill='%23f4eee6'/%3E%3C/svg%3E") 12 12, crosshair;
   z-index: 0;
+}
+
+.hero-fluid-canvas:active {
+  cursor: grabbing, crosshair;
+}
+
+/* Mobile Touch Micro-copy Caption */
+.hero-touch-hint {
+  display: none;
+}
+
+@media (max-aspect-ratio: 110/100), (max-width: 880px) {
+  .hero-touch-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    position: absolute;
+    top: clamp(14%, 17vh, 21%);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    padding: 0.38rem 0.95rem;
+    border-radius: 9999px;
+    background: rgba(22, 24, 29, 0.78);
+    border: 1px solid rgba(244, 238, 230, 0.16);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: rgb(184, 173, 153);
+    font-family: var(--font-mono, monospace);
+    font-size: 0.64rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    pointer-events: none;
+    user-select: none;
+    opacity: 1;
+    transform: translate(-50%, 0);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  }
+
+  .hero-touch-hint.hero-touch-hint--hidden {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+    pointer-events: none;
+  }
+
+  .hero-touch-hint-pulse {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgb(184, 173, 153);
+    box-shadow: 0 0 8px rgba(184, 173, 153, 0.85);
+    animation: heroHintPulse 2.2s infinite ease-in-out;
+  }
+}
+
+@keyframes heroHintPulse {
+  0%, 100% {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-touch-hint-pulse {
+    animation: none;
+  }
+  .hero-touch-hint {
+    transition: none;
+  }
 }
 
 /* Foreground Accessibility & Portfolio Typography Overlay */
@@ -2508,6 +2583,7 @@ body {
 .about-matrix-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.55rem;
   font-family: var(--font-mono, monospace);
   font-size: 0.72rem;
@@ -2520,6 +2596,18 @@ body {
   border-bottom: 1px solid color-mix(in srgb, var(--ink, #f4eee6) 14%, transparent);
 }
 
+.about-matrix-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.about-matrix-count {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+
 /* ==========================================================================
    Interactive 3D Steam Trading Card Engine
    ========================================================================== */
@@ -2527,6 +2615,89 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.65rem;
+  align-content: start;
+  min-height: 450px;
+}
+
+/* Skills Pagination Controls: Minimalist Typographic Line Index */
+.about-skills-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid color-mix(in srgb, var(--ink, #f4eee6) 8%, transparent);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  color: var(--ink-soft, #b9b4ae);
+}
+
+.about-page-nav-btn {
+  background: transparent;
+  border: none;
+  color: color-mix(in srgb, var(--ink, #f4eee6) 40%, transparent);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.about-page-nav-btn:hover:not(:disabled) {
+  color: var(--ink, #f4eee6);
+  transform: translateX(0);
+}
+
+.about-page-nav-btn:disabled {
+  opacity: 0.15;
+  cursor: not-allowed;
+}
+
+.about-page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.about-page-num-btn {
+  background: transparent;
+  border: none;
+  color: color-mix(in srgb, var(--ink, #f4eee6) 35%, transparent);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.15rem 0.3rem;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.about-page-num-btn:hover:not(.about-page-num-btn--active) {
+  color: color-mix(in srgb, var(--ink, #f4eee6) 75%, transparent);
+}
+
+.about-page-num-btn--active {
+  color: var(--ink, #f4eee6);
+  font-weight: 700;
+}
+
+.about-page-num-btn--active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 2px;
+  right: 2px;
+  height: 1px;
+  background: var(--ink, #f4eee6);
+  border-radius: 1px;
+}
+
+.about-page-divider {
+  opacity: 0.25;
+  font-size: 0.65rem;
+  user-select: none;
 }
 
 .steam-card-container {
@@ -2711,11 +2882,16 @@ body {
     grid-template-columns: 1fr;
     gap: 3rem;
   }
+
+  .about-skills-grid {
+    min-height: auto;
+  }
 }
 
 @media (max-width: 520px) {
   .about-skills-grid {
     grid-template-columns: 1fr;
+    min-height: auto;
   }
 }
 

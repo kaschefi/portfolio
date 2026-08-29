@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Layers,
   ExternalLink,
@@ -14,7 +14,9 @@ import {
   Server,
   Smartphone,
   Coffee,
-  Globe
+  Globe,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { SteamCard3D } from './SteamCard3D';
 
@@ -117,6 +119,15 @@ interface AboutSectionProps {
 }
 
 export const AboutSection: React.FC<AboutSectionProps> = ({ onExploreProjects: _onExploreProjects }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+  const totalPages = Math.ceil(SKILLS_DATA.length / ITEMS_PER_PAGE);
+
+  const currentSkills = SKILLS_DATA.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <section className="about-dossier-section" id="about">
       <div className="about-dossier-wrapper">
@@ -126,7 +137,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onExploreProjects: _
           <div className="about-section-tag">
             <span>DOSSIER // 01</span>
             <span className="about-section-tag-divider">—</span>
-            <span>PROFILE & TECHNICAL PHILOSOPHY</span>
+            <span>PROFILE &amp; TECHNICAL PHILOSOPHY</span>
           </div>
 
         </div>
@@ -176,19 +187,21 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onExploreProjects: _
           </div>
 
           {/* Right Column: Core Competencies Matrix & Volume Navigation */}
-
-
-
           <div className="about-right-col">
             <div className="about-matrix-header">
-              <Code2 size={15} />
-              <span>SKILLS</span>
+              <div className="about-matrix-title">
+                <Code2 size={15} />
+                <span>SKILLS</span>
+              </div>
+              <span className="about-matrix-count">
+                [{currentSkills.length} OF {SKILLS_DATA.length}]
+              </span>
             </div>
 
             <div className="about-skills-grid">
-              {SKILLS_DATA.map((skill, index) => (
+              {currentSkills.map((skill, index) => (
                 <SteamCard3D
-                  key={index}
+                  key={`${currentPage}-${index}`}
                   name={skill.name}
                   category={skill.category}
                   icon={skill.icon}
@@ -197,10 +210,48 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onExploreProjects: _
                 />
               ))}
             </div>
+
+            {/* Skills Pagination Controls: Minimalist Typographic Line Index */}
+            <div className="about-skills-pagination" aria-label="Skills pagination">
+              <button
+                type="button"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="about-page-nav-btn"
+                aria-label="Previous page"
+              >
+                <ChevronLeft size={13} />
+              </button>
+
+              <div className="about-page-numbers">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <React.Fragment key={pageNum}>
+                    {pageNum > 1 && <span className="about-page-divider">/</span>}
+                    <button
+                      key={pageNum}
+                      type="button"
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`about-page-num-btn ${currentPage === pageNum ? 'about-page-num-btn--active' : ''}`}
+                      aria-label={`Page ${pageNum}`}
+                      aria-current={currentPage === pageNum ? 'page' : undefined}
+                    >
+                      {String(pageNum).padStart(2, '0')}
+                    </button>
+                  </React.Fragment>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="about-page-nav-btn"
+                aria-label="Next page"
+              >
+                <ChevronRight size={13} />
+              </button>
+            </div>
           </div>
-
-
-
 
         </div>
 
