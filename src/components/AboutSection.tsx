@@ -1,25 +1,25 @@
 import React from 'react';
-import { 
-  GraduationCap, 
-  Layers, 
-  Mail, 
-  ArrowUpRight, 
-  ExternalLink, 
-  ArrowDown, 
-  Code2, 
-  BrainCircuit, 
-  Boxes, 
-  Database, 
-  Activity, 
-  Sparkles, 
-  Terminal, 
-  Eye, 
-  Workflow, 
-  Server, 
+import {
+  GraduationCap,
+  Layers,
+  Mail,
+  ArrowUpRight,
+  ExternalLink,
+  Code2,
+  BrainCircuit,
+  Boxes,
+  Database,
+  Activity,
+  Sparkles,
+  Terminal,
+  Eye,
+  Workflow,
+  Server,
   Smartphone,
   Coffee,
   Globe
 } from 'lucide-react';
+import { SteamCard3D } from './SteamCard3D';
 
 interface SkillItem {
   name: string;
@@ -119,7 +119,7 @@ interface AboutSectionProps {
   onExploreProjects?: () => void;
 }
 
-export const AboutSection: React.FC<AboutSectionProps> = ({ onExploreProjects }) => {
+export const AboutSection: React.FC<AboutSectionProps> = ({ onExploreProjects: _onExploreProjects }) => {
   return (
     <section className="about-dossier-section" id="about">
       <div className="about-dossier-wrapper">
@@ -140,43 +140,22 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onExploreProjects })
           {/* Left Column: Profile, Institution & Background Narrative */}
           <div className="about-left-col">
             <h2 className="about-heading-serif">
-              Engineering autonomous physical-digital systems with mathematical rigor.
+              Now, the human part.
             </h2>
-
-            <div className="about-institution-badge">
-              <GraduationCap size={16} className="about-badge-icon" />
-              <div>
-                <span className="about-inst-name">Hochschule Campus Wien</span>
-                <span className="about-inst-field">Computer Science · Autonomous Systems & Robotics</span>
-              </div>
-            </div>
-
             <div className="about-narrative-block">
               <p className="about-narrative-p">
-                I am a software and robotics systems engineer focused on the synthesis of <strong>autonomous AI agent orchestration</strong>,
-                <strong> physical robotics kinematics</strong>, and <strong>high-reliability backend infrastructure</strong>.
+                I'm a Computer Science student at Hochschule Campus Wien, building the layer where AI reasoning meets physical and backend systems.
               </p>
               <p className="about-narrative-p">
-                My research and production implementations range from sub-50ms embedded motor safety reflex interceptors on physical robots
-                to multi-agent emergency dispatch networks, graph-based warehouse optimization, and fine-grained neural vision architectures.
+                My work spans four areas: multi-agent orchestration (tool-routing architectures that cut latency 30x and token usage by 83% in a 20+ tool agent), model training and fine-tuning (fine-tuned CNN architectures to 96%+ validation accuracy, with Grad-CAM interpretability to verify what the model actually learned), production backend systems (async FastAPI, RAG pipelines with hybrid search and reranking, PostgreSQL-backed state), and applied robotics (real-time vision with YOLOv8, low-latency video pipelines for a search-and-rescue robot). I also build the frontends that make these systems usable.
               </p>
               <p className="about-narrative-p">
-                I prioritize zero-compromise runtime performance (such as event-driven zero-load WebGL rendering),
-                deterministic graph state machines, and elegant, tactile interface design.
+                I care about the parts most people skip: sub-second reliability, clean state management, and interfaces that actually feel good to use.
               </p>
             </div>
 
             {/* Direct Contact Action Row */}
             <div className="about-actions-row">
-              <a
-                href="mailto:contact@kaschefi.dev"
-                className="about-contact-btn about-contact-btn--primary"
-              >
-                <Mail size={15} />
-                <span>contact@kaschefi.dev</span>
-                <ArrowUpRight size={14} />
-              </a>
-
               <a
                 href="https://github.com/kaschefi"
                 target="_blank"
@@ -188,7 +167,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onExploreProjects })
               </a>
 
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/mkashefirad/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="about-link-pill"
@@ -206,38 +185,21 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onExploreProjects })
           <div className="about-right-col">
             <div className="about-matrix-header">
               <Code2 size={15} />
-              <span>RESONANT SKILLS MATRIX</span>
+              <span>SKILLS</span>
             </div>
 
             <div className="about-skills-grid">
               {SKILLS_DATA.map((skill, index) => (
-                <div key={index} className="about-skill-card">
-                  <div className="about-skill-card-top">
-                    <span className="about-skill-icon">{skill.icon}</span>
-                    <span className="about-skill-category">{skill.category}</span>
-                  </div>
-                  <span className="about-skill-name">{skill.name}</span>
-                </div>
+                <SteamCard3D
+                  key={index}
+                  name={skill.name}
+                  category={skill.category}
+                  icon={skill.icon}
+                  maxTilt={13}
+                  scaleHover={1.035}
+                />
               ))}
             </div>
-
-            {/* Flow to Bookshelf Cue */}
-            {onExploreProjects && (
-              <div className="about-shelf-cue">
-                <div className="about-shelf-cue-text">
-                  <Layers size={14} />
-                  <span>Documented across 6 interactive engineering volumes below</span>
-                </div>
-                <button
-                  onClick={onExploreProjects}
-                  className="about-shelf-cue-btn"
-                  aria-label="Scroll to 3D Bookshelf"
-                >
-                  <span>Explore Research Volumes</span>
-                  <ArrowDown size={14} />
-                </button>
-              </div>
-            )}
           </div>
 
 

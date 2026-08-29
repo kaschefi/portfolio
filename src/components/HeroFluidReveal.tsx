@@ -902,7 +902,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
               </svg>
             </a>
             <a
-              href="https://linkedin.com"
+              href="https://www.linkedin.com/in/mkashefirad/"
               target="_blank"
               rel="noopener noreferrer"
               className="hero-icon-btn"

@@ -2520,86 +2520,146 @@ body {
   border-bottom: 1px solid color-mix(in srgb, var(--ink, #f4eee6) 14%, transparent);
 }
 
-@keyframes anim-shimmer-sweep {
-  0% { transform: translateX(-100%) rotate(25deg); opacity: 0; }
-  30% { opacity: 1; }
-  70% { opacity: 1; }
-  100% { transform: translateX(250%) rotate(25deg); opacity: 0; }
-}
-
+/* ==========================================================================
+   Interactive 3D Steam Trading Card Engine
+   ========================================================================== */
 .about-skills-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.55rem;
+  gap: 0.65rem;
 }
 
-.about-skill-card {
+.steam-card-container {
+  perspective: 1000px;
+  position: relative;
+  display: block;
+  cursor: pointer;
+  outline: none;
+  border-radius: 10px;
+  user-select: none;
+}
+
+.steam-card-container:focus-visible .steam-card-body {
+  outline: 2px solid var(--accent-blue, #3884ff);
+  outline-offset: 2px;
+}
+
+.steam-card-body {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0.75rem 0.9rem;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.015);
+  min-height: 82px;
+  padding: 0.8rem 0.95rem;
+  border-radius: 10px;
+  background: rgba(14, 18, 28, 0.65);
   border: 1px solid rgba(244, 238, 230, 0.08);
-  position: relative;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow;
   overflow: hidden;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.about-skill-card::after {
-  content: '';
+/* Holographic Foil / Prismatic Sheen Layer */
+.steam-card-holo-layer {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 45%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  inset: 0;
   pointer-events: none;
-  opacity: 0;
+  mix-blend-mode: color-dodge;
+  z-index: 2;
+  border-radius: 10px;
+  will-change: opacity, background;
 }
 
-.about-skill-card:hover::after {
-  animation: anim-shimmer-sweep 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+/* Dynamic Light Glare Reflection Layer */
+.steam-card-glare-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 3;
+  border-radius: 10px;
+  will-change: opacity, background;
 }
 
-.about-skill-card:hover {
-  background: rgba(255, 255, 255, 0.035);
-  border-color: rgba(244, 238, 230, 0.25);
-  transform: translateY(-2px);
+/* Card Content with 3D Parallax Elevation */
+.steam-card-content {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  transform: translateZ(16px);
+  transform-style: preserve-3d;
 }
 
-.about-skill-card-top {
+.steam-card-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
   margin-bottom: 0.35rem;
+  transform: translateZ(12px);
 }
 
-.about-skill-icon {
+.steam-card-icon {
   display: flex;
   align-items: center;
-  opacity: 0.75;
+  justify-content: center;
   color: #d1cbc2;
+  opacity: 0.75;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease, opacity 0.2s ease;
+  transform: translateZ(8px);
 }
 
-.about-skill-category {
+.steam-card-container:hover .steam-card-icon {
+  opacity: 1;
+  color: #ffffff;
+  transform: translateZ(14px) scale(1.08);
+}
+
+.steam-card-category {
   font-family: var(--font-mono, monospace);
   font-size: 0.58rem;
-  letter-spacing: 0.05em;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #716e6a;
-  transition: letter-spacing 0.2s ease, color 0.2s ease;
+  color: var(--ink-soft, #716e6a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s ease, letter-spacing 0.2s ease;
+  transform: translateZ(6px);
 }
 
-.about-skill-card:hover .about-skill-category {
-  letter-spacing: 0.09em;
+.steam-card-container:hover .steam-card-category {
+  letter-spacing: 0.08em;
   color: #9da9be;
 }
 
-.about-skill-name {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: #e8e2d8;
+.steam-card-bottom {
+  transform: translateZ(20px);
+}
+
+.steam-card-name {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--ink, #f4eee6);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  display: block;
+}
+
+/* Ambient Subtle Corner Bracket Accent */
+.steam-card-reticle {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 40%);
 }
 
 /* Shelf Cue Bottom Bar */
