@@ -112,7 +112,7 @@ export const SteamCard3D: React.FC<SteamCard3DProps> = ({
     [maxTilt, scaleHover]
   );
 
-  // Smoothly restore default state on mouse leave
+  // Smoothly restore default state on mouse/touch leave
   const handleMouseLeave = useCallback(() => {
     if (rafId.current) {
       cancelAnimationFrame(rafId.current);
@@ -129,6 +129,54 @@ export const SteamCard3D: React.FC<SteamCard3DProps> = ({
     });
   }, []);
 
+  // Calculate 3D tilt coordinates on mobile touch move
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (!cardRef.current || e.touches.length === 0) return;
+      const touch = e.touches[0];
+      const rect = cardRef.current.getBoundingClientRect();
+      const clientX = touch.clientX - rect.left;
+      const clientY = touch.clientY - rect.top;
+
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
+
+      rafId.current = requestAnimationFrame(() => {
+        const width = rect.width;
+        const height = rect.height;
+
+        const percentX = (clientX / width) * 2 - 1;
+        const percentY = (clientY / height) * 2 - 1;
+
+        const rotateX = -percentY * (maxTilt * 0.75);
+        const rotateY = percentX * (maxTilt * 0.75);
+
+        const glareX = (clientX / width) * 100;
+        const glareY = (clientY / height) * 100;
+        const glareAngle = Math.atan2(clientY - height / 2, clientX - width / 2) * (180 / Math.PI) + 90;
+
+        const distanceFromCenter = Math.min(Math.sqrt(percentX * percentX + percentY * percentY), 1.2);
+        const glareOpacity = Math.min(0.15 + distanceFromCenter * 0.4, 0.6);
+
+        const shadowX = -percentX * 10;
+        const shadowY = -percentY * 10 + 6;
+
+        setStyleState({
+          transform: `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(${scaleHover}, ${scaleHover}, 1)`,
+          glareX,
+          glareY,
+          glareOpacity,
+          glareAngle,
+          shadowX,
+          shadowY,
+          isHovered: true
+        });
+      });
+    },
+    [maxTilt, scaleHover]
+  );
+
   useEffect(() => {
     return () => {
       if (rafId.current) cancelAnimationFrame(rafId.current);
@@ -141,6 +189,9 @@ export const SteamCard3D: React.FC<SteamCard3DProps> = ({
       className={`steam-card-container ${className}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleMouseLeave}
+      onTouchCancel={handleMouseLeave}
       tabIndex={0}
       role="article"
       aria-label={`${name} - ${category}`}

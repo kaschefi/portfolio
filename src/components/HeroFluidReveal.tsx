@@ -745,10 +745,30 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       }
     };
 
+    const onPointerDown = (e: MouseEvent | TouchEvent) => {
+      dismissCaption();
+      let clientX = 0;
+      let clientY = 0;
+      if ('touches' in e && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else if ('clientX' in e) {
+        clientX = (e as MouseEvent).clientX;
+        clientY = (e as MouseEvent).clientY;
+      } else {
+        return;
+      }
+      lastX = clientX;
+      lastY = clientY;
+      hasMoved = true;
+      // Immediate tactile fluid ripple on direct touch / click
+      addSplat(clientX, clientY, 0.001, 0.001, [1.0, 1.0, 1.0], 3200, 0.95, 180);
+    };
+
     window.addEventListener('mousemove', onPointerMove, { passive: true });
     window.addEventListener('touchmove', onPointerMove, { passive: true });
-    window.addEventListener('pointerdown', dismissCaption, { passive: true });
-    window.addEventListener('touchstart', dismissCaption, { passive: true });
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('touchstart', onPointerDown, { passive: true });
 
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
@@ -983,8 +1003,8 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       }
       window.removeEventListener('mousemove', onPointerMove);
       window.removeEventListener('touchmove', onPointerMove);
-      window.removeEventListener('pointerdown', dismissCaption);
-      window.removeEventListener('touchstart', dismissCaption);
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('touchstart', onPointerDown);
       window.removeEventListener('resize', onResize);
     };
   }, []);
@@ -1000,6 +1020,14 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         }}
         className="hero-fluid-canvas"
       />
+
+      {/* Circle Loader (Shown while Layer 1 & 2 textures load) */}
+      <div 
+        className={`hero-loader-overlay ${isLoaded ? 'hero-loader-overlay--hidden' : ''}`}
+        aria-hidden={isLoaded}
+      >
+        <div className="hero-spinner" />
+      </div>
 
       {/* Mobile/Touch Interaction Micro-Copy Caption */}
       <div ref={captionRef} className="hero-touch-hint" aria-hidden="true">

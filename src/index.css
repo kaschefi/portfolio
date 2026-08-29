@@ -89,6 +89,7 @@ body {
 .hero-section {
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   background-color: #16181d;
   position: relative;
   overflow: hidden;
@@ -99,6 +100,7 @@ body {
   position: relative;
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background-color: #16181d;
   user-select: none;
@@ -189,6 +191,64 @@ body {
   }
 }
 
+/* ==========================================================================
+   Hero Circle Loader — Minimal Pure Ring Spinner
+   ========================================================================== */
+
+.hero-loader-overlay {
+  position: absolute;
+  top: 48%;
+  left: 72%;
+  transform: translate(-50%, -50%);
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.hero-loader-overlay--hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.hero-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(244, 238, 230, 0.12);
+  border-top-color: rgba(244, 238, 230, 0.85);
+  animation: heroSpinnerRotate 0.85s linear infinite;
+}
+
+/* Responsive Placement: Center on Mobile / Vertical Screens */
+@media (max-aspect-ratio: 110/100), (max-width: 880px) {
+  .hero-loader-overlay {
+    top: 44%;
+    left: 50%;
+  }
+}
+
+/* Keyframes */
+@keyframes heroSpinnerRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-spinner {
+    animation: none;
+  }
+}
+
 /* Foreground Accessibility & Portfolio Typography Overlay */
 .hero-overlay-wrapper {
   position: absolute;
@@ -197,7 +257,11 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: clamp(1.75rem, 4.5vw, 4rem);
+  padding: clamp(1.25rem, 4vw, 3.5rem);
+  padding-top: max(clamp(1.25rem, 4vw, 3.5rem), env(safe-area-inset-top));
+  padding-bottom: max(clamp(1.25rem, 4vw, 3.5rem), env(safe-area-inset-bottom));
+  padding-left: max(clamp(1.25rem, 4vw, 3.5rem), env(safe-area-inset-left));
+  padding-right: max(clamp(1.25rem, 4vw, 3.5rem), env(safe-area-inset-right));
   pointer-events: none;
 }
 
@@ -234,6 +298,7 @@ body {
   text-transform: uppercase;
   cursor: pointer;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: all 0.22s var(--ease-smooth);
 }
 
@@ -260,13 +325,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 1px solid color-mix(in srgb, var(--ink, #f4eee6) 24%, transparent);
   background: transparent;
   color: var(--ink, #f4eee6);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: all 0.22s var(--ease-smooth);
   text-decoration: none;
   cursor: pointer;
@@ -318,7 +384,7 @@ body {
 }
 
 .hero-title {
-  font-size: clamp(2.8rem, 6.5vw, 5.2rem);
+  font-size: clamp(2.2rem, 6.5vw, 5.2rem);
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 0.98;
@@ -351,7 +417,7 @@ body {
 }
 
 .hero-description {
-  font-size: clamp(0.92rem, 1.15vw, 1.05rem);
+  font-size: clamp(0.88rem, 1.15vw, 1.05rem);
   color: color-mix(in srgb, var(--ink, #f4eee6) 80%, transparent);
   font-family: var(--font-sans);
   font-weight: 300;
@@ -374,7 +440,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
-  min-height: 42px;
+  min-height: 44px;
   padding: 0 1.35rem;
   border-radius: 9999px;
   border: 1px solid color-mix(in srgb, var(--ink, #f4eee6) 32%, transparent);
@@ -388,6 +454,7 @@ body {
   text-decoration: none;
   cursor: pointer;
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: all 0.22s var(--ease-smooth);
 }
 
@@ -426,6 +493,143 @@ body {
 
 .hero-outline-btn:hover .hero-btn-terminal {
   opacity: 1;
+}
+
+/* ==========================================================================
+   Hero Responsive Adaptations (Mobile, Tablet, Touch, Short Viewports)
+   ========================================================================== */
+
+/* Tablet & Mobile Portrait (max-width: 880px or vertical aspect ratio) */
+@media (max-width: 880px), (max-aspect-ratio: 110/100) {
+  .hero-center-content {
+    max-width: 100%;
+    margin-top: auto;
+    margin-bottom: 0;
+    padding: 1.5rem 0 0.5rem;
+    z-index: 20;
+  }
+
+  .hero-title {
+    font-size: clamp(2.2rem, 8.5vw, 3.8rem);
+    margin-bottom: 0.85rem;
+  }
+
+  .hero-description {
+    max-width: 100%;
+    margin-bottom: 1.65rem;
+  }
+}
+
+/* Small Mobile Screens (< 480px) */
+@media (max-width: 480px) {
+  .hero-eyebrow {
+    font-size: 0.62rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 9.5vw, 2.6rem);
+    line-height: 1.02;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-subhead {
+    font-size: 0.65rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .hero-description {
+    font-size: 0.85rem;
+    line-height: 1.55;
+    margin-bottom: 1.35rem;
+  }
+
+  .hero-cta-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.55rem;
+    width: 100%;
+  }
+
+  .hero-outline-btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+}
+
+/* Touch Ergonomics & Coarse Pointers */
+@media (pointer: coarse) {
+  .hero-icon-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .hero-outline-btn {
+    min-height: 44px;
+  }
+}
+
+/* Touch-Only Devices: Clean Active State without Sticky Hovers */
+@media (hover: none) {
+  .hero-icon-btn:hover,
+  .hero-outline-btn:hover {
+    transform: none;
+    box-shadow: none;
+    background: transparent;
+    color: var(--ink, #f4eee6);
+  }
+
+  .hero-icon-btn:active,
+  .hero-outline-btn:active {
+    opacity: 0.75;
+    transform: scale(0.98);
+  }
+}
+
+/* Short Height Viewports (Landscape Mobile / Small Displays <= 650px) */
+@media (max-height: 650px) {
+  .hero-overlay-wrapper {
+    padding: 0.75rem 1.5rem;
+  }
+
+  .hero-center-content {
+    padding: 0.25rem 0;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .hero-eyebrow {
+    margin-bottom: 0.25rem;
+  }
+
+  .hero-title {
+    font-size: clamp(1.7rem, 5.5vh, 2.6rem);
+    margin-bottom: 0.35rem;
+  }
+
+  .hero-subhead {
+    margin-bottom: 0.4rem;
+    padding-bottom: 0.15rem;
+  }
+
+  .hero-description {
+    font-size: 0.82rem;
+    line-height: 1.38;
+    margin-bottom: 0.75rem;
+    max-width: 460px;
+  }
+
+  .hero-cta-row {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  .hero-outline-btn {
+    min-height: 38px;
+    padding: 0 1rem;
+    font-size: 0.64rem;
+  }
 }
 
 .bookshelf-section {
@@ -2391,7 +2595,9 @@ body {
 .about-dossier-wrapper {
   max-width: 1280px;
   margin: 0 auto;
-  padding: clamp(3.5rem, 6vw, 6rem) clamp(1.5rem, 4vw, 4rem);
+  padding: clamp(3rem, 6vw, 6rem) clamp(1.25rem, 4vw, 4rem);
+  padding-left: max(clamp(1.25rem, 4vw, 4rem), env(safe-area-inset-left));
+  padding-right: max(clamp(1.25rem, 4vw, 4rem), env(safe-area-inset-right));
 }
 
 .about-section-top {
@@ -2880,18 +3086,93 @@ body {
 @media (max-width: 900px) {
   .about-dossier-grid {
     grid-template-columns: 1fr;
-    gap: 3rem;
+    gap: clamp(2rem, 5vw, 3.5rem);
   }
 
   .about-skills-grid {
-    min-height: auto;
+    min-height: 440px;
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
+  .about-section-top {
+    margin-bottom: 2.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .about-heading-serif {
+    font-size: clamp(1.65rem, 6.5vw, 2.25rem);
+    margin-bottom: 1.25rem;
+  }
+
+  .about-narrative-p {
+    font-size: 0.92rem;
+    line-height: 1.65;
+  }
+
+  .about-actions-row {
+    width: 100%;
+  }
+
+  .about-link-pill {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-height: 44px;
+  }
+
   .about-skills-grid {
-    grid-template-columns: 1fr;
-    min-height: auto;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    min-height: 410px;
+    align-content: start;
+  }
+
+  .steam-card-body {
+    min-height: 76px;
+    padding: 0.7rem 0.8rem;
+  }
+
+  .steam-card-name {
+    font-size: 0.78rem;
+  }
+
+  .steam-card-category {
+    font-size: 0.54rem;
+  }
+}
+
+
+@media (pointer: coarse) {
+  .about-page-nav-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .about-page-num-btn {
+    min-width: 36px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .about-link-pill {
+    min-height: 44px;
+  }
+}
+
+@media (hover: none) {
+  .about-link-pill:hover {
+    transform: none;
+  }
+
+  .about-link-pill:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+
+  .steam-card-container:active .steam-card-body {
+    transform: scale(0.98);
   }
 }
 
@@ -2911,17 +3192,19 @@ body {
 .contact-footer-wrapper {
   max-width: 1280px;
   margin: 0 auto;
-  padding: clamp(3.5rem, 6vw, 5.5rem) clamp(1.5rem, 4vw, 4rem) 2.5rem;
+  padding: clamp(3rem, 6vw, 5.5rem) clamp(1.25rem, 4vw, 4rem) max(2.5rem, env(safe-area-inset-bottom));
+  padding-left: max(clamp(1.25rem, 4vw, 4rem), env(safe-area-inset-left));
+  padding-right: max(clamp(1.25rem, 4vw, 4rem), env(safe-area-inset-right));
 }
 
 /* Big Callout Card */
 .contact-callout-card {
-  padding: clamp(2rem, 4.5vw, 3.5rem);
+  padding: clamp(1.75rem, 4.5vw, 3.5rem);
   border-radius: 20px;
   background: linear-gradient(135deg, rgba(28, 32, 42, 0.6) 0%, rgba(18, 20, 26, 0.8) 100%);
   border: 1px solid color-mix(in srgb, var(--ink, #f4eee6) 18%, transparent);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
-  margin-bottom: 3.5rem;
+  margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
 }
 
 .contact-callout-header {
@@ -2968,9 +3251,9 @@ body {
 
 .contact-callout-title {
   font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(2rem, 3.8vw, 3.2rem);
+  font-size: clamp(1.75rem, 3.8vw, 3.2rem);
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1.12;
   letter-spacing: -0.015em;
   margin: 0 0 1rem;
   background: linear-gradient(180deg, #ffffff 0%, #ede6db 60%, #c4bdb2 100%);
@@ -2979,7 +3262,7 @@ body {
 }
 
 .contact-callout-subtitle {
-  font-size: clamp(0.92rem, 1.05vw, 1.02rem);
+  font-size: clamp(0.88rem, 1.05vw, 1.02rem);
   line-height: 1.65;
   color: color-mix(in srgb, var(--ink, #f4eee6) 78%, transparent);
   font-weight: 300;
@@ -3006,19 +3289,30 @@ body {
 
 .contact-primary-email-btn {
   flex: 1;
+  min-width: 0;
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
+  min-height: 44px;
   padding: 0.7rem 1.4rem;
   border-radius: 9999px;
   background: var(--ink, #f4eee6);
   color: #121418;
   font-family: var(--font-mono, monospace);
-  font-size: 0.76rem;
+  font-size: clamp(0.68rem, 3vw, 0.76rem);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   transition: all 0.22s var(--ease-smooth);
+}
+
+.contact-primary-email-btn span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .contact-primary-email-btn:hover {
@@ -3030,13 +3324,15 @@ body {
 .contact-btn-arrow {
   margin-left: auto;
   opacity: 0.75;
+  flex-shrink: 0;
 }
 
 .contact-copy-btn {
   position: relative;
   display: grid;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
   place-items: center;
   border-radius: 50%;
   border: 1px solid color-mix(in srgb, var(--ink, #f4eee6) 24%, transparent);
@@ -3090,6 +3386,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+  min-height: 40px;
   padding: 0.6rem 1.15rem;
   border-radius: 9999px;
   border: 1px solid color-mix(in srgb, var(--ink, #f4eee6) 20%, transparent);
@@ -3172,24 +3469,77 @@ body {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .contact-colophon-bar {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: 0.85rem;
+    padding-top: 1.5rem;
   }
+}
+
+@media (max-width: 600px) {
+  .contact-callout-card {
+    border-radius: 16px;
+    padding: 1.5rem 1.25rem;
+  }
+
+  .contact-callout-title {
+    font-size: clamp(1.6rem, 6.5vw, 2.2rem);
+  }
+
   .contact-email-box {
     flex-direction: column;
     border-radius: 16px;
+    padding: 0.5rem;
   }
+
   .contact-primary-email-btn {
     width: 100%;
     justify-content: center;
   }
+
   .contact-copy-btn {
     width: 100%;
-    border-radius: 12px;
-    height: 36px;
+    border-radius: 9999px;
+    height: 42px;
+  }
+
+  .contact-links-row {
+    width: 100%;
+  }
+
+  .contact-network-pill {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-height: 44px;
+  }
+}
+
+@media (pointer: coarse) {
+  .contact-primary-email-btn,
+  .contact-copy-btn,
+  .contact-network-pill,
+  .contact-back-top-btn {
+    min-height: 44px;
+  }
+}
+
+@media (hover: none) {
+  .contact-primary-email-btn:hover,
+  .contact-copy-btn:hover,
+  .contact-network-pill:hover,
+  .contact-back-top-btn:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .contact-primary-email-btn:active,
+  .contact-copy-btn:active,
+  .contact-network-pill:active,
+  .contact-back-top-btn:active {
+    opacity: 0.8;
+    transform: scale(0.98);
   }
 }
 
