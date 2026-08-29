@@ -310,7 +310,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       }
     `;
 
-    // Reveal Composite Shader with Chromatic Dispersion, Edge Curls, and Portrait Transition
+    // Reveal Composite Shader with Chromatic Dispersion, FBM Fluid Dissolve, Fresnel Rim Glow, and Edge Curls
     const compositeFS = `
       precision highp float;
       varying vec2 vUV;
@@ -321,7 +321,39 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       uniform vec2 uResolution;
       uniform vec2 uImageResolution;
       uniform float uTime;
-      uniform float uIntroProgress; // 0.0 = starts at human (Layer 2), transitions smoothly to 1.0 (cybernetic Layer 1)
+      uniform float uIntroProgress; // 0.0 = Layer 1 (cybernetic robotme.png), 1.0 = Layer 2 (human engineer me.png)
+
+      // 2D Hash & Value Noise (fbm.ts)
+      float hash(vec2 p) {
+        p = fract(p * vec2(123.34, 456.21));
+        p += dot(p, p + 45.32);
+        return fract(p.x * p.y);
+      }
+
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        float a = hash(i);
+        float b = hash(i + vec2(1.0, 0.0));
+        float c = hash(i + vec2(0.0, 1.0));
+        float d = hash(i + vec2(1.0, 1.0));
+        float res = mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+        return res * res;
+      }
+
+      // 4-Octave Fractional Brownian Motion with rotation (fbm.ts)
+      float fbm(vec2 p) {
+        float v = 0.0;
+        float a = 0.5;
+        mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+        for (int i = 0; i < 4; i++) {
+          v += a * noise(p);
+          p = rot * p * 2.0 + vec2(100.0);
+          a *= 0.5;
+        }
+        return v;
+      }
 
       vec2 getFitUV(vec2 uvCoord, vec2 screenRes, vec2 imgRes) {
         float screenAspect = screenRes.x / screenRes.y;
@@ -345,17 +377,10 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         return (centered / scale) + 0.5;
       }
 
-      vec4 safeSample(sampler2D tex, vec2 uvCoord) {
-        if (uvCoord.x < 0.001 || uvCoord.x > 0.999 || uvCoord.y < 0.001 || uvCoord.y > 0.999) {
-          return vec4(0.0);
-        }
-        return texture2D(tex, uvCoord);
-      }
-
       void main() {
         vec2 fitUV = getFitUV(vUV, uResolution, uImageResolution);
 
-        // Fluid density & velocity
+        // Interactive Fluid density & velocity
         float fluidDensity = texture2D(uDensity, vUV).r;
         vec2 vel = texture2D(uVelocity, vUV).xy;
 
@@ -367,46 +392,84 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         float fluidB = texture2D(uDensity, vUV - vec2(0.0, eps.y)).r;
         vec2 fluidGrad = vec2(fluidR - fluidL, fluidT - fluidB);
 
-        // Smooth liquid reveal mask (cleanly resolves to base state when density < 0.05)
+        // Smooth liquid reveal mask for interactive pointer reveal
         float revealAmount = smoothstep(0.05, 0.70, fluidDensity);
-
-        // Transition boundary (peaks strictly at the active tearing edge: 1.0 at edge, 0.0 in interior)
         float transitionBoundary = revealAmount * (1.0 - revealAmount) * 4.0;
 
         // Confine fluid optical distortion and chromatic shift strictly to the tearing perimeter
         vec2 rawDistort = clamp(vel * 0.002, vec2(-0.02), vec2(0.02)) + clamp(fluidGrad * 0.015, vec2(-0.02), vec2(0.02));
         vec2 edgeDistort = rawDistort * transitionBoundary;
 
-        bool inBounds = (fitUV.x >= 0.0 && fitUV.x <= 1.0 && fitUV.y >= 0.0 && fitUV.y <= 1.0);
+        // --- FBM Fluid Intro Transformation (Layer 1 cybernetic -> Layer 2 human engineer) ---
+        // Domain-warped FBM noise pattern moving organically across portrait (fbm.ts + FluidSim.ts)
+        vec2 fbmUV = fitUV * 4.5 + vec2(uTime * 0.18, -uTime * 0.12);
+        float noiseVal = fbm(fbmUV);
+        float noiseVal2 = fbm(fbmUV + noiseVal * 1.8 + vec2(2.1, 7.4));
 
-        // Sample Layer 1: Cybernetic portrait (robotme.png)
-        vec4 col1 = inBounds ? texture2D(uLayer1, fitUV) : vec4(0.0);
+        // Spatial progression sweep across portrait (0.0 = 100% Layer 1 robotme.png, 1.0 = 100% Layer 2 me.png)
+        float spatialDist = (fitUV.y * 0.55 + fitUV.x * 0.35) + (noiseVal2 - 0.5) * 0.40;
+        float sweepMin = -0.35;
+        float sweepMax = 1.35;
+        float currentCutoff = mix(sweepMin, sweepMax, uIntroProgress);
+        float introTear = smoothstep(spatialDist - 0.14, spatialDist + 0.14, currentCutoff);
+        if (uIntroProgress <= 0.001) introTear = 0.0;
+        if (uIntroProgress >= 0.999) introTear = 1.0;
 
-        // Sample Layer 2: Revealed human engineer portrait (me.png)
-        vec2 uv2 = fitUV + edgeDistort;
+        // Intro wave edge boundary & Fresnel-style energy glow calculation (fresnelMaterial.ts)
+        float introEdge = introTear * (1.0 - introTear) * 4.0;
+        float introActive = step(0.001, uIntroProgress) * (1.0 - step(0.999, uIntroProgress));
+        float introEdgeIntensity = introEdge * introActive;
+
+        // Multi-tap fluid displacement ripple along the intro dissolve front (FluidSim.ts)
+        vec2 introWarp = vec2(
+          fbm(fitUV * 8.0 + vec2(uTime * 0.30, 0.0)) - 0.5,
+          fbm(fitUV * 8.0 + vec2(0.0, uTime * 0.30)) - 0.5
+        ) * 0.055 * introEdgeIntensity;
+
+        // Sample Layer 1: Human engineer portrait (me.png)
+        vec2 uv1 = fitUV + introWarp * 0.5;
+        bool inBounds1 = (uv1.x >= 0.0 && uv1.x <= 1.0 && uv1.y >= 0.0 && uv1.y <= 1.0);
+        vec4 col1 = vec4(0.0);
+        if (inBounds1) {
+          // Chromatic dispersion at intro wavefront
+          vec2 cOffset1 = introWarp * 0.4;
+          float r = texture2D(uLayer1, clamp(uv1 + cOffset1, vec2(0.0), vec2(1.0))).r;
+          float g = texture2D(uLayer1, uv1).g;
+          float b = texture2D(uLayer1, clamp(uv1 - cOffset1, vec2(0.0), vec2(1.0))).b;
+          float a = texture2D(uLayer1, uv1).a;
+          col1 = vec4(r, g, b, a);
+        }
+
+        // Sample Layer 2: Cybernetic portrait (robotme.png)
+        vec2 uv2 = fitUV + edgeDistort - introWarp * 0.5;
         bool inBounds2 = (uv2.x >= 0.0 && uv2.x <= 1.0 && uv2.y >= 0.0 && uv2.y <= 1.0);
-
         vec4 col2 = vec4(0.0);
         if (inBounds2) {
-          vec2 cOffset = clamp(edgeDistort * 0.35, vec2(-0.005), vec2(0.005));
-          float r = texture2D(uLayer2, clamp(uv2 + cOffset, vec2(0.0), vec2(1.0))).r;
+          vec2 cOffset2 = clamp(edgeDistort * 0.35 + introWarp * 0.4, vec2(-0.01), vec2(0.01));
+          float r = texture2D(uLayer2, clamp(uv2 + cOffset2, vec2(0.0), vec2(1.0))).r;
           float g = texture2D(uLayer2, uv2).g;
-          float b = texture2D(uLayer2, clamp(uv2 - cOffset, vec2(0.0), vec2(1.0))).b;
+          float b = texture2D(uLayer2, clamp(uv2 - cOffset2, vec2(0.0), vec2(1.0))).b;
           float a = texture2D(uLayer2, uv2).a;
           col2 = vec4(r, g, b, a);
         }
 
-        // Base resting state: starts at Layer 2 (human) upon initial load, then smoothly transitions to Layer 1 (cybernetic)
-        // uIntroProgress goes from 0.0 (Layer 2) to 1.0 (Layer 1)
-        vec4 basePortrait = mix(col2, col1, uIntroProgress);
+        // Base resting state: starts at Layer 1 (human me.png), then organically transforms into Layer 2 (cybernetic robotme.png)
+        vec4 basePortrait = mix(col1, col2, introTear);
 
-        // Fluid reveal layer: hovering / dragging dissolves whatever is on top to reveal Layer 2 (human engineer)
-        vec4 subject = mix(basePortrait, col2, revealAmount);
+        // Electric cyan/gold Fresnel edge glow along the intro wave front (fresnelMaterial.ts)
+        vec3 fresnelCyan = vec3(0.18, 0.68, 1.0);
+        vec3 fresnelAmber = vec3(1.0, 0.85, 0.45);
+        vec3 introGlowColor = mix(fresnelCyan, fresnelAmber, noiseVal);
+        float heightFade = smoothstep(0.1, 0.9, fitUV.y);
+        vec3 introRimGlow = introGlowColor * (introEdgeIntensity * 1.5) * (0.8 + 0.4 * heightFade);
 
-        // Refined ink / drafting bleed at transition boundaries
+        // Fluid reveal layer: hovering / dragging on top of cybernetic portrait dissolves it to reveal human engineer Layer 1
+        vec4 subject = mix(basePortrait, col1, revealAmount);
+
+        // Refined ink / drafting bleed at interactive transition boundaries
         float edgeStrength = smoothstep(0.01, 0.18, length(fluidGrad)) * transitionBoundary;
         vec3 edgeGlow = vec3(0.72, 0.68, 0.60) * edgeStrength * 0.25;
-        subject.rgb += edgeGlow * subject.a;
+        subject.rgb += (edgeGlow + introRimGlow) * subject.a;
 
         // Archival deep slate backdrop (#16181d) matching the 3D bookshelf scene
         vec3 bg = vec3(0.086, 0.094, 0.114);
@@ -519,17 +582,25 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.src = url;
-      img.onload = () => {
+
+      const onImageSuccess = () => {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, tex);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-        motionFrames = Math.max(motionFrames, 60);
+        motionFrames = Math.max(motionFrames, 120);
         if (onLoad) onLoad(img);
       };
-      img.onerror = (err) => {
-        console.error('Failed to load texture:', url, err);
-      };
+
+      if (img.complete && img.naturalWidth > 0) {
+        // Image was cached by browser; trigger synchronously/next tick
+        setTimeout(onImageSuccess, 0);
+      } else {
+        img.onload = onImageSuccess;
+        img.onerror = (err) => {
+          console.error('Failed to load texture:', url, err);
+        };
+      }
 
       return tex;
     };
@@ -590,11 +661,11 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       wake(frames);
     };
 
-    // Intro state: starts displaying human Layer 2, then smoothly dissolves into cybernetic Layer 1
+    // Intro state: starts displaying cybernetic Layer 1, then organically transforms into human Layer 2
     let introStartTime: number | null = null;
     let introProgress = 0.0;
-    const INTRO_DELAY_MS = 600; // Hold on human layer for 600ms so user clearly registers it
-    const INTRO_DURATION_MS = 1400; // 1.4s smooth dissolve to cybernetic layer
+    const INTRO_DELAY_MS = 350; // Snappy 350ms hold on Layer 1 so user registers initial state
+    const INTRO_DURATION_MS = 1400; // 1.4s fluid energy wave transition transforming Layer 1 to Layer 2
 
     // Interaction Hint & Caption Orchestration
     let hasPlayedHint = false;
@@ -626,32 +697,27 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       const screenAspect = rect.width / rect.height;
       const isWidescreen = screenAspect > 1.10;
 
-      // Diagonal stroke coordinates replicating the exact red line gesture
-      // Widescreen: sweeps from top-left above the title (u=0.245, v=0.915) down-right into the portrait edge (u=0.505, v=0.215)
-      // Mobile: sweeps diagonally across the centered portrait
+      // Diagonal stroke coordinates replicating natural cursor motion
       const startU = isWidescreen ? 0.245 : 0.22;
       const startV = isWidescreen ? 0.915 : 0.82;
       const endU = isWidescreen ? 0.505 : 0.62;
       const endV = isWidescreen ? 0.215 : 0.28;
 
-      // Realistic continuous mouse drag: 18 steps spaced 25ms apart (~425ms total swipe)
       const steps = 25;
       const stepIntervalMs = 1;
 
       for (let i = 0; i < steps; i++) {
         const t = i / (steps - 1);
-        // Slight natural ergonomic curvature along the diagonal stroke
         const u = startU + (endU - startU) * t + (isWidescreen ? 0.012 : 0.008) * Math.sin(Math.PI * t);
         const v = startV + (endV - startV) * t - (isWidescreen ? 0.015 : 0.010) * Math.sin(Math.PI * t);
 
-        // Instantaneous tangent velocity vector along the stroke
         const tangentU = (endU - startU) / (steps - 1) + (isWidescreen ? 0.012 : 0.008) * Math.PI * Math.cos(Math.PI * t) / (steps - 1);
         const tangentV = (endV - startV) / (steps - 1) - (isWidescreen ? 0.015 : 0.010) * Math.PI * Math.cos(Math.PI * t) / (steps - 1);
 
         const clientX = rect.left + u * rect.width;
         const clientY = rect.top + (1.0 - v) * rect.height;
         const deltaX = tangentU;
-        const deltaY = -tangentV; // screen Y increases downward
+        const deltaY = -tangentV;
 
         const tid = window.setTimeout(() => {
           if (!isRunning) return;
@@ -661,9 +727,9 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
             deltaX,
             deltaY,
             [1.45, 1.45, 1.45],
-            10200, // natural flick momentum boost matching mouse physics
-            1.15, // crisp reveal radius creating fluid wave into portrait
-            360   // frame persistence for smooth decay
+            10200,
+            1.15,
+            360
           );
         }, i * stepIntervalMs);
 
@@ -679,11 +745,11 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         return;
       }
 
-      // Idle delay before triggering the mouse swipe hint
+      // Idle delay before triggering hint (only after 8 seconds of complete user inactivity)
       idleTimer = window.setTimeout(() => {
         idleTimer = null;
         playPhantomSplatSequence();
-      }, 2500);
+      }, 8000);
     };
 
     const checkLoaded = () => {
@@ -691,21 +757,21 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       if (loadedCount >= 2) {
         setIsLoaded(true);
         introStartTime = performance.now();
-        wake(240); // Keep loop rendering through the intro transition
+        wake(360); // Keep loop rendering through the intro transition
         if (!isCaptionDismissed && captionTimer === null) {
           captionTimer = window.setTimeout(dismissCaption, 4500);
         }
       }
     };
 
-    // Layer 1: robotme.png (cybernetic portrait at rest)
-    const layer1Texture = loadTexture(`${baseUrl}robotme.png`, (img) => {
+    // Layer 1: me.png (human engineer portrait at initial load)
+    const layer1Texture = loadTexture(`${baseUrl}me.png`, (img) => {
       imageDimensions = { width: img.naturalWidth || 1952, height: img.naturalHeight || 2150 };
       checkLoaded();
     });
 
-    // Layer 2: me.png (human engineer revealed under fluid cursor)
-    const layer2Texture = loadTexture(`${baseUrl}me.png`, () => {
+    // Layer 2: robotme.png (cybernetic portrait transformed via fluid/FBM wave)
+    const layer2Texture = loadTexture(`${baseUrl}robotme.png`, () => {
       checkLoaded();
     });
 

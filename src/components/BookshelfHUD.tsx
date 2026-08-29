@@ -170,16 +170,16 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
     volume.id === 'codex'
       ? MOKA_PAGES_DATA[activePageKey]
       : volume.id === 'xcode'
-      ? XCODE_PAGES_DATA[activePageKey]
-      : volume.id === 'figma'
-      ? FIGMA_PAGES_DATA[activePageKey]
-      : volume.id === 'cursor'
-      ? CURSOR_PAGES_DATA[activePageKey]
-      : volume.id === 'claude-code'
-      ? CLAUDE_CODE_PAGES_DATA[activePageKey]
-      : volume.id === 'antigravity'
-      ? ANTIGRAVITY_PAGES_DATA[activePageKey]
-      : undefined;
+        ? XCODE_PAGES_DATA[activePageKey]
+        : volume.id === 'figma'
+          ? FIGMA_PAGES_DATA[activePageKey]
+          : volume.id === 'cursor'
+            ? CURSOR_PAGES_DATA[activePageKey]
+            : volume.id === 'claude-code'
+              ? CLAUDE_CODE_PAGES_DATA[activePageKey]
+              : volume.id === 'antigravity'
+                ? ANTIGRAVITY_PAGES_DATA[activePageKey]
+                : undefined;
 
   const getPageTitle = (page: number) => {
     if (richContent) {
@@ -199,8 +199,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
       {/* 1. Top Editorial Header */}
       <header className="editorial-header" aria-label="Collection">
         <div className="editorial-identity">
-          <strong>Working Volumes</strong>
-          <span>Six field guides for making</span>
+          <strong>Projects</strong>
         </div>
         <div className="editorial-index">
           <span>Edition 02 · 2026</span>
