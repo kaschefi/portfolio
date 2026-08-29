@@ -525,7 +525,7 @@ export function applyCoverPatches(code) {
       h.addColorStop(1, "rgba(0,0,0,0.1)");
       t.fillStyle = h;
       t.fillRect(0, 0, o.width, o.height);
-      const texture = Q(new l.CanvasTexture(o));
+      const texture = Q(new l.CanvasTexture(o), { anisotropy: 16 });
       texture.name = e.id + "-cover-front";
       return texture;
     }
@@ -543,7 +543,7 @@ export function applyCoverPatches(code) {
     $t(t, e, o.width, o.height);
     t.fillStyle = e.foil, t.textAlign = "center", t.textBaseline = "middle", t.font = '500 18px Inter, "Helvetica Neue", Arial, sans-serif', t.letterSpacing = "4px", t.fillText("WORKING VOLUMES  /  " + e.roman, o.width / 2, 92);
     const n = e.title.length > 10 ? 72 : 88;
-    return t.font = "400 " + n + 'px "Iowan Old Style", Baskerville, Georgia, serif', t.fillText(e.title, o.width / 2, o.height * 0.72), t.font = '500 16px Inter, "Helvetica Neue", Arial, sans-serif', t.fillText(e.discipline.toUpperCase(), o.width / 2, o.height * 0.79), Q(new l.CanvasTexture(o));
+    return t.font = "400 " + n + 'px "Iowan Old Style", Baskerville, Georgia, serif', t.fillText(e.title, o.width / 2, o.height * 0.72), t.font = '500 16px Inter, "Helvetica Neue", Arial, sans-serif', t.fillText(e.discipline.toUpperCase(), o.width / 2, o.height * 0.79), Q(new l.CanvasTexture(o), { anisotropy: 16 });
   }
   function Cn(e) {
     const o = document.createElement("canvas");
@@ -594,7 +594,7 @@ export function applyCoverPatches(code) {
       t.letterSpacing = "4px";
       t.fillText(e.discipline ? e.discipline.toUpperCase() : "AI ASSISTANT", 78, 1024);
 
-      return Q(new l.CanvasTexture(o));
+      return Q(new l.CanvasTexture(o), { anisotropy: 16 });
     }
 
     // Custom Volume 2 Foil Layer (Figma: white canvas so alphaMap gives full metallic glow)
@@ -633,7 +633,7 @@ export function applyCoverPatches(code) {
       t.fillText(e.discipline ? e.discipline.toUpperCase() : "SAWYER ROBOT", 78, 1024);
 
       t.shadowBlur = 0;
-      return Q(new l.CanvasTexture(o));
+      return Q(new l.CanvasTexture(o), { anisotropy: 16 });
     }
 
     // Custom Volume 3 Foil Layer (Cursor / Semantic-ETL-Pipeline: Solid Black Foil)
@@ -665,7 +665,7 @@ export function applyCoverPatches(code) {
       t.letterSpacing = "4px";
       t.fillText(e.discipline ? e.discipline.toUpperCase() : "DIRECTED EDITING", 68, 1024);
 
-      return Q(new l.CanvasTexture(o));
+      return Q(new l.CanvasTexture(o), { anisotropy: 16 });
     }
 
     // Custom Volume 7 Foil Layer (JoinApp: White "Join" + Lime "App")
@@ -704,7 +704,7 @@ export function applyCoverPatches(code) {
       t.fillStyle = "#a3e635";
       t.fillText(e.discipline ? e.discipline.toUpperCase() : "FULL-STACK", 78, 1024);
 
-      return Q(new l.CanvasTexture(o));
+      return Q(new l.CanvasTexture(o), { anisotropy: 16 });
     }
 
     // Custom Volume 5 Foil Layer (Claude Code: Antique Gold Foil Glow)
@@ -741,7 +741,7 @@ export function applyCoverPatches(code) {
       t.fillText(e.discipline ? e.discipline.toUpperCase() : "VISION & DEEP LEARNING", 76, 1024);
 
       t.shadowBlur = 0;
-      return Q(new l.CanvasTexture(o));
+      return Q(new l.CanvasTexture(o), { anisotropy: 16 });
     }
 
     // Authentic ThreeUI foil layer for Volume 4 (Antigravity)
@@ -754,7 +754,7 @@ export function applyCoverPatches(code) {
     t.font = '500 ' + discSize + 'px Inter, "Helvetica Neue", Arial, sans-serif';
     t.letterSpacing = discSpacing;
     t.fillText(e.discipline ? e.discipline.toUpperCase() : "WAREHOUSE ROUTING AND SCHEDULING SYSTEM", 60, 1066);
-    return Q(new l.CanvasTexture(o));
+    return Q(new l.CanvasTexture(o), { anisotropy: 16 });
   }
   `;
 

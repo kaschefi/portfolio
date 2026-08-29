@@ -68,8 +68,17 @@ export const BookshelfContainer: React.FC<BookshelfContainerProps> = ({
       { threshold: 0.05 }
     );
 
+    // 1b. ResizeObserver: Keep WebGL canvas buffer pixel-perfect without CSS stretching
+    const resizeObserver = new ResizeObserver(() => {
+      window.dispatchEvent(new Event('resize'));
+    });
+    resizeObserver.observe(root);
+
     observer.observe(root);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      resizeObserver.disconnect();
+    };
   }, []);
 
   // 2. Apply dynamic palette CSS variables

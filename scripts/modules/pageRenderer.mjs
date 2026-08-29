@@ -13,9 +13,9 @@ export function applyPagePatches(code) {
     const r = \`#\${new l.Color(e.color).lerp(new l.Color(2169622), 0.62).getHexString()}\`;
     return Array.from({ length: 12 }, (a, n) => {
       const c = document.createElement("canvas"), i = 512, d = 768;
-      c.width = 384, c.height = 576;
+      c.width = 1024, c.height = 1536;
       const s = c.getContext("2d");
-      s.scale(0.75, 0.75);
+      s.scale(2, 2);
       const h = ye(pe(\`\${e.id}-leaf-\${n}\`) + e.seed);
       to(s, i, d, h);
 

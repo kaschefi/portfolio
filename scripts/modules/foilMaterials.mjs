@@ -4,10 +4,11 @@
 export function applyFoilAndMaterialPatches(rawCode) {
   let code = rawCode;
 
-  // 1. Patch Spine foil Kn(e) to draw in vibrant foil colors
-  code = code.replace(
-    /function Kn\(e\)\s*\{[\s\S]*?Q\(new l\.CanvasTexture\(o\)\);\s*\}/,
-    `function Kn(e) {
+  // 1. Patch Spine foil Kn(e)
+  const knStartIdx = code.indexOf('function Kn(e) {');
+  const knEndIdx = code.indexOf('function kn(e) {');
+  if (knStartIdx !== -1 && knEndIdx !== -1) {
+    const newKnFunction = `function Kn(e) {
     const o = document.createElement("canvas");
     o.width = 384, o.height = 1536;
     const t = o.getContext("2d");
@@ -53,14 +54,44 @@ export function applyFoilAndMaterialPatches(rawCode) {
     t.moveTo(o.width * 0.5 - 24, o.height - 120);
     t.lineTo(o.width * 0.5 + 24, o.height - 120);
     t.stroke();
-    return Q(new l.CanvasTexture(o));
-  }`
-  );
+    return Q(new l.CanvasTexture(o), { anisotropy: 16 });
+  }\n  `;
+    code = code.slice(0, knStartIdx) + newKnFunction + code.slice(knEndIdx);
+  }
 
-  // 2. Patch Back foil Mn(e) to draw in vibrant foil colors
-  code = code.replace(
-    /function Mn\(e\)\s*\{[\s\S]*?Q\(new l\.CanvasTexture\(o\)\);\s*\}/,
-    `function Mn(e) {
+  // 1b. Patch Back cloth kn(e) to have anisotropy 16
+  const backClothStartIdx = code.indexOf('function kn(e) {');
+  const mnStartIdx = code.indexOf('function Mn(e) {');
+  if (backClothStartIdx !== -1 && mnStartIdx !== -1) {
+    const newBackClothFunction = `function kn(e) {
+    const o = document.createElement("canvas");
+    o.width = 768, o.height = 1152;
+    const t = o.getContext("2d"), r = ye(pe(\`\${e.id}-back-cloth\`) + e.seed);
+    t.fillStyle = e.color, t.fillRect(0, 0, o.width, o.height);
+    const a = t.createLinearGradient(0, 0, o.width, 0);
+    a.addColorStop(0, "rgba(0,0,0,0.15)"), a.addColorStop(0.05, "rgba(255,255,255,0.028)"), a.addColorStop(0.84, "rgba(255,255,255,0)"), a.addColorStop(1, "rgba(0,0,0,0.11)"), t.fillStyle = a, t.fillRect(0, 0, o.width, o.height);
+    for (let c = 0; c < 2600; c += 1) {
+      const i = r() * o.width, d = r() * o.height, s = 5 + r() * 30;
+      t.strokeStyle = r() > 0.5 ? "rgba(255,255,255,0.018)" : "rgba(0,0,0,0.016)", t.lineWidth = 0.45 + r() * 0.65, t.beginPath(), t.moveTo(i, d), t.lineTo(i + s, d + (r() - 0.5) * 1.5), t.stroke();
+    }
+    const n = t.createRadialGradient(
+      o.width * 0.62,
+      o.height * 0.38,
+      20,
+      o.width * 0.62,
+      o.height * 0.38,
+      o.width * 0.75
+    );
+    return n.addColorStop(0, "rgba(255,255,255,0.03)"), n.addColorStop(1, "rgba(0,0,0,0.09)"), t.fillStyle = n, t.fillRect(0, 0, o.width, o.height), Q(new l.CanvasTexture(o), { anisotropy: 16 });
+  }\n  `;
+    code = code.slice(0, backClothStartIdx) + newBackClothFunction + code.slice(mnStartIdx);
+  }
+
+  // 2. Patch Back foil Mn(e)
+  const mnIdx = code.indexOf('function Mn(e) {');
+  const tFuncIdx = code.indexOf('function T(e, o, t');
+  if (mnIdx !== -1 && tFuncIdx !== -1) {
+    const newMnFunction = `function Mn(e) {
     const o = document.createElement("canvas");
     o.width = 768, o.height = 1152;
     const t = o.getContext("2d");
@@ -115,9 +146,10 @@ export function applyFoilAndMaterialPatches(rawCode) {
     t.globalAlpha = 1;
     t.textAlign = "right";
     t.fillText("AN IMAGINED EDITION", 700, 1080);
-    return Q(new l.CanvasTexture(o));
-  }`
-  );
+    return Q(new l.CanvasTexture(o), { anisotropy: 16 });
+  }\n  `;
+    code = code.slice(0, mnIdx) + newMnFunction + code.slice(tFuncIdx);
+  }
 
   // 3. Patch front foil (po), spine foil (ho), and back foil (go) materials with luminous metallic foil properties
   code = code.replace(

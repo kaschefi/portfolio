@@ -24,9 +24,9 @@ The Three.js Bookshelf Scene must **ALWAYS** operate under **Event-Driven On-Dem
      - Page flipping / curling animations
      - Carousel volume sliding
    - After motion ceases, `__motionFrames` counts down and the loop sleeps immediately.
-3. **DPR Clamping (`devicePixelRatio <= 1.0`)**:
-   - `renderer.setPixelRatio` must always be clamped to `Math.min(window.devicePixelRatio || 1, 1.0)`.
-   - Never allow uncapped 2x/3x Retina super-sampling, which quadruples pixel shading calculations for zero perceptual gain.
+3. **DPR Clamping (`devicePixelRatio <= 2.0`)**:
+   - `renderer.setPixelRatio` must always be clamped to `Math.min(window.devicePixelRatio || 1, 2.0)`.
+   - Never allow uncapped 3x/4x super-sampling, while ensuring crisp native resolution on 1.25x/1.5x/2x Retina displays.
 4. **Power Profile**:
    - `powerPreference` must remain `"default"` to prevent forcing discrete GPUs into maximum power draw.
 5. **Persistence via `scripts/optimize-renderer.mjs`**:

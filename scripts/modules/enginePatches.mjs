@@ -10,17 +10,17 @@ export function applyEnginePatches(rawCode) {
   // 2. Clamp powerPreference from "high-performance" to "default" to protect discrete GPUs
   code = code.replace('powerPreference: "high-performance"', 'powerPreference: "default"');
 
-  // 3. Clamp setPixelRatio to max 1.0 (prevent 2x/3x Retina thermal overhead)
+  // 3. Set setPixelRatio to native high-density DPR (max 2.0 for Retina/HiDPI sharpness)
   code = code.replace(
     /D\.setPixelRatio\(Math\.min\(window\.devicePixelRatio \|\| 1, [^)]+\)\)/g,
-    'D.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.0))'
+    'D.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.0))'
   );
 
-  // 4. Add Motion Frames keeper and __wake helper at the top of fa() renderer function
-  if (!code.includes('let __motionFrames = 60;')) {
+  // 4. Add Motion Frames keeper, __wake helper, and heroDrag at top of fa()
+  if (!code.includes('const heroDrag = {')) {
     code = code.replace(
       'function fa(Nr, m, He = {}) {',
-      'function fa(Nr, m, He = {}) {\n  let __motionFrames = 60;\n  const __wake = (frames = 60) => { __motionFrames = Math.max(__motionFrames, frames); U(); };\n'
+      'function fa(Nr, m, He = {}) {\n  let __motionFrames = 60;\n  const __wake = (frames = 60) => { __motionFrames = Math.max(__motionFrames, frames); U(); };\n  const heroDrag = { active: false, pointerId: null, startX: 0, startY: 0, lastX: 0, lastY: 0, lastTime: 0, velocityX: 0, hasDragged: false, isVerticalScroll: false, dragDistance: 0, startV: 0 };\n'
     );
   }
 
@@ -57,12 +57,131 @@ export function applyEnginePatches(rawCode) {
   if (code.includes('function mr(e) {') && !code.includes('function mr(e) { __wake(45);')) {
     code = code.replace('function mr(e) {', 'function mr(e) { __wake(45);');
   }
-  if (code.includes('function dr(e) {') && !code.includes('function dr(e) { __wake(45);')) {
-    code = code.replace('function dr(e) {', 'function dr(e) { __wake(45);');
-  }
-  if (code.includes('function fr(e) {') && !code.includes('function fr(e) { __wake(45);')) {
-    code = code.replace('function fr(e) {', 'function fr(e) { __wake(45);');
-  }
+
+  // 6b. Connect dr(e) to hero dragging
+  code = code.replace(
+    /function dr\(e\)\s*\{[\s\S]*?(?=function fr\(e\))/,
+    `function dr(e) { __wake(45);
+    if (b === "hero" && (e.button === 0 || e.pointerType === "touch")) {
+      De(e);
+      heroDrag.active = true;
+      heroDrag.pointerId = e.pointerId;
+      heroDrag.startX = e.clientX;
+      heroDrag.startY = e.clientY;
+      heroDrag.lastX = e.clientX;
+      heroDrag.lastY = e.clientY;
+      heroDrag.lastTime = performance.now();
+      heroDrag.velocityX = 0;
+      heroDrag.hasDragged = false;
+      heroDrag.isVerticalScroll = false;
+      heroDrag.dragDistance = 0;
+      heroDrag.startV = V;
+      __wake(60);
+      return;
+    }
+    b !== "detail" || K || e.button !== 0 || e.isPrimary === !1 || (De(e), M.allowClick = !1, lr() && (M.active = !0, M.pointerId = e.pointerId, M.startX = e.clientX, M.startY = e.clientY, M.moved = !1));
+  }\n  `
+  );
+
+  // 6c. Connect fr(e) to hero dragging with smart vertical vs horizontal scroll detection
+  code = code.replace(
+    /function fr\(e\)\s*\{[\s\S]*?(?=function ke\(e\))/,
+    `function fr(e) { __wake(45);
+    if (heroDrag.active && e.pointerId === heroDrag.pointerId && b === "hero") {
+      if (heroDrag.isVerticalScroll) return;
+
+      const deltaX = e.clientX - heroDrag.lastX;
+      const totalDeltaX = e.clientX - heroDrag.startX;
+      const totalDeltaY = e.clientY - heroDrag.startY;
+      const absX = Math.abs(totalDeltaX);
+      const absY = Math.abs(totalDeltaY);
+      const now = performance.now();
+      const dt = Math.max(1, now - heroDrag.lastTime);
+
+      if (!heroDrag.hasDragged) {
+        if (absY > absX && absY > 7) {
+          heroDrag.isVerticalScroll = true;
+          heroDrag.active = false;
+          return;
+        }
+        if (absX > absY && absX > 7) {
+          heroDrag.hasDragged = true;
+          m.setPointerCapture?.(e.pointerId);
+        }
+      }
+
+      if (heroDrag.hasDragged) {
+        if (e.cancelable) e.preventDefault();
+        // Dragging left (negative deltaX) increases V (moves carousel to the right)
+        // Dragging right (positive deltaX) decreases V (moves carousel to the left)
+        const step = -deltaX / 360;
+        V += step;
+        heroDrag.velocityX = -deltaX / dt;
+        heroDrag.dragDistance += Math.abs(deltaX);
+        Ne = 0.18;
+        __wake(60);
+        U();
+      }
+
+      heroDrag.lastX = e.clientX;
+      heroDrag.lastY = e.clientY;
+      heroDrag.lastTime = now;
+      return;
+    }
+    !M.active || e.pointerId !== M.pointerId || Math.hypot(
+      e.clientX - M.startX,
+      e.clientY - M.startY
+    ) > 16 && (M.moved = !0);
+  }\n  `
+  );
+
+  // 6d. Connect ke(e) to hero drag release & snapping
+  code = code.replace(
+    /function ke\(e\)\s*\{[\s\S]*?(?=function hr\(e\))/,
+    `function ke(e) {
+    if (heroDrag.active && e.pointerId === heroDrag.pointerId && b === "hero") {
+      if (heroDrag.hasDragged) {
+        let flick = 0;
+        if (Math.abs(heroDrag.velocityX) > 0.3) {
+          flick = Math.sign(heroDrag.velocityX) * Math.min(1.2, Math.abs(heroDrag.velocityX) * 0.4);
+        }
+        V = Math.round(V + flick);
+        Ne = 0.25;
+        __wake(90);
+        U();
+      }
+      heroDrag.active = false;
+      heroDrag.isVerticalScroll = false;
+      heroDrag.pointerId = null;
+      if (m.hasPointerCapture?.(e.pointerId)) {
+        m.releasePointerCapture(e.pointerId);
+      }
+      return;
+    }
+    !M.active || e.pointerId !== M.pointerId || (M.allowClick = e.type === "pointerup" && !M.moved, M.active = !1, M.pointerId = null);
+  }\n  `
+  );
+
+  // 6e. Connect yr(e) (click) to prevent book opening if user was dragging
+  code = code.replace(
+    /function yr\(e\)\s*\{[\s\S]*?(?=function vr\(e\))/,
+    `function yr(e) {
+    if (heroDrag.hasDragged || heroDrag.dragDistance > 8) {
+      heroDrag.hasDragged = false;
+      heroDrag.dragDistance = 0;
+      return;
+    }
+    if (b === "detail" && !K && e.button === 0) {
+      if (!M.allowClick || (M.allowClick = !1, De(e), !lr())) return;
+      e.preventDefault(), ve(!0);
+      return;
+    }
+    if (b !== "hero" || e.button !== 0) return;
+    De(e);
+    const o = sr();
+    o < 0 || (e.preventDefault(), ar(o, m), xe(m));
+  }\n  `
+  );
   if (code.includes('z = new na(L, m), z.enabled = !1')) {
     code = code.replace(
       'z = new na(L, m), z.enabled = !1',
