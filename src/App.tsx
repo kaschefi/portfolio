@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { HeroFluidReveal } from './components/HeroFluidReveal';
 import { AboutSection } from './components/AboutSection';
-import { BookshelfContainer } from './components/BookshelfContainer';
+import { BookshelfContainer, preloadBookshelfScene } from './components/BookshelfContainer';
 import { BookshelfHUD } from './components/BookshelfHUD';
 import { ProjectDetailModal } from './components/ProjectDetailModal';
 import { ContactFooter } from './components/ContactFooter';
@@ -19,12 +19,32 @@ export function App() {
   const [selectedModalVolume, setSelectedModalVolume] = useState<VolumeProject | null>(null);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState<boolean>(false);
 
-  // Ensure initial load / refresh always starts at the top
+  // Ensure initial load / refresh always starts at the top & trigger speculative preloading
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
+
+    // Speculative background preloading for the 3D WebGL bundle
+    let preloaded = false;
+    const triggerPreload = () => {
+      if (preloaded) return;
+      preloaded = true;
+      preloadBookshelfScene().catch(() => {});
+      window.removeEventListener('scroll', triggerPreload);
+    };
+
+    // Preload speculatively after Hero intro transition finishes (4.0s) so it doesn't freeze the Hero intro
+    const timer = setTimeout(triggerPreload, 4000);
+
+    // Or trigger immediately if user starts scrolling down
+    window.addEventListener('scroll', triggerPreload, { passive: true });
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', triggerPreload);
+    };
   }, []);
 
   const currentVolume = VOLUMES_DATA.find((v) => v.id === currentVolumeId) || VOLUMES_DATA[0];

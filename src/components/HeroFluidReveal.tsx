@@ -559,7 +559,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       ? import.meta.env.BASE_URL
       : `${import.meta.env.BASE_URL}/`;
 
-    const loadTexture = (url: string, onLoad?: (bitmap: ImageBitmap) => void) => {
+    const loadTexture = (url: string, onLoad?: (img: HTMLImageElement) => void) => {
       const tex = gl.createTexture();
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -568,21 +568,42 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-      // 1x1 placeholder
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+      // 1x1 transparent placeholder
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        1,
+        1,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        new Uint8Array([0, 0, 0, 0])
+      );
 
-      fetch(url)
-        .then((res) => res.blob())
-        .then((blob) => createImageBitmap(blob, { imageOrientation: 'flipY', premultiplyAlpha: 'none' }))
-        .then((bitmap) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = url;
+
+      img.decode()
+        .then(() => {
           gl.activeTexture(gl.TEXTURE0);
           gl.bindTexture(gl.TEXTURE_2D, tex);
-          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); // already flipped via createImageBitmap
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmap);
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
           motionFrames = Math.max(motionFrames, 120);
-          if (onLoad) onLoad(bitmap);
+          if (onLoad) onLoad(img);
         })
-        .catch((err) => console.error('Failed to load texture via ImageBitmap:', url, err));
+        .catch(() => {
+          img.onload = () => {
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, tex);
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+            motionFrames = Math.max(motionFrames, 120);
+            if (onLoad) onLoad(img);
+          };
+        });
 
       return tex;
     };
@@ -745,16 +766,29 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         if (currentProgress < 85) {
           currentProgress += 3;
           setProgress(currentProgress);
-          progressTimer = window.setTimeout(updateProgress, 16);
+          progressTimer = window.setTimeout(updateProgress, 20);
         } else {
           progressTimer = window.setTimeout(updateProgress, 30);
         }
       } else {
-        // Instant jump to completion once ready
-        setProgress(100);
-        setIsLoaded(true);
-        introStartTime = performance.now();
-        wake(240);
+        // Accelerate to 100% and seamlessly start intro transition
+        if (currentProgress < 100) {
+          currentProgress = Math.min(100, currentProgress + 8);
+          setProgress(currentProgress);
+          progressTimer = window.setTimeout(updateProgress, 16);
+        } else {
+          setProgress(100);
+          setIsLoaded(true);
+          window.setTimeout(() => {
+            if (!isRunning) return;
+            introStartTime = performance.now();
+            wake(360);
+          }, 350);
+
+          if (!isCaptionDismissed && captionTimer === null) {
+            captionTimer = window.setTimeout(dismissCaption, 4500);
+          }
+        }
       }
     };
 
@@ -769,7 +803,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
 
     // Layer 1: me.webp (human engineer portrait at initial load)
     const layer1Texture = loadTexture(`${baseUrl}me.webp`, (img) => {
-      imageDimensions = { width: img.naturalWidth || 1952, height: img.naturalHeight || 2150 };
+      imageDimensions = { width: img.naturalWidth || img.width || 1952, height: img.naturalHeight || img.height || 2150 };
       checkLoaded();
     });
 

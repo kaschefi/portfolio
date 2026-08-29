@@ -1,7 +1,17 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { BookshelfScene } from '../../node_modules/@designcodeio/threeui/lib-dist/shaders/bookshelf/BookshelfScene.js';
+import React, { useRef, useEffect, useState, Suspense, lazy } from 'react';
 import { sound } from '../utils/audio';
 import { VOLUMES_DATA } from '../data/portfolioData';
+import { BookshelfSkeleton } from './BookshelfSkeleton';
+
+// Code-split / lazy load heavy 3D WebGL BookshelfScene bundle
+export const preloadBookshelfScene = () =>
+  import('../../node_modules/@designcodeio/threeui/lib-dist/shaders/bookshelf/BookshelfScene.js');
+
+const LazyBookshelfScene = lazy(() =>
+  preloadBookshelfScene().then((module) => ({
+    default: module.BookshelfScene
+  }))
+);
 
 interface BookshelfContainerProps {
   onVolumeChange: (volumeId: string) => void;
@@ -215,7 +225,9 @@ export const BookshelfContainer: React.FC<BookshelfContainerProps> = ({
           transition: 'opacity 0.4s ease'
         }}
       >
-        <BookshelfScene />
+        <Suspense fallback={<BookshelfSkeleton />}>
+          <LazyBookshelfScene />
+        </Suspense>
       </div>
 
       <div className="bookshelf-vignette" aria-hidden="true" />
