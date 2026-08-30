@@ -107,12 +107,12 @@ export function App() {
       <section className="hero-section" id="hero">
         {isMobile ? (
           <MobileHero
-            onExploreBookshelf={() => handleScrollToSection('about')}
+            onExploreBookshelf={() => handleScrollToSection('bookshelf')}
             onOpenEmail={() => setIsEmailModalOpen(true)}
           />
         ) : (
           <HeroFluidReveal
-            onExploreBookshelf={() => handleScrollToSection('about')}
+            onExploreBookshelf={() => handleScrollToSection('bookshelf')}
             onOpenAbout={() => handleScrollToSection('about')}
             onOpenEmail={() => setIsEmailModalOpen(true)}
           />
