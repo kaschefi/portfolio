@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/optimize-renderer.mjs && vite",
-    "build": "node scripts/optimize-renderer.mjs && tsc -b && vite build",
+    "build": "node scripts/optimize-renderer.mjs && tsc -b && vite build && node scripts/compress-dist.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
     "postinstall": "node scripts/optimize-renderer.mjs"

@@ -1,0 +1,29 @@
+# HTML & SPA Root (Always revalidate to prevent stale builds)
+/
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Immutable hashed JS & CSS assets
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Static media & models
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.glb
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.ico
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
