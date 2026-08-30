@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import type { VolumeProject } from '../data/portfolioData';
 import { X, ExternalLink, CheckCircle2, Layers, BookOpen } from 'lucide-react';
 import { GithubIcon } from './Icons';
-import confetti from 'canvas-confetti';
 import { sound } from '../utils/audio';
 
 interface ProjectDetailModalProps {
@@ -19,16 +18,19 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   useEffect(() => {
     if (isOpen && volume) {
       sound.playSuccess();
-      try {
-        confetti({
-          particleCount: 45,
-          spread: 60,
-          origin: { y: 0.8 },
-          colors: [volume.accent, volume.foil, '#ffffff']
+      import('canvas-confetti')
+        .then((confettiModule) => {
+          const confetti = confettiModule.default || confettiModule;
+          confetti({
+            particleCount: 45,
+            spread: 60,
+            origin: { y: 0.8 },
+            colors: [volume.accent, volume.foil, '#ffffff']
+          });
+        })
+        .catch(() => {
+          // Confetti fallback
         });
-      } catch {
-        // Confetti fallback
-      }
     }
   }, [isOpen, volume]);
 

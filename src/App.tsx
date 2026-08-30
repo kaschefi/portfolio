@@ -1,21 +1,37 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { HeroFluidReveal } from './components/HeroFluidReveal';
-import { AboutSection } from './components/AboutSection';
-import { BookshelfContainer, preloadBookshelfScene } from './components/BookshelfContainer';
-import { BookshelfHUD } from './components/BookshelfHUD';
-import { ProjectDetailModal } from './components/ProjectDetailModal';
-import { ContactFooter } from './components/ContactFooter';
-import { EmailPickerModal } from './components/EmailPickerModal';
+import { AboutSectionSkeleton } from './components/AboutSectionSkeleton';
+import { BookshelfSkeleton } from './components/BookshelfSkeleton';
+import { ContactFooterSkeleton } from './components/ContactFooterSkeleton';
 import type { VolumeProject } from './data/portfolioData';
-import { VOLUMES_DATA } from './data/portfolioData';
+
+// Code-split / lazy-load non-critical, below-the-fold, and modal components
+const LazyAboutSection = lazy(() =>
+  import('./components/AboutSection').then((m) => ({ default: m.AboutSection }))
+);
+
+const LazyBookshelfSection = lazy(() => import('./components/BookshelfSection'));
+
+const LazyContactFooter = lazy(() =>
+  import('./components/ContactFooter').then((m) => ({ default: m.ContactFooter }))
+);
+
+const LazyProjectDetailModal = lazy(() =>
+  import('./components/ProjectDetailModal').then((m) => ({ default: m.ProjectDetailModal }))
+);
+
+const LazyEmailPickerModal = lazy(() =>
+  import('./components/EmailPickerModal').then((m) => ({ default: m.EmailPickerModal }))
+);
+
+// Speculative preloader for idle background fetching
+const preloadBelowTheFold = () => {
+  import('./components/AboutSection');
+  import('./components/BookshelfSection');
+  import('./components/ContactFooter');
+};
 
 export function App() {
-  const [currentVolumeId, setCurrentVolumeId] = useState<string>('codex');
-  const [sceneState, setSceneState] = useState<{ isOpen: boolean; isInspecting: boolean; page: number }>({
-    isOpen: false,
-    isInspecting: false,
-    page: 1
-  });
   const [selectedModalVolume, setSelectedModalVolume] = useState<VolumeProject | null>(null);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState<boolean>(false);
 
@@ -26,35 +42,22 @@ export function App() {
     }
     window.scrollTo(0, 0);
 
-    // Speculative background preloading for the 3D WebGL bundle
+    // Speculative background preloading after Hero intro transition finishes (4.0s) or on initial scroll
     let preloaded = false;
     const triggerPreload = () => {
       if (preloaded) return;
       preloaded = true;
-      preloadBookshelfScene().catch(() => {});
+      preloadBelowTheFold();
       window.removeEventListener('scroll', triggerPreload);
     };
 
-    // Preload speculatively after Hero intro transition finishes (4.0s) so it doesn't freeze the Hero intro
     const timer = setTimeout(triggerPreload, 4000);
-
-    // Or trigger immediately if user starts scrolling down
     window.addEventListener('scroll', triggerPreload, { passive: true });
 
     return () => {
       clearTimeout(timer);
       window.removeEventListener('scroll', triggerPreload);
     };
-  }, []);
-
-  const currentVolume = VOLUMES_DATA.find((v) => v.id === currentVolumeId) || VOLUMES_DATA[0];
-
-  const handleVolumeChange = useCallback((id: string) => {
-    setCurrentVolumeId(id);
-  }, []);
-
-  const handleStateChange = useCallback((state: { isOpen: boolean; isInspecting: boolean; page: number }) => {
-    setSceneState(state);
   }, []);
 
   const handleCloseModal = () => {
@@ -90,7 +93,7 @@ export function App() {
 
   return (
     <div className="portfolio-app">
-      {/* 1. Hero Section with Interactive Fluid Reveal */}
+      {/* 1. Hero Section with Interactive Fluid Reveal (Critical Path / Instant FCP) */}
       <section className="hero-section" id="hero">
         <HeroFluidReveal 
           onExploreBookshelf={() => handleScrollToSection('about')} 
@@ -100,40 +103,48 @@ export function App() {
       </section>
 
       {/* 2. Editorial About / Technical Philosophy Dossier Section */}
-      <AboutSection 
-        onExploreProjects={() => handleScrollToSection('bookshelf')} 
-      />
+      <Suspense fallback={<AboutSectionSkeleton />}>
+        <LazyAboutSection 
+          onExploreProjects={() => handleScrollToSection('bookshelf')} 
+        />
+      </Suspense>
 
       {/* 3. Interactive 3D Bookshelf Viewport */}
-      <main className="bookshelf-section" id="bookshelf">
-        <BookshelfContainer
-          onVolumeChange={handleVolumeChange}
-          onStateChange={handleStateChange}
-        >
-          <BookshelfHUD
-            sceneState={sceneState}
-            volume={currentVolume}
-          />
-        </BookshelfContainer>
-      </main>
+      <Suspense fallback={
+        <main className="bookshelf-section" id="bookshelf">
+          <BookshelfSkeleton />
+        </main>
+      }>
+        <LazyBookshelfSection />
+      </Suspense>
 
       {/* 4. Frictionless Contact & Availability Callout Footer */}
-      <ContactFooter 
-        onOpenEmail={() => setIsEmailModalOpen(true)}
-      />
+      <Suspense fallback={<ContactFooterSkeleton />}>
+        <LazyContactFooter 
+          onOpenEmail={() => setIsEmailModalOpen(true)}
+        />
+      </Suspense>
 
       {/* Project Case Study Drawer Modal */}
-      <ProjectDetailModal
-        volume={selectedModalVolume}
-        isOpen={Boolean(selectedModalVolume)}
-        onClose={handleCloseModal}
-      />
+      {selectedModalVolume && (
+        <Suspense fallback={null}>
+          <LazyProjectDetailModal
+            volume={selectedModalVolume}
+            isOpen={Boolean(selectedModalVolume)}
+            onClose={handleCloseModal}
+          />
+        </Suspense>
+      )}
 
       {/* Webmail & Direct Client Picker Modal */}
-      <EmailPickerModal
-        isOpen={isEmailModalOpen}
-        onClose={() => setIsEmailModalOpen(false)}
-      />
+      {isEmailModalOpen && (
+        <Suspense fallback={null}>
+          <LazyEmailPickerModal
+            isOpen={isEmailModalOpen}
+            onClose={() => setIsEmailModalOpen(false)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }

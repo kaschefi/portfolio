@@ -4,7 +4,7 @@ import { VOLUMES_DATA } from '../data/portfolioData';
 import { BookshelfSkeleton } from './BookshelfSkeleton';
 
 // Code-split / lazy load heavy 3D WebGL BookshelfScene bundle
-export const preloadBookshelfScene = () =>
+const preloadBookshelfScene = () =>
   import('../../node_modules/@designcodeio/threeui/lib-dist/shaders/bookshelf/BookshelfScene.js');
 
 const LazyBookshelfScene = lazy(() =>
