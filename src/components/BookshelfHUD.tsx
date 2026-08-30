@@ -389,6 +389,10 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
                   src={richContent.image}
                   alt={richContent.imageCaption || "System Architecture"}
                   className="moka-diagram-img"
+                  loading="lazy"
+                  decoding="async"
+                  width={800}
+                  height={400}
                 />
               </div>
             )}

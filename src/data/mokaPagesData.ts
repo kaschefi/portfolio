@@ -88,7 +88,7 @@ async def process_user_utterance(user_input: str, thread_id: str = "cozmo_defaul
     subtitle: "Spinal Reflex Layer & FAISS-Indexed Tool Vector Space",
     discipline: "Information Retrieval & Directed Acyclic Graph (DAG) Routing",
     thesis: "Eliminating Tool Crowding and Prompt Confusion via Vector Subspace Filtering and Unified Node Execution",
-    image: "/router_benchmark.png",
+    image: "/router_benchmark.webp",
     imageCaption: "LangSmith 57-Case Benchmark: Monolithic LLM Baseline (A) vs. MoKa Two-Layer Router (B) achieving 93.0% routing accuracy, 83% token reduction, and ~45ms P50 latency.",
     overview:
       "A hierarchical dispatch pipeline that marries zero-LLM semantic embeddings with an in-memory FAISS tool vector store. Layer 1 executes hardware actions in ~45ms; Layer 2 dynamically retrieves top-k tool schemas, slashing prompt tokens by 83% and boosting routing accuracy to 93.0%.",
@@ -144,7 +144,7 @@ class ToolVectorRegistry:
     subtitle: "33Hz Low-Level Packet Monkey-Patching & IMU/Vision Fusion",
     discipline: "Embedded Robotics & Real-Time Cyber-Physical Control",
     thesis: "Zero-Latency Hardware Interception via SDK Monkey-Patching, Deceleration Shock Filters, and Visual Stasis Sliding Windows",
-    image: "/cozmo_hardware_sketch.png",
+    image: "/cozmo_hardware_sketch.webp",
     imageCaption: "Physical Schematic & Dimensions: Anki Cozmo robotic chassis with 4-DOF articulators, drop IR sensors, 3-axis IMU pitch tilt guards, and 33Hz packet-level safety interceptors.",
     overview:
       "A multi-modal safety supervisor operating at PyCozmo's 33Hz packet frequency. It monkey-patches motor controls to intercept dangerous host commands, fusing cliff IR, IMU pitch tilt (>0.35 rad), impact shock deceleration, and OpenCV visual stasis (cv2.absdiff < 3.5) into autonomous evasion routines.",

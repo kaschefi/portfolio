@@ -5,144 +5,105 @@ import fs from 'fs';
 import path from 'path';
 
 export function getAssetDataUris() {
+  const readDataUri = (candidates) => {
+    for (const p of candidates) {
+      if (fs.existsSync(p)) {
+        const ext = path.extname(p).toLowerCase();
+        let mime = 'image/png';
+        if (ext === '.webp') mime = 'image/webp';
+        else if (ext === '.jpg' || ext === '.jpeg') mime = 'image/jpeg';
+        else if (ext === '.svg') mime = 'image/svg+xml';
+        const base64 = fs.readFileSync(p).toString('base64');
+        return `data:${mime};base64,${base64}`;
+      }
+    }
+    return '';
+  };
+
   // 1. MOKA OLED eyes icon
-  let mokaDataUri = '';
-  const mokaCandidates = [
+  const mokaDataUri = readDataUri([
+    path.resolve('public/moka_icon.webp'),
+    path.resolve('public/moka-icon.webp'),
+    path.resolve('public/antigravity_icon.webp'),
+    path.resolve('src/assets/antigravity_icon.webp'),
     path.resolve('public/moka_icon.png'),
     path.resolve('public/moka-icon.png'),
     path.resolve('public/antigravity_icon.png'),
     path.resolve('src/assets/antigravity_icon.png')
-  ];
-  for (const p of mokaCandidates) {
-    if (fs.existsSync(p)) {
-      const mokaBase64 = fs.readFileSync(p).toString('base64');
-      mokaDataUri = `data:image/png;base64,${mokaBase64}`;
-      break;
-    }
-  }
+  ]);
 
   // 2. Router benchmark image
-  const benchPath = path.resolve('public/router_benchmark.png');
-  let benchDataUri = '';
-  if (fs.existsSync(benchPath)) {
-    const benchBase64 = fs.readFileSync(benchPath).toString('base64');
-    benchDataUri = `data:image/png;base64,${benchBase64}`;
-  }
+  const benchDataUri = readDataUri([
+    path.resolve('public/router_benchmark.webp'),
+    path.resolve('src/assets/router_benchmark.webp'),
+    path.resolve('public/router_benchmark.png'),
+    path.resolve('src/assets/router_benchmark.png')
+  ]);
 
   // 3. Cozmo hardware sketch image
-  const cozmoSketchPath = path.resolve('public/cozmo_hardware_sketch.png');
-  let cozmoSketchDataUri = '';
-  if (fs.existsSync(cozmoSketchPath)) {
-    const cozmoSketchBase64 = fs.readFileSync(cozmoSketchPath).toString('base64');
-    cozmoSketchDataUri = `data:image/png;base64,${cozmoSketchBase64}`;
-  }
+  const cozmoSketchDataUri = readDataUri([
+    path.resolve('public/cozmo_hardware_sketch.webp'),
+    path.resolve('src/assets/cozmo_hardware_sketch.webp'),
+    path.resolve('public/cozmo_hardware_sketch.png')
+  ]);
 
-  // 4. JoinApp cover transparent PNG
-  const joinAppCandidates = [
+  // 4. JoinApp cover transparent PNG/WebP
+  const joinAppDataUri = readDataUri([
+    path.resolve('public/joinapp.webp'),
+    path.resolve('src/assets/joinapp.webp'),
     path.resolve('src/assets/joinapp.png'),
     path.resolve('public/joinapp.png'),
     path.resolve('src/assets/joinapp.jpg'),
     path.resolve('public/joinapp.jpg')
-  ];
-  let joinAppDataUri = '';
-  for (const p of joinAppCandidates) {
-    if (fs.existsSync(p)) {
-      const isPng = p.endsWith('.png');
-      const joinAppBase64 = fs.readFileSync(p).toString('base64');
-      joinAppDataUri = `data:image/${isPng ? 'png' : 'jpeg'};base64,${joinAppBase64}`;
-      break;
-    }
-  }
+  ]);
 
   // 5. Figma cover / Sawyer Robot image
-  const figmaCandidates = [
+  const figmaDataUri = readDataUri([
+    path.resolve('public/sawyerRobot.webp'),
+    path.resolve('src/assets/sawyerRobot.webp'),
     path.resolve('src/assets/sawyerRobot.png'),
     path.resolve('public/sawyerRobot.png'),
     path.resolve('src/assets/sawyerRobot.jpg'),
     path.resolve('public/sawyerRobot.jpg'),
-    path.resolve('src/assets/figma_icon.png'),
-    path.resolve('public/figma_icon.png'),
-    path.resolve('src/assets/figma.png'),
-    path.resolve('public/figma.png'),
-    path.resolve('src/assets/aegis_logo.png'),
-    path.resolve('public/aegis_logo.png')
-  ];
-  let figmaDataUri = '';
-  for (const p of figmaCandidates) {
-    if (fs.existsSync(p)) {
-      const isPng = p.endsWith('.png');
-      const figmaBase64 = fs.readFileSync(p).toString('base64');
-      figmaDataUri = `data:image/${isPng ? 'png' : 'jpeg'};base64,${figmaBase64}`;
-      break;
-    }
-  }
+    path.resolve('src/assets/figma_icon.webp'),
+    path.resolve('public/figma_icon.webp')
+  ]);
 
   // 6. Figma diagram / token architecture image
-  const figmaDiagramCandidates = [
+  const figmaDiagramDataUri = readDataUri([
+    path.resolve('src/assets/figma_diagram.webp'),
+    path.resolve('public/figma_diagram.webp'),
+    path.resolve('src/assets/token_architecture.webp'),
+    path.resolve('public/token_architecture.webp'),
     path.resolve('src/assets/figma_diagram.png'),
     path.resolve('public/figma_diagram.png'),
     path.resolve('src/assets/token_architecture.png'),
     path.resolve('public/token_architecture.png')
-  ];
-  let figmaDiagramDataUri = '';
-  for (const p of figmaDiagramCandidates) {
-    if (fs.existsSync(p)) {
-      const isPng = p.endsWith('.png');
-      const figmaDiagBase64 = fs.readFileSync(p).toString('base64');
-      figmaDiagramDataUri = `data:image/${isPng ? 'png' : 'jpeg'};base64,${figmaDiagBase64}`;
-      break;
-    }
-  }
+  ]);
 
   // 7. Claude Code cover image candidates
-  const claudeCodeCandidates = [
+  const claudeCodeDataUri = readDataUri([
+    path.resolve('public/claude_code.webp'),
+    path.resolve('src/assets/claude_code.webp'),
+    path.resolve('public/cat.webp'),
+    path.resolve('src/assets/cat.webp'),
     path.resolve('src/assets/claude_code.png'),
     path.resolve('public/claude_code.png'),
     path.resolve('src/assets/claude_code.jpg'),
-    path.resolve('public/claude_code.jpg'),
-    path.resolve('src/assets/claudeCode.png'),
-    path.resolve('public/claudeCode.png'),
-    path.resolve('src/assets/claudeCode.jpg'),
-    path.resolve('public/claudeCode.jpg'),
-    path.resolve('src/assets/claude.png'),
-    path.resolve('public/claude.png'),
-    path.resolve('src/assets/claude.jpg'),
-    path.resolve('public/claude.jpg'),
-    path.resolve('src/assets/hugomed.png'),
-    path.resolve('public/hugomed.png'),
-    path.resolve('src/assets/hugo_med.png'),
-    path.resolve('public/hugo_med.png')
-  ];
-  let claudeCodeDataUri = '';
-  for (const p of claudeCodeCandidates) {
-    if (fs.existsSync(p)) {
-      const isPng = p.endsWith('.png');
-      const claudeBase64 = fs.readFileSync(p).toString('base64');
-      claudeCodeDataUri = `data:image/${isPng ? 'png' : 'jpeg'};base64,${claudeBase64}`;
-      break;
-    }
-  }
+    path.resolve('public/claude_code.jpg')
+  ]);
 
   // 8. Claude Code diagram / medical architecture image
-  const claudeDiagramCandidates = [
+  const claudeCodeDiagramDataUri = readDataUri([
+    path.resolve('src/assets/claude_code_diagram.webp'),
+    path.resolve('public/claude_code_diagram.webp'),
+    path.resolve('src/assets/claude_diagram.webp'),
+    path.resolve('public/claude_diagram.webp'),
     path.resolve('src/assets/claude_code_diagram.png'),
     path.resolve('public/claude_code_diagram.png'),
     path.resolve('src/assets/claude_diagram.png'),
-    path.resolve('public/claude_diagram.png'),
-    path.resolve('src/assets/hugomed_diagram.png'),
-    path.resolve('public/hugomed_diagram.png'),
-    path.resolve('src/assets/clinical_rag_diagram.png'),
-    path.resolve('public/clinical_rag_diagram.png')
-  ];
-  let claudeCodeDiagramDataUri = '';
-  for (const p of claudeDiagramCandidates) {
-    if (fs.existsSync(p)) {
-      const isPng = p.endsWith('.png');
-      const claudeDiagBase64 = fs.readFileSync(p).toString('base64');
-      claudeCodeDiagramDataUri = `data:image/${isPng ? 'png' : 'jpeg'};base64,${claudeDiagBase64}`;
-      break;
-    }
-  }
+    path.resolve('public/claude_diagram.png')
+  ]);
 
   return {
     mokaDataUri,
