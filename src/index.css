@@ -247,9 +247,6 @@ body {
   stroke: rgba(244, 238, 230, 0.88);
   stroke-width: 2.2;
   stroke-linecap: round;
-  stroke-dasharray: 119.38;
-  stroke-dashoffset: 119.38;
-  transition: stroke-dashoffset 0.12s linear;
 }
 
 .hero-progress-text {

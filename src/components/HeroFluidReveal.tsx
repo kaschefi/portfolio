@@ -1174,6 +1174,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
               cx="22"
               cy="22"
               r="19"
+              strokeDasharray="119.38"
               style={{
                 strokeDashoffset: 119.38 - (119.38 * progress) / 100
               }}
