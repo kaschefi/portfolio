@@ -112,7 +112,11 @@ export function App() {
       {/* 3. Interactive 3D Bookshelf Viewport */}
       <Suspense fallback={
         <main className="bookshelf-section" id="bookshelf">
-          <BookshelfSkeleton />
+          <div className="bookshelf-wrapper">
+            <div className="bookshelf-stage">
+              <BookshelfSkeleton />
+            </div>
+          </div>
         </main>
       }>
         <LazyBookshelfSection />

@@ -15,6 +15,10 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Static 3D models directory
+/models/*
+  Cache-Control: public, max-age=31536000, immutable
+
 # Static media & models
 /*.webp
   Cache-Control: public, max-age=31536000, immutable

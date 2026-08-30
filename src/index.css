@@ -739,8 +739,15 @@ body {
 
 /* Canvas Smooth Fade-In and Mobile Pan-Y Scrolling */
 .bookshelf__canvas {
-  transition: opacity 0.8s var(--ease-smooth);
+  opacity: 0;
+  transition: opacity 350ms ease-out;
   touch-action: pan-y !important;
+  will-change: opacity;
+}
+
+.bookshelf__canvas.is-ready,
+.bookshelf[data-state="ready"] .bookshelf__canvas {
+  opacity: 1;
 }
 
 .bookshelf-stage,
@@ -4015,7 +4022,7 @@ body {
 }
 
 /* ==========================================================================
-   Bookshelf Skeleton & 3D Pedestal Standby Placeholder
+   Bookshelf Skeleton & 3D Archival Standby Placeholder (Classic & Lux)
    ========================================================================== */
 
 .bookshelf-stage {
@@ -4027,154 +4034,344 @@ body {
 .bookshelf-skeleton {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 50% 55%, rgba(22, 27, 39, 0.6) 0%, rgba(10, 13, 20, 0.95) 75%);
+  background: radial-gradient(circle at 50% 50%, rgba(24, 28, 40, 0.8) 0%, rgba(14, 17, 25, 0.98) 80%);
   pointer-events: none;
   user-select: none;
   z-index: 2;
-  animation: skeletonFadeIn 0.3s ease forwards;
+  animation: skeletonFadeIn 0.35s ease forwards;
+  overflow: hidden;
 }
 
 .skeleton-shelf-container {
   position: relative;
-  width: min(90%, 820px);
+  width: min(94%, 860px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-bottom: 2rem;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  padding-bottom: 1.5rem;
+}
+
+.skeleton-ambient-glow {
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100%, 720px);
+  height: 280px;
+  background: radial-gradient(ellipse at center, rgba(239, 193, 109, 0.06) 0%, rgba(244, 238, 230, 0.02) 45%, transparent 75%);
+  filter: blur(40px);
+  pointer-events: none;
 }
 
 .skeleton-books-row {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: clamp(10px, 2.2vw, 24px);
+  gap: clamp(8px, 1.8vw, 22px);
   perspective: 1000px;
-  margin-bottom: -1px;
+  margin-bottom: -2px;
+  z-index: 2;
 }
 
-.skeleton-book-spine {
+/* Classic Luxury Book Spines */
+.skeleton-lux-spine {
   position: relative;
-  width: clamp(42px, 7.5vw, 68px);
-  height: clamp(160px, 28vw, 260px);
   border-radius: 4px 4px 1px 1px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 60%, rgba(0, 0, 0, 0.4) 100%), rgba(18, 23, 35, 0.85);
-  border: 1px solid rgba(244, 238, 230, 0.12);
+  border: 1px solid rgba(239, 193, 109, 0.22);
   border-bottom: none;
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.6), inset 1px 0 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 16px 36px rgba(0, 0, 0, 0.75),
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset -1px 0 0 rgba(0, 0, 0, 0.45);
   overflow: hidden;
-  animation: spineShimmer 2.2s ease-in-out infinite alternate;
+  transform-origin: bottom center;
+  transition: transform 0.3s ease;
+  will-change: transform;
 }
 
-.skeleton-spine-inner {
+/* Rich Archival Cloth Themes */
+.skeleton-spine--ultramarine {
+  background: linear-gradient(180deg, #1b2e4b 0%, #132035 50%, #0d1624 100%);
+}
+
+.skeleton-spine--terracotta {
+  background: linear-gradient(180deg, #442a1d 0%, #321e14 50%, #20130d 100%);
+}
+
+.skeleton-spine--emerald {
+  background: linear-gradient(180deg, #183d2e 0%, #112c21 50%, #0b1c15 100%);
+}
+
+.skeleton-spine--celestial {
+  background: linear-gradient(180deg, #1c2b48 0%, #141f34 50%, #0d1523 100%);
+}
+
+.skeleton-spine--amethyst {
+  background: linear-gradient(180deg, #371e44 0%, #291633 50%, #1b0e22 100%);
+}
+
+.skeleton-spine--burgundy {
+  background: linear-gradient(180deg, #441a24 0%, #32131b 50%, #200c11 100%);
+}
+
+/* Warm Gold Leaf Luster Shimmer */
+.skeleton-shimmer-layer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(239, 193, 109, 0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: goldLeafLuster 2.2s infinite ease-in-out;
+  pointer-events: none;
+  border-radius: inherit;
+  will-change: background-position;
+  transform: translateZ(0);
+}
+
+.skeleton-lux-inner {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0.3rem 1.4rem;
+  padding: 1rem 0.35rem 1.1rem;
+  z-index: 1;
 }
 
-.skeleton-spine-tag {
-  font-family: var(--font-mono, monospace);
-  font-size: clamp(0.5rem, 0.85vw, 0.62rem);
-  font-weight: 600;
-  color: rgba(244, 238, 230, 0.45);
-  letter-spacing: 0.05em;
+.skeleton-lux-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
 }
 
-.skeleton-spine-title {
-  font-family: var(--font-display, var(--font-sans, sans-serif));
-  font-size: clamp(0.55rem, 0.9vw, 0.68rem);
-  font-weight: 700;
-  color: rgba(244, 238, 230, 0.7);
+.skeleton-lux-roman {
+  font-family: var(--font-serif, 'Cinzel', 'Cormorant Garamond', Georgia, serif);
+  font-size: clamp(0.75rem, 1.2vw, 0.95rem);
+  font-weight: 500;
   letter-spacing: 0.12em;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  text-transform: uppercase;
+  color: var(--spine-foil, #efc16d);
+  opacity: 0.85;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  animation: goldGleam 2.8s ease-in-out infinite alternate;
 }
 
-.skeleton-spine-foil-line {
-  width: 60%;
+.skeleton-lux-divider {
+  width: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--spine-foil, #efc16d), transparent);
+  opacity: 0.55;
+}
+
+.skeleton-lux-title-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0.8rem 0;
+}
+
+.skeleton-lux-bar {
+  border-radius: 3px;
+  animation: goldPulse 2.4s ease-in-out infinite alternate;
+}
+
+.skeleton-lux-bar--primary {
+  width: 9px;
+  height: 52%;
+  background: linear-gradient(180deg, rgba(239, 193, 109, 0.22) 0%, rgba(239, 193, 109, 0.06) 100%);
+  border: 1px solid rgba(239, 193, 109, 0.2);
+  box-shadow: 0 0 12px rgba(239, 193, 109, 0.12);
+}
+
+.skeleton-lux-bar--secondary {
+  width: 5px;
+  height: 34%;
+  background: rgba(239, 193, 109, 0.08);
+}
+
+.skeleton-lux-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+
+.skeleton-lux-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--spine-foil, #efc16d);
+  opacity: 0.65;
+}
+
+/* Headcap, Tailband & Gilded Fillets */
+.skeleton-lux-headcap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 100%);
+}
+
+.skeleton-lux-tailband {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, transparent 100%);
+}
+
+.skeleton-lux-foil-fillet {
+  position: absolute;
+  left: 0;
+  right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(239, 193, 109, 0.6), transparent);
-  border-radius: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--spine-foil, #efc16d) 50%, transparent 100%);
+  opacity: 0.5;
 }
 
-.skeleton-pedestal-beam {
+.skeleton-lux-foil-fillet--top {
+  top: 5px;
+}
+
+.skeleton-lux-foil-fillet--bottom {
+  bottom: 5px;
+}
+
+/* Architectural Walnut & Gilded Shelf Ledge */
+.skeleton-pedestal-walnut {
   position: relative;
   width: 100%;
-  height: 12px;
-  background: linear-gradient(180deg, rgba(244, 238, 230, 0.18) 0%, rgba(20, 24, 34, 0.9) 100%);
-  border-radius: 3px;
-  border-top: 1px solid rgba(244, 238, 230, 0.35);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  z-index: 3;
+}
+
+.skeleton-pedestal-gold-rim {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(239, 193, 109, 0.55) 50%, transparent 100%);
+  box-shadow: 0 0 12px rgba(239, 193, 109, 0.3);
+}
+
+.skeleton-pedestal-walnut-face {
+  width: 100%;
+  height: 14px;
+  background: linear-gradient(180deg, #251b16 0%, #150f0c 100%);
+  border: 1px solid rgba(239, 193, 109, 0.15);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 
+    0 18px 40px rgba(0, 0, 0, 0.9),
+    0 6px 14px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .skeleton-pedestal-glow {
   position: absolute;
-  top: -2px;
-  left: 10%;
-  right: 10%;
-  height: 6px;
-  background: radial-gradient(ellipse at center, rgba(56, 132, 255, 0.45) 0%, transparent 70%);
-  filter: blur(4px);
+  top: -4px;
+  left: 15%;
+  right: 15%;
+  height: 8px;
+  background: radial-gradient(ellipse at center, rgba(239, 193, 109, 0.2) 0%, transparent 75%);
+  filter: blur(5px);
+  pointer-events: none;
 }
 
-.skeleton-status-bar {
+.skeleton-pedestal-shadow {
+  position: absolute;
+  top: 100%;
+  left: 5%;
+  right: 5%;
+  height: 24px;
+  background: radial-gradient(ellipse at top, rgba(0, 0, 0, 0.75) 0%, transparent 80%);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+/* Editorial Luxury Archival Status Badge */
+.skeleton-lux-status {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 2rem;
-  padding: 6px 14px;
+  gap: 12px;
+  margin-top: 2.2rem;
+  padding: 8px 22px;
   border-radius: 999px;
-  background: rgba(14, 18, 28, 0.85);
-  border: 1px solid rgba(244, 238, 230, 0.12);
-  backdrop-filter: blur(12px);
+  background: rgba(18, 22, 32, 0.88);
+  border: 1px solid rgba(239, 193, 109, 0.25);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55), 0 0 16px rgba(239, 193, 109, 0.08);
 }
 
-.skeleton-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #3884ff;
-  box-shadow: 0 0 8px #3884ff;
-  animation: dotPulse 1.4s ease-in-out infinite alternate;
+.skeleton-lux-star {
+  font-size: 0.68rem;
+  color: #efc16d;
+  animation: starGleam 2s ease-in-out infinite alternate;
 }
 
 .skeleton-status-text {
   font-family: var(--font-mono, monospace);
   font-size: 0.64rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: rgba(244, 238, 230, 0.75);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: rgba(244, 238, 230, 0.85);
 }
 
 @keyframes skeletonFadeIn {
   from {
     opacity: 0;
+    transform: scale(0.988);
   }
   to {
     opacity: 1;
+    transform: scale(1);
   }
 }
 
-@keyframes spineShimmer {
+@keyframes goldLeafLuster {
   0% {
-    border-color: rgba(244, 238, 230, 0.1);
-    transform: translateY(0);
+    background-position: 200% 0;
   }
   100% {
-    border-color: rgba(244, 238, 230, 0.28);
-    transform: translateY(-4px);
+    background-position: -200% 0;
   }
 }
 
-@keyframes dotPulse {
+@keyframes goldPulse {
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes goldGleam {
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 8px rgba(239, 193, 109, 0.5);
+  }
+}
+
+@keyframes starGleam {
   0% {
     opacity: 0.4;
     transform: scale(0.85);

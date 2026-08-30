@@ -192,6 +192,26 @@ export const BookshelfContainer: React.FC<BookshelfContainerProps> = ({
   }, [onVolumeChange, onStateChange]);
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [isSceneReady, setIsSceneReady] = useState<boolean>(false);
+
+  useEffect(() => {
+    const root = containerRef.current;
+    if (!root) return;
+
+    const checkReady = () => {
+      const ready = root.querySelector('.bookshelf[data-state="ready"]') !== null ||
+        root.querySelector('.bookshelf__canvas.is-ready') !== null;
+      if (ready) {
+        setIsSceneReady(true);
+      }
+    };
+
+    checkReady();
+    const observer = new MutationObserver(checkReady);
+    observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-state', 'class'] });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const handleViewSpine = () => setIsExpanded(true);
@@ -231,7 +251,16 @@ export const BookshelfContainer: React.FC<BookshelfContainerProps> = ({
       </div>
 
       <div className="bookshelf-vignette" aria-hidden="true" />
-      {children}
+      <div
+        className="bookshelf-hud-wrapper"
+        style={{
+          opacity: isSceneReady ? 1 : 0,
+          pointerEvents: isSceneReady ? 'auto' : 'none',
+          transition: 'opacity 0.4s ease-out'
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 };

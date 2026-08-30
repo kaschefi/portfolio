@@ -25,6 +25,12 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Static 3D models directory
+[[headers]]
+  for = "/models/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
 # Static fonts and media assets
 [[headers]]
   for = "/*.woff2"
