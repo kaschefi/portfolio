@@ -61,9 +61,9 @@ export const ContactFooter: React.FC<ContactFooterProps> = ({ onOpenEmail }) => 
                   className="contact-primary-email-btn"
                   aria-label={`Open email picker for ${email}`}
                 >
-                  <Mail size={16} />
-                  <span>{email}</span>
-                  <ArrowUpRight size={15} className="contact-btn-arrow" />
+                  <Mail size={15} className="contact-email-icon" />
+                  <span className="contact-email-text">{email}</span>
+                  <ArrowUpRight size={14} className="contact-btn-arrow" />
                 </button>
 
                 <button
@@ -71,16 +71,17 @@ export const ContactFooter: React.FC<ContactFooterProps> = ({ onOpenEmail }) => 
                   className="contact-copy-btn"
                   aria-label="Copy email address to clipboard"
                   title="Copy email to clipboard"
+                  type="button"
                 >
                   {copied ? (
                     <>
                       <Check size={14} className="contact-copy-success" />
-                      <span className="contact-copy-tooltip">Copied!</span>
+                      <span className="contact-copy-label">Copied!</span>
                     </>
                   ) : (
                     <>
                       <Copy size={14} />
-                      <span className="contact-copy-tooltip">Copy</span>
+                      <span className="contact-copy-label">Copy</span>
                     </>
                   )}
                 </button>
