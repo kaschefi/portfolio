@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mohammad-kashefirad-portfolio.vercel.app/sitemap.xml

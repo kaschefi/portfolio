@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import type { VolumeProject } from '../data/portfolioData';
-import { X, ExternalLink, CheckCircle2, Layers, BookOpen } from 'lucide-react';
+import { X, CheckCircle2, Layers, BookOpen } from 'lucide-react';
 import { GithubIcon } from './Icons';
 import { sound } from '../utils/audio';
 
@@ -17,20 +17,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 }) => {
   useEffect(() => {
     if (isOpen && volume) {
-      sound.playSuccess();
-      import('canvas-confetti')
-        .then((confettiModule) => {
-          const confetti = confettiModule.default || confettiModule;
-          confetti({
-            particleCount: 45,
-            spread: 60,
-            origin: { y: 0.8 },
-            colors: [volume.accent, volume.foil, '#ffffff']
-          });
-        })
-        .catch(() => {
-          // Confetti fallback
-        });
+      sound.playBookOpen();
     }
   }, [isOpen, volume]);
 
@@ -49,21 +36,25 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       <div
         className="modal-drawer"
         onClick={(e) => e.stopPropagation()}
-        style={{ '--volume-accent': volume.accent } as React.CSSProperties}
       >
+        {/* Archival Modal Header */}
         <div className="modal-header">
           <div>
-            <div className="badge-eyebrow">
-              <span className="roman-tag" style={{ background: volume.color }}>
-                Vol. {volume.roman}
+            <div className="about-section-tag" style={{ marginBottom: '0.45rem' }}>
+              <span className="mobile-roman-badge">
+                VOL. {volume.roman}
               </span>
-              <span className="discipline-tag">{volume.discipline}</span>
+              <span className="about-section-tag-divider">—</span>
+              <span>{volume.discipline}</span>
+              <span className="about-section-tag-divider">·</span>
+              <span>{projectDetails.timeframe}</span>
             </div>
-            <h2 id="modal-title" className="section-title" style={{ fontSize: '1.75rem', marginBottom: '0.2rem' }}>
+
+            <h2 id="modal-title" className="about-heading-serif modal-title-serif">
               {volume.title} · {projectDetails.name}
             </h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              {projectDetails.institution} · {projectDetails.timeframe}
+            <p className="modal-subtitle-inst">
+              {projectDetails.institution}
             </p>
           </div>
 
@@ -76,63 +67,50 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             aria-label="Close modal"
             type="button"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
         <div className="modal-body">
-          {/* Hero Project Card */}
+          {/* Hero Project Card (Skill Card Material Aesthetic) */}
           <div className="project-hero-card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+            <div className="project-hero-top-row">
               <div>
-                <span style={{ fontSize: '0.78rem', color: volume.accent, fontWeight: 700, textTransform: 'uppercase' }}>
+                <span className="project-hero-category">
                   {projectDetails.category}
                 </span>
-                <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', marginTop: '0.2rem' }}>
+                <h3 className="project-hero-title">
                   {projectDetails.name}
                 </h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                  Role: <strong style={{ color: '#fff' }}>{projectDetails.role}</strong>
+                <p className="project-hero-role">
+                  Role: <strong>{projectDetails.role}</strong>
                 </p>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <div className="project-hero-actions">
                 {projectDetails.githubUrl && (
                   <a
                     href={projectDetails.githubUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="open-book-btn"
-                    style={{ textDecoration: 'none' }}
+                    className="modal-action-btn modal-action-btn--secondary"
                   >
-                    <GithubIcon size={15} />
+                    <GithubIcon size={14} />
                     <span>Source</span>
-                  </a>
-                )}
-                {projectDetails.liveUrl && (
-                  <a
-                    href={projectDetails.liveUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="contact-pill-btn"
-                    style={{ textDecoration: 'none', padding: '0.45rem 0.9rem', fontSize: '0.8rem' }}
-                  >
-                    <ExternalLink size={15} />
-                    <span>Live Demo</span>
                   </a>
                 )}
               </div>
             </div>
 
-            <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', marginTop: '1rem', lineHeight: 1.6 }}>
+            <p className="project-hero-summary">
               {projectDetails.summary}
             </p>
 
-            {/* Key Metrics */}
+            {/* Key Metrics Grid */}
             <div className="project-metrics-grid">
               {projectDetails.keyMetrics.map((m, idx) => (
                 <div key={idx} className="metric-box">
-                  <div className="metric-value" style={{ color: volume.accent }}>
+                  <div className="metric-value">
                     {m.value}
                   </div>
                   <div className="metric-label">{m.label}</div>
@@ -141,8 +119,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             </div>
 
             {/* Tech Stack */}
-            <div style={{ marginTop: '1.25rem' }}>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <div className="project-tech-section">
+              <span className="project-tech-label">
                 Engineered with
               </span>
               <div className="tech-tag-cloud">
@@ -153,32 +131,35 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 ))}
               </div>
             </div>
+
+            {/* Reticle Corner Accent */}
+            <div className="mobile-card-reticle" aria-hidden="true" />
           </div>
 
           {/* Architecture & Engineering Deep-Dive */}
-          <div>
-            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              <Layers size={18} color={volume.accent} />
-              <span>System Architecture & Approach</span>
+          <div className="project-arch-section">
+            <h4 className="project-section-title">
+              <Layers size={16} className="project-section-icon" />
+              <span>System Architecture &amp; Approach</span>
             </h4>
-            <div style={{ padding: '1.25rem', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-subtle)' }}>
-              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '0.75rem' }}>
-                <strong style={{ color: '#fff' }}>The Challenge:</strong> {projectDetails.problem}
+            <div className="project-arch-card">
+              <p className="project-arch-p">
+                <strong>The Challenge:</strong> {projectDetails.problem}
               </p>
-              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '0.75rem' }}>
-                <strong style={{ color: '#fff' }}>The Engineering Solution:</strong> {projectDetails.solution}
+              <p className="project-arch-p">
+                <strong>The Engineering Solution:</strong> {projectDetails.solution}
               </p>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                💡 Architecture Pattern: {projectDetails.architectureDescription}
+              <p className="project-arch-subtext">
+                Architecture Pattern: {projectDetails.architectureDescription}
               </p>
             </div>
           </div>
 
           {/* Chapters & Source Proof */}
           <div className="chapters-section">
-            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <BookOpen size={18} color={volume.accent} />
-              <span>Volume Chapters & Implementation Highlights</span>
+            <h4 className="project-section-title">
+              <BookOpen size={16} className="project-section-icon" />
+              <span>Volume Chapters &amp; Implementation Highlights</span>
             </h4>
 
             {chapters.map((chapter) => (
@@ -199,7 +180,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 <ul className="highlights-list">
                   {chapter.highlights.map((h, i) => (
                     <li key={i} className="highlight-item">
-                      <CheckCircle2 size={14} color={volume.accent} />
+                      <CheckCircle2 size={13} className="highlight-icon" />
                       <span>{h}</span>
                     </li>
                   ))}
@@ -209,15 +190,15 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           </div>
 
           {/* Technical Specs Footer */}
-          <div style={{ padding: '1.25rem', borderRadius: '12px', background: 'rgba(0, 0, 0, 0.3)', border: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+          <div className="project-specs-footer">
             <div>
-              <strong>Format:</strong> {volume.format}
+              <span className="specs-label">Format:</span> {volume.format}
             </div>
             <div>
-              <strong>Binding:</strong> {volume.binding}
+              <span className="specs-label">Binding:</span> {volume.binding}
             </div>
             <div>
-              <strong>Motif:</strong> {volume.motif}
+              <span className="specs-label">Motif:</span> {volume.motif}
             </div>
           </div>
         </div>
@@ -225,3 +206,4 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     </div>
   );
 };
+

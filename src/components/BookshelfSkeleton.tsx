@@ -140,7 +140,7 @@ export const BookshelfSkeleton: React.FC = () => {
         {/* Editorial Luxury Archival Status Badge */}
         <div className="skeleton-status-bar skeleton-lux-status">
           <span className="skeleton-lux-star" aria-hidden="true">✦</span>
-          <span className="skeleton-status-text">CURATING ARCHIVAL COLLECTION · VOL. I–VI</span>
+          <span className="skeleton-status-text">LOADING</span>
           <span className="skeleton-lux-star" aria-hidden="true">✦</span>
         </div>
       </div>
