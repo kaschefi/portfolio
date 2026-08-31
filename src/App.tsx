@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense, lazy } from 'react';
+import { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { HeroFluidReveal } from './components/HeroFluidReveal';
 import { MobileHero } from './components/MobileHero';
 import { MobileProjectCards } from './components/MobileProjectCards';
@@ -8,71 +8,68 @@ import { ContactFooterSkeleton } from './components/ContactFooterSkeleton';
 import { useIsMobile } from './utils/useIsMobile';
 import type { VolumeProject } from './data/portfolioData';
 
-// Code-split / lazy-load non-critical, below-the-fold, and modal components
+// Code-split components
 const LazyAboutSection = lazy(() =>
   import('./components/AboutSection').then((m) => ({ default: m.AboutSection }))
 );
-
 const LazyBookshelfSection = lazy(() => import('./components/BookshelfSection'));
-
 const LazyContactFooter = lazy(() =>
   import('./components/ContactFooter').then((m) => ({ default: m.ContactFooter }))
 );
-
 const LazyProjectDetailModal = lazy(() =>
   import('./components/ProjectDetailModal').then((m) => ({ default: m.ProjectDetailModal }))
 );
-
 const LazyEmailPickerModal = lazy(() =>
   import('./components/EmailPickerModal').then((m) => ({ default: m.EmailPickerModal }))
 );
-
-// Speculative preloader for idle background fetching.
-// The 3D bookshelf (and its ~2.3MB Three.js chunk) is only preloaded on
-// devices that will actually render it — see the isMobile branch below.
-const preloadBelowTheFold = (isMobile: boolean) => {
-  import('./components/AboutSection');
-  if (!isMobile) {
-    import('./components/BookshelfSection');
-  }
-  import('./components/ContactFooter');
-};
 
 export function App() {
   const isMobile = useIsMobile();
   const [selectedModalVolume, setSelectedModalVolume] = useState<VolumeProject | null>(null);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState<boolean>(false);
 
-  // Ensure initial load / refresh always starts at the top & trigger speculative preloading
+  // Track when the user is approaching or requesting the 3D Bookshelf
+  const [shouldLoadBookshelf, setShouldLoadBookshelf] = useState<boolean>(false);
+  const bookshelfTriggerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll restoration
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
+  }, []);
 
-    // Speculative background preloading after Hero intro transition finishes (4.0s) or on initial scroll
-    let preloaded = false;
-    const triggerPreload = () => {
-      if (preloaded) return;
-      preloaded = true;
-      preloadBelowTheFold(isMobile);
-      window.removeEventListener('scroll', triggerPreload);
-    };
+  // Proximity observer: Only download and mount Three.js when user scrolls towards it
+  useEffect(() => {
+    if (isMobile || shouldLoadBookshelf) return;
 
-    const timer = setTimeout(triggerPreload, 4000);
-    window.addEventListener('scroll', triggerPreload, { passive: true });
+    const trigger = bookshelfTriggerRef.current;
+    if (!trigger) return;
 
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('scroll', triggerPreload);
-    };
-  }, [isMobile]);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoadBookshelf(true);
+          observer.disconnect();
+        }
+      },
+      // Starts loading 400px before the user reaches the bookshelf
+      { rootMargin: '400px 0px' }
+    );
+
+    observer.observe(trigger);
+    return () => observer.disconnect();
+  }, [isMobile, shouldLoadBookshelf]);
 
   const handleCloseModal = () => {
     setSelectedModalVolume(null);
   };
 
   const handleScrollToSection = (sectionId: string) => {
+    if (sectionId === 'bookshelf') {
+      setShouldLoadBookshelf(true);
+    }
     const el = document.getElementById(sectionId);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
@@ -85,7 +82,6 @@ export function App() {
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
         return;
       }
-
       if (e.key === 'Escape') {
         if (selectedModalVolume) {
           handleCloseModal();
@@ -94,16 +90,13 @@ export function App() {
         }
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedModalVolume, isEmailModalOpen]);
 
   return (
     <div className="portfolio-app">
-      {/* 1. Hero Section (Critical Path / Instant FCP).
-          Mobile gets a lightweight CSS crossfade instead of the full-screen
-          WebGL fluid-morph shader, which is heavy on phone GPUs/battery. */}
+      {/* 1. Hero Section (Gets 100% of GPU & CPU thread upon arrival) */}
       <section className="hero-section" id="hero">
         {isMobile ? (
           <MobileHero
@@ -119,20 +112,32 @@ export function App() {
         )}
       </section>
 
-      {/* 2. Editorial About / Technical Philosophy Dossier Section */}
+      {/* 2. Editorial About Section */}
       <Suspense fallback={<AboutSectionSkeleton />}>
         <LazyAboutSection
           onExploreProjects={() => handleScrollToSection('bookshelf')}
         />
       </Suspense>
 
-      {/* 3. Projects: interactive 3D bookshelf on desktop, lightweight 2D
-          cards on mobile. The 3D component (and its Three.js bundle) is
-          simply never rendered on mobile, so it's never downloaded either. */}
-      {isMobile ? (
-        <MobileProjectCards onSelectVolume={setSelectedModalVolume} />
-      ) : (
-        <Suspense fallback={
+      {/* 3. Bookshelf Section Trigger & Container */}
+      <div ref={bookshelfTriggerRef} style={{ position: 'relative', width: '100%' }}>
+        {isMobile ? (
+          <MobileProjectCards onSelectVolume={setSelectedModalVolume} />
+        ) : shouldLoadBookshelf ? (
+          <Suspense
+            fallback={
+              <main className="bookshelf-section" id="bookshelf">
+                <div className="bookshelf-wrapper">
+                  <div className="bookshelf-stage">
+                    <BookshelfSkeleton />
+                  </div>
+                </div>
+              </main>
+            }
+          >
+            <LazyBookshelfSection />
+          </Suspense>
+        ) : (
           <main className="bookshelf-section" id="bookshelf">
             <div className="bookshelf-wrapper">
               <div className="bookshelf-stage">
@@ -140,19 +145,15 @@ export function App() {
               </div>
             </div>
           </main>
-        }>
-          <LazyBookshelfSection />
-        </Suspense>
-      )}
+        )}
+      </div>
 
-      {/* 4. Frictionless Contact & Availability Callout Footer */}
+      {/* 4. Contact Footer */}
       <Suspense fallback={<ContactFooterSkeleton />}>
-        <LazyContactFooter
-          onOpenEmail={() => setIsEmailModalOpen(true)}
-        />
+        <LazyContactFooter onOpenEmail={() => setIsEmailModalOpen(true)} />
       </Suspense>
 
-      {/* Project Case Study Drawer Modal */}
+      {/* Modals */}
       {selectedModalVolume && (
         <Suspense fallback={null}>
           <LazyProjectDetailModal
@@ -163,7 +164,6 @@ export function App() {
         </Suspense>
       )}
 
-      {/* Webmail & Direct Client Picker Modal */}
       {isEmailModalOpen && (
         <Suspense fallback={null}>
           <LazyEmailPickerModal
