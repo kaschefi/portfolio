@@ -312,6 +312,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
     `;
 
     // Reveal Composite Shader with Chromatic Dispersion, FBM Fluid Dissolve, Fresnel Rim Glow, and Edge Curls
+    // Optimized Reveal Composite Shader with Early Bypasses and Conditional FBM
     const compositeFS = `
       precision highp float;
       varying vec2 vUV;
@@ -322,9 +323,8 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       uniform vec2 uResolution;
       uniform vec2 uImageResolution;
       uniform float uTime;
-      uniform float uIntroProgress; // 0.0 = Layer 1 (cybernetic robotme.png), 1.0 = Layer 2 (human engineer me.png)
+      uniform float uIntroProgress; // 0.0 = Layer 1 (human), 1.0 = Layer 2 (cybernetic)
 
-      // 2D Hash & Value Noise (fbm.ts)
       float hash(vec2 p) {
         p = fract(p * vec2(123.34, 456.21));
         p += dot(p, p + 45.32);
@@ -343,7 +343,6 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         return res * res;
       }
 
-      // 4-Octave Fractional Brownian Motion with rotation (fbm.ts)
       float fbm(vec2 p) {
         float v = 0.0;
         float a = 0.5;
@@ -359,80 +358,80 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       vec2 getFitUV(vec2 uvCoord, vec2 screenRes, vec2 imgRes) {
         float screenAspect = screenRes.x / screenRes.y;
         float imgAspect = imgRes.x / imgRes.y;
-
-        // Desktop Widescreen: Right-anchor (0.72x, 0.48y) to leave clean negative space for Left Typography Column
-        // Mobile / Portrait: Center-aligned (0.50x, 0.44y)
         bool isWidescreen = screenAspect > 1.10;
         float targetCenterX = isWidescreen ? 0.72 : 0.50;
         float targetCenterY = isWidescreen ? 0.48 : 0.44;
         float scale = isWidescreen ? 0.90 : 0.95;
-
         vec2 centered = uvCoord - vec2(targetCenterX, targetCenterY);
-
         if (screenAspect > imgAspect) {
           centered.x *= (screenAspect / imgAspect);
         } else {
           centered.y *= (imgAspect / screenAspect);
         }
-
         return (centered / scale) + 0.5;
       }
 
       void main() {
         vec2 fitUV = getFitUV(vUV, uResolution, uImageResolution);
 
-        // Interactive Fluid density & velocity
+        // 1. Fluid Density & Distortion Evaluation
         float fluidDensity = texture2D(uDensity, vUV).r;
-        vec2 vel = texture2D(uVelocity, vUV).xy;
-
-        // Density gradient for refractive displacement and edge curl highlights
-        vec2 eps = vec2(1.0 / uResolution.x, 1.0 / uResolution.y) * 2.5;
-        float fluidR = texture2D(uDensity, vUV + vec2(eps.x, 0.0)).r;
-        float fluidL = texture2D(uDensity, vUV - vec2(eps.x, 0.0)).r;
-        float fluidT = texture2D(uDensity, vUV + vec2(0.0, eps.y)).r;
-        float fluidB = texture2D(uDensity, vUV - vec2(0.0, eps.y)).r;
-        vec2 fluidGrad = vec2(fluidR - fluidL, fluidT - fluidB);
-
-        // Smooth liquid reveal mask for interactive pointer reveal
         float revealAmount = smoothstep(0.05, 0.70, fluidDensity);
         float transitionBoundary = revealAmount * (1.0 - revealAmount) * 4.0;
 
-        // Confine fluid optical distortion and chromatic shift strictly to the tearing perimeter
-        vec2 rawDistort = clamp(vel * 0.002, vec2(-0.02), vec2(0.02)) + clamp(fluidGrad * 0.015, vec2(-0.02), vec2(0.02));
-        vec2 edgeDistort = rawDistort * transitionBoundary;
+        vec2 edgeDistort = vec2(0.0);
+        vec2 fluidGrad = vec2(0.0);
 
-        // --- FBM Fluid Intro Transformation (Layer 1 cybernetic -> Layer 2 human engineer) ---
-        // Domain-warped FBM noise pattern moving organically across portrait (fbm.ts + FluidSim.ts)
-        vec2 fbmUV = fitUV * 4.5 + vec2(uTime * 0.18, -uTime * 0.12);
-        float noiseVal = fbm(fbmUV);
-        float noiseVal2 = fbm(fbmUV + noiseVal * 1.8 + vec2(2.1, 7.4));
+        // Optimization: Only compute multi-tap texture derivatives when active fluid is present
+        if (fluidDensity > 0.005) {
+          vec2 vel = texture2D(uVelocity, vUV).xy;
+          vec2 eps = vec2(1.0 / uResolution.x, 1.0 / uResolution.y) * 2.5;
+          float fluidR = texture2D(uDensity, vUV + vec2(eps.x, 0.0)).r;
+          float fluidL = texture2D(uDensity, vUV - vec2(eps.x, 0.0)).r;
+          float fluidT = texture2D(uDensity, vUV + vec2(0.0, eps.y)).r;
+          float fluidB = texture2D(uDensity, vUV - vec2(0.0, eps.y)).r;
+          fluidGrad = vec2(fluidR - fluidL, fluidT - fluidB);
 
-        // Spatial progression sweep across portrait (0.0 = 100% Layer 1 robotme.png, 1.0 = 100% Layer 2 me.png)
-        float spatialDist = (fitUV.y * 0.55 + fitUV.x * 0.35) + (noiseVal2 - 0.5) * 0.40;
-        float sweepMin = -0.35;
-        float sweepMax = 1.35;
-        float currentCutoff = mix(sweepMin, sweepMax, uIntroProgress);
-        float introTear = smoothstep(spatialDist - 0.14, spatialDist + 0.14, currentCutoff);
-        if (uIntroProgress <= 0.001) introTear = 0.0;
-        if (uIntroProgress >= 0.999) introTear = 1.0;
+          vec2 rawDistort = clamp(vel * 0.002, vec2(-0.02), vec2(0.02)) + clamp(fluidGrad * 0.015, vec2(-0.02), vec2(0.02));
+          edgeDistort = rawDistort * transitionBoundary;
+        }
 
-        // Intro wave edge boundary & Fresnel-style energy glow calculation (fresnelMaterial.ts)
-        float introEdge = introTear * (1.0 - introTear) * 4.0;
-        float introActive = step(0.001, uIntroProgress) * (1.0 - step(0.999, uIntroProgress));
-        float introEdgeIntensity = introEdge * introActive;
+        // 2. Intro Transition & FBM Wavefront (Active only during the intro phase)
+        float introTear = 1.0;
+        vec2 introWarp = vec2(0.0);
+        vec3 introRimGlow = vec3(0.0);
 
-        // Multi-tap fluid displacement ripple along the intro dissolve front (FluidSim.ts)
-        vec2 introWarp = vec2(
-          fbm(fitUV * 8.0 + vec2(uTime * 0.30, 0.0)) - 0.5,
-          fbm(fitUV * 8.0 + vec2(0.0, uTime * 0.30)) - 0.5
-        ) * 0.055 * introEdgeIntensity;
+        if (uIntroProgress < 0.001) {
+          introTear = 0.0;
+        } else if (uIntroProgress < 0.999) {
+          vec2 fbmUV = fitUV * 4.5 + vec2(uTime * 0.18, -uTime * 0.12);
+          float noiseVal = fbm(fbmUV);
+          float noiseVal2 = fbm(fbmUV + noiseVal * 1.8 + vec2(2.1, 7.4));
 
-        // Sample Layer 1: Human engineer portrait (me.png)
+          float spatialDist = (fitUV.y * 0.55 + fitUV.x * 0.35) + (noiseVal2 - 0.5) * 0.40;
+          float sweepMin = -0.35;
+          float sweepMax = 1.35;
+          float currentCutoff = mix(sweepMin, sweepMax, uIntroProgress);
+          introTear = smoothstep(spatialDist - 0.14, spatialDist + 0.14, currentCutoff);
+
+          float introEdge = introTear * (1.0 - introTear) * 4.0;
+          introWarp = vec2(
+            fbm(fitUV * 8.0 + vec2(uTime * 0.30, 0.0)) - 0.5,
+            fbm(fitUV * 8.0 + vec2(0.0, uTime * 0.30)) - 0.5
+          ) * 0.055 * introEdge;
+
+          vec3 fresnelCyan = vec3(0.18, 0.68, 1.0);
+          vec3 fresnelAmber = vec3(1.0, 0.85, 0.45);
+          vec3 introGlowColor = mix(fresnelCyan, fresnelAmber, noiseVal);
+          float heightFade = smoothstep(0.1, 0.9, fitUV.y);
+          introRimGlow = introGlowColor * (introEdge * 1.5) * (0.8 + 0.4 * heightFade);
+        }
+
+        // 3. Layer 1 Sampling (Human portrait)
         vec2 uv1 = fitUV + introWarp * 0.5;
         bool inBounds1 = (uv1.x >= 0.0 && uv1.x <= 1.0 && uv1.y >= 0.0 && uv1.y <= 1.0);
         vec4 col1 = vec4(0.0);
         if (inBounds1) {
-          // Chromatic dispersion at intro wavefront
           vec2 cOffset1 = introWarp * 0.4;
           float r = texture2D(uLayer1, clamp(uv1 + cOffset1, vec2(0.0), vec2(1.0))).r;
           float g = texture2D(uLayer1, uv1).g;
@@ -441,7 +440,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
           col1 = vec4(r, g, b, a);
         }
 
-        // Sample Layer 2: Cybernetic portrait (robotme.png)
+        // 4. Layer 2 Sampling (Cybernetic portrait)
         vec2 uv2 = fitUV + edgeDistort - introWarp * 0.5;
         bool inBounds2 = (uv2.x >= 0.0 && uv2.x <= 1.0 && uv2.y >= 0.0 && uv2.y <= 1.0);
         vec4 col2 = vec4(0.0);
@@ -454,25 +453,15 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
           col2 = vec4(r, g, b, a);
         }
 
-        // Base resting state: starts at Layer 1 (human me.png), then organically transforms into Layer 2 (cybernetic robotme.png)
         vec4 basePortrait = mix(col1, col2, introTear);
-
-        // Electric cyan/gold Fresnel edge glow along the intro wave front (fresnelMaterial.ts)
-        vec3 fresnelCyan = vec3(0.18, 0.68, 1.0);
-        vec3 fresnelAmber = vec3(1.0, 0.85, 0.45);
-        vec3 introGlowColor = mix(fresnelCyan, fresnelAmber, noiseVal);
-        float heightFade = smoothstep(0.1, 0.9, fitUV.y);
-        vec3 introRimGlow = introGlowColor * (introEdgeIntensity * 1.5) * (0.8 + 0.4 * heightFade);
-
-        // Fluid reveal layer: hovering / dragging on top of cybernetic portrait dissolves it to reveal human engineer Layer 1
         vec4 subject = mix(basePortrait, col1, revealAmount);
 
-        // Refined ink / drafting bleed at interactive transition boundaries
+        // Edge drafting highlights
         float edgeStrength = smoothstep(0.01, 0.18, length(fluidGrad)) * transitionBoundary;
         vec3 edgeGlow = vec3(0.72, 0.68, 0.60) * edgeStrength * 0.25;
         subject.rgb += (edgeGlow + introRimGlow) * subject.a;
 
-        // Archival deep slate backdrop (#16181d) matching the 3D bookshelf scene
+        // Background blending
         vec3 bg = vec3(0.086, 0.094, 0.114);
         float spotX = (uResolution.x / uResolution.y > 1.05) ? 0.72 : 0.50;
         float centerDist = length(vUV - vec2(spotX, 0.48));

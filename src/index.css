@@ -1492,7 +1492,7 @@ body {
   position: relative;
   padding: 1.5rem;
   border-radius: 10px;
-  background: rgba(14, 18, 28, 0.65);
+  background: rgba(14, 18, 28, 0.88);
   border: 1px solid rgba(244, 238, 230, 0.08);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -3435,13 +3435,14 @@ body {
   min-height: 82px;
   padding: 0.8rem 0.95rem;
   border-radius: 10px;
-  background: rgba(14, 18, 28, 0.65);
+  background: rgba(14, 18, 28, 0.88);
   border: 1px solid rgba(244, 238, 230, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   transform-style: preserve-3d;
-  will-change: transform, box-shadow;
   overflow: hidden;
+}
+
+.steam-card-container:hover .steam-card-body {
+  will-change: transform, box-shadow;
 }
 
 /* Holographic Foil / Prismatic Sheen Layer */
@@ -3452,10 +3453,8 @@ body {
   mix-blend-mode: color-dodge;
   z-index: 2;
   border-radius: 10px;
-  will-change: opacity, background;
 }
 
-/* Dynamic Light Glare Reflection Layer */
 .steam-card-glare-layer {
   position: absolute;
   inset: 0;
@@ -3463,7 +3462,6 @@ body {
   mix-blend-mode: overlay;
   z-index: 3;
   border-radius: 10px;
-  will-change: opacity, background;
 }
 
 /* Card Content with 3D Parallax Elevation */
@@ -4248,8 +4246,11 @@ body {
   overflow: hidden;
   user-select: none;
   transform-style: preserve-3d;
-  will-change: transform, box-shadow;
   cursor: default;
+}
+
+.email-picker-address-card:hover {
+  will-change: transform, box-shadow;
 }
 
 .email-picker-address-left {
@@ -4999,7 +5000,7 @@ body {
   flex-direction: column;
   padding: 1.15rem 1.2rem;
   border-radius: 10px;
-  background: rgba(14, 18, 28, 0.65);
+  background: rgba(14, 18, 28, 0.92);
   border: 1px solid rgba(244, 238, 230, 0.08);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -5241,4 +5242,3 @@ body {
   color: var(--ink, #f4eee6);
   transform: translateX(2px) translateY(-2px);
 }
-

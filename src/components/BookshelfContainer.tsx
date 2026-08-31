@@ -56,40 +56,93 @@ export const BookshelfContainer: React.FC<BookshelfContainerProps> = ({
   const [isInspecting, setIsInspecting] = useState<boolean>(false);
 
   // 1. IntersectionObserver: Stop WebGL work completely when scrolled out of view
+  // 3. Optimized Bi-Directional DOM Observer with Narrow Filter
   useEffect(() => {
     const root = containerRef.current;
     if (!root) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const inView = entry.isIntersecting;
-        setIsScrolledIntoView(inView);
+    let lastTitle = '';
+    let lastPage = 1;
+    let lastOpen = false;
+    let lastInspect = false;
 
-        const canvas = root.querySelector('canvas');
-        if (canvas) {
-          if (!inView) {
-            canvas.style.visibility = 'hidden';
-          } else {
-            canvas.style.visibility = 'visible';
-            window.dispatchEvent(new Event('resize'));
-          }
+    // Apply initial palette
+    applyPalette('codex');
+
+    const handleMutations = () => {
+      const titleElem = root.querySelector('#selection-title') as HTMLElement | null;
+      const pageElem = root.querySelector('#page-counter') as HTMLElement | null;
+
+      if (titleElem && titleElem.textContent) {
+        const rawTitle = titleElem.textContent.trim().toLowerCase();
+        let matchedId = TITLE_TO_ID[rawTitle];
+        if (!matchedId) {
+          const found = VOLUMES_DATA.find(
+            (v) =>
+              v.title.toLowerCase() === rawTitle ||
+              v.id.toLowerCase() === rawTitle ||
+              v.discipline.toLowerCase() === rawTitle
+          );
+          if (found) matchedId = found.id;
         }
-      },
-      { threshold: 0.05 }
-    );
+        matchedId = matchedId || 'codex';
+        if (matchedId !== lastTitle) {
+          lastTitle = matchedId;
+          applyPalette(matchedId);
+          onVolumeChange(matchedId);
+          sound.playShelfSlide();
+        }
+      }
 
-    // 1b. ResizeObserver: Keep WebGL canvas buffer pixel-perfect without CSS stretching
-    const resizeObserver = new ResizeObserver(() => {
-      window.dispatchEvent(new Event('resize'));
+      let currentPage = 1;
+      if (pageElem && pageElem.textContent) {
+        const match = pageElem.textContent.match(/(\d+)/);
+        if (match) {
+          currentPage = parseInt(match[1], 10) || 1;
+        }
+      }
+
+      const inspecting =
+        root.querySelector('.bookshelf')?.classList.contains('mode-detail') ||
+        root.querySelector('#detail-panel')?.getAttribute('aria-hidden') === 'false' ||
+        false;
+
+      const toggleBtn = root.querySelector('#toggle-book') as HTMLButtonElement | null;
+      const isOpen = toggleBtn
+        ? toggleBtn.getAttribute('aria-pressed') === 'true' ||
+        toggleBtn.textContent?.toLowerCase().includes('close') ||
+        false
+        : false;
+
+      if (inspecting !== lastInspect) {
+        lastInspect = inspecting;
+        setIsInspecting(inspecting);
+      }
+
+      if (currentPage !== lastPage || isOpen !== lastOpen || inspecting !== lastInspect) {
+        lastPage = currentPage;
+        lastOpen = isOpen;
+        onStateChange({
+          isOpen,
+          isInspecting: inspecting,
+          page: currentPage
+        });
+      }
+    };
+
+    const observer = new MutationObserver(handleMutations);
+
+    observer.observe(root, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'data-state', 'aria-hidden', 'aria-pressed', 'aria-current']
     });
-    resizeObserver.observe(root);
 
-    observer.observe(root);
     return () => {
       observer.disconnect();
-      resizeObserver.disconnect();
     };
-  }, []);
+  }, [onVolumeChange, onStateChange]);
 
   // 2. Apply dynamic palette CSS variables
   const applyPalette = (volId: string) => {

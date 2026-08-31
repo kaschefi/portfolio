@@ -1,119 +1,15 @@
 // scripts/modules/assetLoader.mjs
-// Encodes and manages binary assets as embedded Base64 data URIs for Three.js textures.
-
-import fs from 'fs';
-import path from 'path';
+// Provides static asset paths for Three.js textures instead of multi-megabyte Base64 strings.
 
 export function getAssetDataUris() {
-  const readDataUri = (candidates) => {
-    for (const p of candidates) {
-      if (fs.existsSync(p)) {
-        const ext = path.extname(p).toLowerCase();
-        let mime = 'image/png';
-        if (ext === '.webp') mime = 'image/webp';
-        else if (ext === '.jpg' || ext === '.jpeg') mime = 'image/jpeg';
-        else if (ext === '.svg') mime = 'image/svg+xml';
-        const base64 = fs.readFileSync(p).toString('base64');
-        return `data:${mime};base64,${base64}`;
-      }
-    }
-    return '';
-  };
-
-  // 1. MOKA OLED eyes icon
-  const mokaDataUri = readDataUri([
-    path.resolve('public/moka_icon.webp'),
-    path.resolve('public/moka-icon.webp'),
-    path.resolve('public/antigravity_icon.webp'),
-    path.resolve('src/assets/antigravity_icon.webp'),
-    path.resolve('public/moka_icon.png'),
-    path.resolve('public/moka-icon.png'),
-    path.resolve('public/antigravity_icon.png'),
-    path.resolve('src/assets/antigravity_icon.png')
-  ]);
-
-  // 2. Router benchmark image
-  const benchDataUri = readDataUri([
-    path.resolve('public/router_benchmark.webp'),
-    path.resolve('src/assets/router_benchmark.webp'),
-    path.resolve('public/router_benchmark.png'),
-    path.resolve('src/assets/router_benchmark.png')
-  ]);
-
-  // 3. Cozmo hardware sketch image
-  const cozmoSketchDataUri = readDataUri([
-    path.resolve('public/cozmo_hardware_sketch.webp'),
-    path.resolve('src/assets/cozmo_hardware_sketch.webp'),
-    path.resolve('public/cozmo_hardware_sketch.png')
-  ]);
-
-  // 4. JoinApp cover transparent PNG/WebP
-  const joinAppDataUri = readDataUri([
-    path.resolve('public/joinapp.webp'),
-    path.resolve('src/assets/joinapp.webp'),
-    path.resolve('src/assets/joinapp.png'),
-    path.resolve('public/joinapp.png'),
-    path.resolve('src/assets/joinapp.jpg'),
-    path.resolve('public/joinapp.jpg')
-  ]);
-
-  // 5. Figma cover / Sawyer Robot image
-  const figmaDataUri = readDataUri([
-    path.resolve('public/sawyerRobot.webp'),
-    path.resolve('src/assets/sawyerRobot.webp'),
-    path.resolve('src/assets/sawyerRobot.png'),
-    path.resolve('public/sawyerRobot.png'),
-    path.resolve('src/assets/sawyerRobot.jpg'),
-    path.resolve('public/sawyerRobot.jpg'),
-    path.resolve('src/assets/figma_icon.webp'),
-    path.resolve('public/figma_icon.webp')
-  ]);
-
-  // 6. Figma diagram / token architecture image
-  const figmaDiagramDataUri = readDataUri([
-    path.resolve('src/assets/figma_diagram.webp'),
-    path.resolve('public/figma_diagram.webp'),
-    path.resolve('src/assets/token_architecture.webp'),
-    path.resolve('public/token_architecture.webp'),
-    path.resolve('src/assets/figma_diagram.png'),
-    path.resolve('public/figma_diagram.png'),
-    path.resolve('src/assets/token_architecture.png'),
-    path.resolve('public/token_architecture.png')
-  ]);
-
-  // 7. Claude Code cover image candidates
-  const claudeCodeDataUri = readDataUri([
-    path.resolve('public/claude_code.webp'),
-    path.resolve('src/assets/claude_code.webp'),
-    path.resolve('public/cat.webp'),
-    path.resolve('src/assets/cat.webp'),
-    path.resolve('src/assets/claude_code.png'),
-    path.resolve('public/claude_code.png'),
-    path.resolve('src/assets/claude_code.jpg'),
-    path.resolve('public/claude_code.jpg')
-  ]);
-
-  // 8. Claude Code diagram / medical architecture image
-  const claudeCodeDiagramDataUri = readDataUri([
-    path.resolve('src/assets/claude_code_diagram.webp'),
-    path.resolve('public/claude_code_diagram.webp'),
-    path.resolve('src/assets/claude_diagram.webp'),
-    path.resolve('public/claude_diagram.webp'),
-    path.resolve('src/assets/claude_code_diagram.png'),
-    path.resolve('public/claude_code_diagram.png'),
-    path.resolve('src/assets/claude_diagram.png'),
-    path.resolve('public/claude_diagram.png')
-  ]);
-
   return {
-    mokaDataUri,
-    benchDataUri,
-    cozmoSketchDataUri,
-    joinAppDataUri,
-    figmaDataUri,
-    figmaDiagramDataUri,
-    claudeCodeDataUri,
-    claudeCodeDiagramDataUri
+    mokaDataUri: '/moka_icon.webp',
+    benchDataUri: '/router_benchmark.webp',
+    cozmoSketchDataUri: '/cozmo_hardware_sketch.webp',
+    joinAppDataUri: '/joinapp.webp',
+    figmaDataUri: '/sawyerRobot.webp',
+    figmaDiagramDataUri: '/token_architecture.webp',
+    claudeCodeDataUri: '/claude_code.webp',
   };
 }
 
@@ -160,4 +56,3 @@ export function injectAssetDeclarations(code, assets) {
 
   return cleanedCode;
 }
-
