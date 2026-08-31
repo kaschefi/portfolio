@@ -12,7 +12,7 @@ export function applyCoverPatches(code) {
     const o = document.createElement("canvas");
     o.width = 768, o.height = 1152;
     const t = o.getContext("2d");
-    const texture = Q(new l.CanvasTexture(o), { anisotropy: 16 });
+    const texture = Q(new l.CanvasTexture(o), { anisotropy: 2 });
     texture.name = e.id + "-cover-front";
 
     // --- Custom MOKA book (Book 01) ---
@@ -32,7 +32,7 @@ export function applyCoverPatches(code) {
         t.fillStyle = a;
         t.fillRect(0, 0, o.width, o.height);
 
-        for (let c = 0; c < 1250; c += 1) {
+        for (let c = 0; c < 50; c += 1) {
           const i = r() * o.width, d = r() * o.height, s = 4 + r() * 22;
           t.strokeStyle = r() > 0.5 ? "rgba(255,255,255,0.024)" : "rgba(0,0,0,0.025)";
           t.lineWidth = 0.6 + r() * 0.8;
@@ -119,7 +119,7 @@ export function applyCoverPatches(code) {
         t.fillStyle = a;
         t.fillRect(0, 0, o.width, o.height);
 
-        for (let c = 0; c < 1250; c += 1) {
+        for (let c = 0; c < 50; c += 1) {
           const i = r() * o.width, d = r() * o.height, s = 4 + r() * 22;
           t.strokeStyle = r() > 0.5 ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.035)";
           t.lineWidth = 0.6 + r() * 0.8;
@@ -203,7 +203,7 @@ export function applyCoverPatches(code) {
         t.fillStyle = a;
         t.fillRect(0, 0, o.width, o.height);
 
-        for (let c = 0; c < 1250; c += 1) {
+        for (let c = 0; c < 50; c += 1) {
           const i = r() * o.width, d = r() * o.height, s = 4 + r() * 22;
           t.strokeStyle = r() > 0.5 ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.04)";
           t.lineWidth = 0.6 + r() * 0.8;
@@ -300,7 +300,7 @@ export function applyCoverPatches(code) {
         t.fillStyle = a;
         t.fillRect(0, 0, o.width, o.height);
 
-        for (let c = 0; c < 1250; c += 1) {
+        for (let c = 0; c < 50; c += 1) {
           const i = r() * o.width, d = r() * o.height, s = 4 + r() * 22;
           t.strokeStyle = r() > 0.5 ? "rgba(255,255,255,0.018)" : "rgba(0,0,0,0.04)";
           t.lineWidth = 0.6 + r() * 0.8;
@@ -396,7 +396,8 @@ export function applyCoverPatches(code) {
   function Cn(e) {
     const o = document.createElement("canvas");
     o.width = 768, o.height = 1152;
-    const t = o.getContext("2d"), r = S.indexOf(e) + 1;
+    const t = o.getContext("2d");
+    const r = S.indexOf(e) + 1;
     t.clearRect(0, 0, o.width, o.height);
     t.fillStyle = "#ffffff";
     t.strokeStyle = "#ffffff";
@@ -434,7 +435,7 @@ export function applyCoverPatches(code) {
       t.font = '600 16px Inter, "Helvetica Neue", Arial, sans-serif';
       t.letterSpacing = "4px";
       t.fillText(e.discipline ? e.discipline.toUpperCase() : "AI ASSISTANT", 78, 1024);
-      return Q(new l.CanvasTexture(o), { anisotropy: 16 });
+      return Q(new l.CanvasTexture(o), { anisotropy: 2 });
     }
 
     // Custom Volume 2 Foil Layer (Figma)
@@ -465,7 +466,7 @@ export function applyCoverPatches(code) {
       t.shadowBlur = 10;
       t.fillText(e.discipline ? e.discipline.toUpperCase() : "SAWYER ROBOT", 78, 1024);
       t.shadowBlur = 0;
-      return Q(new l.CanvasTexture(o), { anisotropy: 16 });
+      return Q(new l.CanvasTexture(o), { anisotropy: 2 });
     }
 
     // Custom Volume 3 Foil Layer (Cursor / Semantic-ETL-Pipeline)
@@ -493,7 +494,7 @@ export function applyCoverPatches(code) {
       t.font = '600 16px Inter, "Helvetica Neue", Arial, sans-serif';
       t.letterSpacing = "4px";
       t.fillText(e.discipline ? e.discipline.toUpperCase() : "DIRECTED EDITING", 68, 1024);
-      return Q(new l.CanvasTexture(o), { anisotropy: 16 });
+      return Q(new l.CanvasTexture(o), { anisotropy: 2 });
     }
 
     // Custom Volume 7 Foil Layer (JoinApp)
@@ -525,7 +526,7 @@ export function applyCoverPatches(code) {
       t.letterSpacing = "4px";
       t.fillStyle = "#a3e635";
       t.fillText(e.discipline ? e.discipline.toUpperCase() : "FULL-STACK", 78, 1024);
-      return Q(new l.CanvasTexture(o), { anisotropy: 16 });
+      return Q(new l.CanvasTexture(o), { anisotropy: 2 });
     }
 
     // Custom Volume 5 Foil Layer (Claude Code)
@@ -557,10 +558,9 @@ export function applyCoverPatches(code) {
       t.shadowBlur = 12;
       t.fillText(e.discipline ? e.discipline.toUpperCase() : "VISION & DEEP LEARNING", 76, 1024);
       t.shadowBlur = 0;
-      return Q(new l.CanvasTexture(o), { anisotropy: 16 });
+      return Q(new l.CanvasTexture(o), { anisotropy: 2 });
     }
 
-    // Authentic ThreeUI foil layer for Volume 4 (Antigravity)
     t.textAlign = "left", t.textBaseline = "alphabetic", t.font = '500 15px Inter, "Helvetica Neue", Arial, sans-serif', t.letterSpacing = "2.8px", t.fillText("WORKING VOLUMES  /  " + ge(r), 58, 70), t.globalAlpha = 0.7, t.lineWidth = 1, t.beginPath(), t.moveTo(58, 86), t.lineTo(164, 86), t.stroke(), t.globalAlpha = 1;
     const a = e.title.length > 10 ? 64 : 78;
     t.font = "400 " + a + 'px "Iowan Old Style", Baskerville, Georgia, serif';
@@ -570,7 +570,7 @@ export function applyCoverPatches(code) {
     t.font = '500 ' + discSize + 'px Inter, "Helvetica Neue", Arial, sans-serif';
     t.letterSpacing = discSpacing;
     t.fillText(e.discipline ? e.discipline.toUpperCase() : "WAREHOUSE ROUTING AND SCHEDULING SYSTEM", 60, 1066);
-    return Q(new l.CanvasTexture(o), { anisotropy: 16 });
+    return Q(new l.CanvasTexture(o), { anisotropy: 2 });
   };\n`;
 
   return code.slice(0, wnStartIdx) + newWnFunction + code.slice(anStartIdx);

@@ -26,7 +26,6 @@ export function applyFoilAndMaterialPatches(rawCode) {
     t.save();
     t.translate(o.width * 0.5, o.height * 0.5);
     t.rotate(Math.PI / 2);
-
     if (e.id === "xcode") {
       t.font = '800 68px Inter, "Helvetica Neue", Arial, sans-serif';
       t.letterSpacing = "-0.5px";
@@ -35,10 +34,8 @@ export function applyFoilAndMaterialPatches(rawCode) {
       const appW = t.measureText("App").width;
       const totalW = joinW + appW;
       const startX = -totalW / 2;
-
       t.fillStyle = "#ffffff";
       t.fillText("Join", startX, 0);
-
       t.fillStyle = "#a3e635";
       t.fillText("App", startX + joinW, 0);
     } else {
@@ -54,23 +51,23 @@ export function applyFoilAndMaterialPatches(rawCode) {
     t.moveTo(o.width * 0.5 - 24, o.height - 120);
     t.lineTo(o.width * 0.5 + 24, o.height - 120);
     t.stroke();
-    return Q(new l.CanvasTexture(o), { anisotropy: 16 });
+    return Q(new l.CanvasTexture(o), { anisotropy: 2 });
   }\n  `;
     code = code.slice(0, knStartIdx) + newKnFunction + code.slice(knEndIdx);
   }
 
-  // 1b. Patch Back cloth kn(e) to have anisotropy 16
+  // 1b. Patch Back cloth kn(e) (Reduced loop from 2600 to 50 iterations)
   const backClothStartIdx = code.indexOf('function kn(e) {');
   const mnStartIdx = code.indexOf('function Mn(e) {');
   if (backClothStartIdx !== -1 && mnStartIdx !== -1) {
     const newBackClothFunction = `function kn(e) {
     const o = document.createElement("canvas");
-    o.width = 768, o.height = 1152;
+    o.width = 512, o.height = 768;
     const t = o.getContext("2d"), r = ye(pe(\`\${e.id}-back-cloth\`) + e.seed);
     t.fillStyle = e.color, t.fillRect(0, 0, o.width, o.height);
     const a = t.createLinearGradient(0, 0, o.width, 0);
     a.addColorStop(0, "rgba(0,0,0,0.15)"), a.addColorStop(0.05, "rgba(255,255,255,0.028)"), a.addColorStop(0.84, "rgba(255,255,255,0)"), a.addColorStop(1, "rgba(0,0,0,0.11)"), t.fillStyle = a, t.fillRect(0, 0, o.width, o.height);
-    for (let c = 0; c < 2600; c += 1) {
+    for (let c = 0; c < 50; c += 1) {
       const i = r() * o.width, d = r() * o.height, s = 5 + r() * 30;
       t.strokeStyle = r() > 0.5 ? "rgba(255,255,255,0.018)" : "rgba(0,0,0,0.016)", t.lineWidth = 0.45 + r() * 0.65, t.beginPath(), t.moveTo(i, d), t.lineTo(i + s, d + (r() - 0.5) * 1.5), t.stroke();
     }
@@ -82,7 +79,7 @@ export function applyFoilAndMaterialPatches(rawCode) {
       o.height * 0.38,
       o.width * 0.75
     );
-    return n.addColorStop(0, "rgba(255,255,255,0.03)"), n.addColorStop(1, "rgba(0,0,0,0.09)"), t.fillStyle = n, t.fillRect(0, 0, o.width, o.height), Q(new l.CanvasTexture(o), { anisotropy: 16 });
+    return n.addColorStop(0, "rgba(255,255,255,0.03)"), n.addColorStop(1, "rgba(0,0,0,0.09)"), t.fillStyle = n, t.fillRect(0, 0, o.width, o.height), Q(new l.CanvasTexture(o), { anisotropy: 2 });
   }\n  `;
     code = code.slice(0, backClothStartIdx) + newBackClothFunction + code.slice(mnStartIdx);
   }
@@ -93,7 +90,7 @@ export function applyFoilAndMaterialPatches(rawCode) {
   if (mnIdx !== -1 && tFuncIdx !== -1) {
     const newMnFunction = `function Mn(e) {
     const o = document.createElement("canvas");
-    o.width = 768, o.height = 1152;
+    o.width = 512, o.height = 768;
     const t = o.getContext("2d");
     const foilColor = (e.id === "xcode" || e.id === "codex" || e.id === "claude-code") ? (e.foil || "#efc16d") : "#ffffff";
     t.clearRect(0, 0, o.width, o.height);
@@ -101,57 +98,44 @@ export function applyFoilAndMaterialPatches(rawCode) {
     t.strokeStyle = foilColor;
     t.textAlign = "left";
     t.textBaseline = "alphabetic";
-    t.font = '500 16px Inter, "Helvetica Neue", Arial, sans-serif';
+    t.font = '500 14px Inter, "Helvetica Neue", Arial, sans-serif';
     t.letterSpacing = "3px";
-    t.fillText(\`WORKING VOLUMES  /  \${e.roman}\`, 68, 82);
+    t.fillText(\`WORKING VOLUMES  /  \${e.roman}\`, 48, 64);
     t.globalAlpha = 0.72;
-    t.fillRect(68, 108, 176, 2);
+    t.fillRect(48, 84, 140, 2);
     t.globalAlpha = 1;
     t.lineWidth = 1.5;
-    for (let r = 0; r < 5; r += 1) {
-      t.globalAlpha = 0.24 - r * 0.032;
+    for (let r = 0; r < 4; r += 1) {
+      t.globalAlpha = 0.24 - r * 0.04;
       t.beginPath();
-      t.arc(548, 374, 74 + r * 38, 0, Math.PI * 2);
+      t.arc(360, 260, 50 + r * 28, 0, Math.PI * 2);
       t.stroke();
     }
     t.globalAlpha = 1;
-    t.beginPath();
-    t.moveTo(348, 374);
-    t.lineTo(704, 374);
-    t.moveTo(548, 174);
-    t.lineTo(548, 574);
-    t.stroke();
-
     if (e.id === "xcode") {
-      t.font = '800 62px Inter, "Helvetica Neue", Arial, sans-serif';
+      t.font = '800 52px Inter, "Helvetica Neue", Arial, sans-serif';
       t.letterSpacing = "-0.5px";
       t.textAlign = "left";
       t.fillStyle = "#ffffff";
-      t.fillText("Join", 68, 956);
+      t.fillText("Join", 48, 640);
       const joinW = t.measureText("Join").width;
       t.fillStyle = "#a3e635";
-      t.fillText("App", 68 + joinW, 956);
+      t.fillText("App", 48 + joinW, 640);
     } else {
-      t.font = \`400 \${e.title.length > 10 ? 52 : 62}px "Iowan Old Style", Baskerville, Georgia, serif\`;
+      t.font = \`400 \${e.title.length > 10 ? 42 : 52}px "Iowan Old Style", Baskerville, Georgia, serif\`;
       t.letterSpacing = "0px";
-      t.fillText(e.title, 68, 956);
+      t.fillText(e.title, 48, 640);
     }
-
-    t.font = '500 15px Inter, "Helvetica Neue", Arial, sans-serif';
-    t.letterSpacing = "2.6px";
+    t.font = '500 13px Inter, "Helvetica Neue", Arial, sans-serif';
+    t.letterSpacing = "2px";
     t.fillStyle = foilColor;
-    t.fillText(e.discipline.toUpperCase(), 70, 1004);
-    t.globalAlpha = 0.68;
-    t.fillRect(68, 1040, 632, 1.5);
-    t.globalAlpha = 1;
-    t.textAlign = "right";
-    t.fillText("AN IMAGINED EDITION", 700, 1080);
-    return Q(new l.CanvasTexture(o), { anisotropy: 16 });
+    t.fillText(e.discipline.toUpperCase(), 50, 680);
+    return Q(new l.CanvasTexture(o), { anisotropy: 2 });
   }\n  `;
     code = code.slice(0, mnIdx) + newMnFunction + code.slice(tFuncIdx);
   }
 
-  // 3. Patch front foil (po), spine foil (ho), and back foil (go) materials with luminous metallic foil properties
+  // 3. Material performance properties
   code = code.replace(
     /po\s*=\s*new l\.MeshPhysicalMaterial\(\{[\s\S]*?polygonOffsetFactor:\s*-2\s*\}\)/,
     `po = new l.MeshPhysicalMaterial({
