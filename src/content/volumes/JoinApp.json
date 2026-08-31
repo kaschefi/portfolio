@@ -1,0 +1,100 @@
+{
+  "id": "xcode",
+  "title": "JoinApp",
+  "subtitle": "Scalable Community Event Hub & Distributed Coordination Engine",
+  "discipline": "Full-Stack Web Systems",
+  "note": "A measured path from blueprint to living platform.",
+  "deck": "A modern full-stack web platform engineering hyperlocal event discovery, atomic participation lifecycles, and automated transactional dispatch across Vienna's metropolitan districts.",
+  "binding": "Violet cloth · neon lime foil",
+  "format": "158 × 232 mm · FH Campus Wien Edition",
+  "theme": "JoinApp · blueprint into living form",
+  "projectDetails": {
+    "name": "JoinApp Community Event Platform",
+    "category": "Full-Stack Web Systems & Distributed Application Architecture",
+    "timeframe": "2025 - 2026",
+    "institution": "FH Campus Wien · Software Engineering",
+    "role": "Lead Full-Stack Architect & Backend Engineer",
+    "summary": "A full-stack community event platform featuring 3-tier architecture (Express 5.x + PostgreSQL), stateless JWT/RBAC security, interactive Leaflet GIS discovery, automated 1-hour ticket dispatch via Node-Cron & Nodemailer, and real-time polling chat.",
+    "problem": "Modern event discovery platforms suffer from heavyweight dependencies, intrusive monetization models, and fragmented community communication with poor reliability in local coordination.",
+    "solution": "Architected a lightweight, decoupled 3-tier system (Controller-Service-Repository) on Express 5.x and PostgreSQL with atomic junction constraints, asynchronous background geocoding (Photon API), RFC 5545 iCalendar generation, and automated cron ticket pipelines.",
+    "keyMetrics": [
+      {
+        "label": "Architecture",
+        "value": "3-Tier Layered"
+      },
+      {
+        "label": "API Latency",
+        "value": "< 85ms p95"
+      },
+      {
+        "label": "Relational Tables",
+        "value": "7 Entities"
+      },
+      {
+        "label": "Supported Locales",
+        "value": "DE-AT & EN-US"
+      }
+    ],
+    "techStack": [
+      "Node.js",
+      "Express 5.x",
+      "PostgreSQL (pg.Pool)",
+      "Leaflet.js",
+      "JavaScript (ES6+)",
+      "JWT & Bcrypt",
+      "Node-Cron",
+      "Nodemailer",
+      "Photon Geocoding API",
+      "HTML5/CSS3"
+    ],
+    "githubUrl": "https://github.com/kaschefi/joinApp",
+    "liveUrl": "https://github.com/kaschefi/joinApp",
+    "architectureDescription": "Decoupled 3-tier service-oriented architecture with stateless JWT authentication, atomic PostgreSQL unique constraints, non-blocking asynchronous GIS geocoding, and cron-driven transactional outbox email dispatch."
+  },
+  "chapters": [
+    {
+      "number": "01",
+      "title": "Clean Architecture & RBAC",
+      "subtitle": "Decoupled Express 5 Services & JWT",
+      "content": "Enforces single-responsibility boundaries across controllers, services, and parameterized PostgreSQL repositories. Reusable middleware interceptors enforce stateless JWT authentication and granular role-based authorization (USER vs ADMIN) across all protected routes.",
+      "highlights": [
+        "Decoupled 3-tier architecture",
+        "Stateless 7-day JWT token rotation",
+        "Granular requireRole & requireSelfOrAdmin guards"
+      ]
+    },
+    {
+      "number": "02",
+      "title": "GIS Mapping & Live Chat",
+      "subtitle": "Interactive Leaflet Pins & Capacity Gating",
+      "content": "Synchronizes Vienna-wide event clusters on Leaflet.js with interactive search cards using bidirectional viewport panning. The event lifecycle prevents double-joining via PostgreSQL unique constraints (error 23505) and gates participant lists until 1 hour before kickoff.",
+      "highlights": [
+        "60 FPS Leaflet.js map marker binding",
+        "Atomic participant capacity validation",
+        "Polling chat engine with auto-scroll threshold"
+      ]
+    },
+    {
+      "number": "03",
+      "title": "PostgreSQL & Cron Outbox",
+      "subtitle": "7-Entity Schema & Ticket Daemon",
+      "content": "A normalized 7-table schema with foreign-key cascades, array types (tags TEXT[]), and subquery aggregations. An automated background daemon polls upcoming events (NOW() + INTERVAL '1 hour') and dispatches personalized HTML tickets via Nodemailer.",
+      "highlights": [
+        "7 normalized relational entities with ON DELETE CASCADE",
+        "At-most-once ticket delivery via cron & PostgreSQL interval arithmetic",
+        "Parallel attendee cancellation emails with Promise.allSettled"
+      ]
+    },
+    {
+      "number": "04",
+      "title": "Geocoding & Calendar Sync",
+      "subtitle": "Photon Spatial API & RFC 5545 iCal",
+      "content": "Offloads address coordinate resolution to Komoot's Photon API asynchronously without stalling HTTP responses. Implements a zero-dependency RFC 5545 iCalendar (.ics) generator on the client side with batch export and Google Calendar web intents.",
+      "highlights": [
+        "Non-blocking asynchronous background geocoding",
+        "Standards-compliant RFC 5545 iCalendar generator",
+        "Bilingual client-side i18n runtime (DE-AT / EN-US)"
+      ]
+    }
+  ]
+}

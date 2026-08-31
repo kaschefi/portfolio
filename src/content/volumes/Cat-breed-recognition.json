@@ -1,0 +1,94 @@
+{
+  "id": "claude-code",
+  "title": "Cat-breed-recognition",
+  "subtitle": "Deep Learning Multi-Class Vision & Breed Classification",
+  "discipline": "Vision & Deep Learning",
+  "note": "Multi-class convolutional classification, fine-grained feature extraction, and real-time inference.",
+  "deck": "An annotated volume on deep learning vision architectures: fine-grained feline breed recognition, spatial feature attention, and real-time edge classification.",
+  "binding": "Phthalo-green cloth · gold foil",
+  "format": "156 × 228 mm · FH Campus Wien Edition",
+  "theme": "Cat-breed-recognition · vision classification",
+  "projectDetails": {
+    "name": "Cat Breed Recognition",
+    "category": "Computer Vision & Deep Learning",
+    "timeframe": "2024",
+    "institution": "FH Campus Wien",
+    "role": "ML Engineer / Vision Researcher (Team: Stefan Auer, Mohammad Kashefirad, Kilian Lorenz)",
+    "summary": "Fine-grained visual classification of 12 cat breeds using transfer learning on the Oxford-IIIT Pet Dataset, systematically benchmarking ResNet50, EfficientNet-B2, and ConvNeXt-tiny with Grad-CAM explainability.",
+    "problem": "Cat breed identification is a fine-grained visual classification (FGVC) task where subtle differences in ear shape, fur texture, and facial structure must be distinguished across varying poses, lighting, and backgrounds.",
+    "solution": "Benchmarked three ImageNet-pretrained CNN baselines and developed an improved ConvNeXt-tiny pipeline using heavy regularization (label smoothing 0.1, dropout 0.4, random erasing p=0.2, weight decay 5e-2) reaching 96.67% accuracy, verified via Grad-CAM heatmaps.",
+    "keyMetrics": [
+      {
+        "label": "Val Accuracy",
+        "value": "96.67%"
+      },
+      {
+        "label": "F1 (Weighted)",
+        "value": "0.9666"
+      },
+      {
+        "label": "Breeds Classified",
+        "value": "12 Classes"
+      }
+    ],
+    "techStack": [
+      "Python",
+      "PyTorch",
+      "timm",
+      "scikit-learn",
+      "Grad-CAM",
+      "Matplotlib",
+      "Seaborn"
+    ],
+    "githubUrl": "https://github.com/kaschefi/cat-breed-recognition",
+    "liveUrl": "",
+    "architectureDescription": "ConvNeXt-tiny backbone with custom classification head, trained with AdamW, label smoothing, random erasing, and Grad-CAM spatial explainability."
+  },
+  "chapters": [
+    {
+      "number": "01",
+      "title": "Architecture Benchmarks",
+      "subtitle": "ConvNeXt-tiny vs. ResNet50 & EfficientNet-B2",
+      "content": "Systematic 5-epoch baseline comparison on Oxford-IIIT Pet dataset. ConvNeXt-tiny achieved 95.42% accuracy, outperforming ResNet50 (90.00%) and EfficientNet-B2 (90.00%) through ViT-inspired depthwise kernels and inverted bottlenecks.",
+      "codeSnippet": "// Fine-Grained ConvNeXt-tiny Transfer Learning Head\nimport timm, torch.nn as nn\n\nmodel = timm.create_model('convnext_tiny', pretrained=True, num_classes=12, drop_rate=0.4)\noptimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=5e-2)\ncriterion = nn.CrossEntropyLoss(label_smoothing=0.1)",
+      "highlights": [
+        "ConvNeXt-tiny 95.42% baseline accuracy",
+        "5x parameter efficiency over ResNet50",
+        "ViT-inspired inverted bottleneck design"
+      ]
+    },
+    {
+      "number": "02",
+      "title": "Iterative Regularization",
+      "subtitle": "Overfitting Mitigation & Generalization Pass",
+      "content": "Selected ConvNeXt-tiny as the best baseline and iterated with stronger regularization: weight decay 5e-2, dropout 0.4, label smoothing 0.1, random erasing (p=0.2), and 10 epochs. Achieved 96.67% val accuracy and 0.9666 weighted F1.",
+      "highlights": [
+        "96.67% top-1 validation accuracy",
+        "0.9666 weighted F1 score",
+        "Label smoothing calibration"
+      ]
+    },
+    {
+      "number": "03",
+      "title": "Explainability & Grad-CAM",
+      "subtitle": "Spatial Attention & Morphological Feature Localization",
+      "content": "Grad-CAM heatmaps consistently localize to the head and facial structures, confirming the model learns genuine morphological features rather than background cues. Attention diffuses in uncertain cases.",
+      "highlights": [
+        "Head/facial feature localization",
+        "Visual attribution verification",
+        "Confidence-correlated heatmap diffusion"
+      ]
+    },
+    {
+      "number": "04",
+      "title": "Fine-Grained Analysis",
+      "subtitle": "Confusion Topology & Architectural Takeaways",
+      "content": "Near-clean separation across all 12 breeds. Ragdoll vs. Birman remains the persistent confusion pair across all models due to genuine biological similarity. Proved architecture choice and regularization trump parameter count.",
+      "highlights": [
+        "12-breed confusion matrix analysis",
+        "Ragdoll vs. Birman morphological boundary",
+        "Architecture > raw parameter count"
+      ]
+    }
+  ]
+}

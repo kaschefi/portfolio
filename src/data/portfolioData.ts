@@ -54,18 +54,38 @@ export interface VolumeProject {
   chapters: Chapter[];
 }
 
-export const VOLUMES_DATA: VolumeProject[] = [
+// The editable text for every book lives in its own JSON file under
+// src/content/volumes/ (one file per book, named after the book's title).
+// This is the ONLY shape a content file needs to match — edit freely.
+type VolumeContent = Pick<
+  VolumeProject,
+  | 'id'
+  | 'title'
+  | 'subtitle'
+  | 'discipline'
+  | 'note'
+  | 'deck'
+  | 'binding'
+  | 'format'
+  | 'theme'
+  | 'projectDetails'
+  | 'chapters'
+>;
+
+// Everything below is "visual identity" — cover color, foil, glyph motif,
+// and the palette used by the 3D renderer. This intentionally stays in
+// code (not JSON) because it's tightly coupled to the shelf/cover shaders,
+// not something you'd typically want to rewrite when just editing text.
+// `id` is the join key that matches each entry to its content JSON file.
+type VisualIdentity = Pick<
+  VolumeProject,
+  'id' | 'roman' | 'motif' | 'motifKey' | 'paletteLabel' | 'color' | 'foil' | 'accent' | 'palette'
+>;
+
+const VISUAL_IDENTITIES: VisualIdentity[] = [
   {
     id: "codex",
-    title: "MOKA",
-    subtitle: "Two-Tier Autonomous Physical & Digital AI Assistant",
     roman: "I",
-    discipline: "AI Assistant",
-    note: "Two-tier cognitive hierarchy: 45ms reflexes and dynamic LangGraph brain.",
-    deck: "An AI-powered robotic assistant built around the Anki Cozmo robot. Features a dual-layer cognitive pipeline: Layer 1 fast semantic reflexes (50ms) for hardware safety and laptop automation, and Layer 2 dynamic LangGraph AI brain with FAISS Tool RAG, local Ollama LLMs, and persistent dual-tier PostgreSQL memory.",
-    binding: "Ultramarine cloth · copper foil",
-    format: "148 × 216 mm · Anki Cozmo Edition",
-    theme: "MoKa · two-tier intelligence pipeline",
     motif: "MoKa Dual-Layer Matrix Glyph",
     motifKey: "moka",
     paletteLabel: "Ultramarine · bone · copper",
@@ -83,65 +103,11 @@ export const VOLUMES_DATA: VolumeProject[] = [
       shelfDark: "#1c0e0a",
       light: "#f4d7b9",
       fill: "#9fb3c9"
-    },
-    projectDetails: {
-      name: "MoKa AI Assistant (Anki Cozmo)",
-      category: "Autonomous Robotics & Agentic Systems",
-      timeframe: "2026",
-      institution: "FH Campus Wien · Autonomous AI Systems",
-      role: "Lead AI Architect & Robotics Systems Engineer",
-      summary: "An AI-powered robotic assistant built around the Anki Cozmo robot featuring a two-layer intelligence pipeline: Layer 1 fast semantic reflexes (~45ms) for real-time hardware safety and OS automation, and Layer 2 dynamic LangGraph AI brain with FAISS Tool RAG, local LLMs (qwen2.5:3b via Ollama), and persistent dual-tier PostgreSQL memory.",
-      problem: "Traditional conversational LLM assistants suffer from 1.5s+ latency, prompt bloat when managing dozens of tools, zero hardware safety rails, and cloud dependency for physical robot interactions.",
-      solution: "Architected a hybrid two-tier routing hierarchy: Layer 1 sub-50ms FastEmbed semantic reflexes for critical motor safety (anti-fall, anti-dump, visual stasis) & PC routines, paired with a Layer 2 stateful LangGraph brain with FAISS vector tool retrieval, Kokoro-ONNX local TTS, and dual-mode PostgreSQL session memory.",
-      keyMetrics: [
-        { label: "Reflex Latency", value: "45ms (~30x faster)" },
-        { label: "Routing Accuracy", value: "93.0% (vs 89.5% baseline)" },
-        { label: "Token Savings", value: "83% reduction" },
-        { label: "Safety Loop Rate", value: "33Hz real-time" }
-      ],
-      techStack: ["Python", "LangGraph", "PyCozmo", "FAISS", "FastEmbed", "FastAPI", "Ollama (qwen2.5 / ornith)", "PostgreSQL", "OpenCV", "Kokoro-ONNX", "Tavily MCP", "n8n"],
-      githubUrl: "https://github.com/kaschefi/cozmo_ai_assistant",
-      liveUrl: "https://github.com/kaschefi/cozmo_ai_assistant",
-      architectureDescription: "Two-Tier Fallback Hierarchy: Layer 1 Semantic Router (FastEmbed) directly triggers PyCozmo motor actions & PC routines in ~45ms; Layer 2 routes complex multi-step reasoning through LangGraph with FAISS dynamic Tool RAG, dual-tier PostgreSQL memory, and Kokoro-ONNX TTS."
-    },
-    chapters: [
-      {
-        number: "01",
-        title: "The Two-Tier Reflex Hierarchy",
-        subtitle: "Sub-50ms Spinal Reflexes & 33Hz Hardware Safety",
-        content: "Physical robotic assistants cannot afford the 1.5s+ latency of standard LLM reasoning loops for motor safety. MoKa implements a Layer 1 FastEmbed semantic router executing in 45ms (~30x faster), intercepting commands to trigger PyCozmo motor routines directly. At 33Hz, the ReflexSafetyGuard actively evaluates IMU pitch tilt (>20°), true forward deceleration, cliff sensors, and OpenCV optical flow visual stasis to autonomously trigger evasive backup maneuvers before table falls or motor stalls occur.",
-        codeSnippet: `# Layer 1 Reflex Safety & Anti-Fall Interceptor\n@reflex_guard.intercept_motion(rate_hz=33)\ndef handle_motor_step(telemetry: CozmoTelemetry):\n    if telemetry.cliff_detected or telemetry.is_falling:\n        emergency_stop_motors()\n        spawn_evasive_thread(reverse_sec=1.2, turn_deg=180)\n        return SafetyStatus.TRIPPED\n    if telemetry.imu_pitch > 0.35 or detect_visual_stasis(telemetry.camera_frame):\n        emergency_stop_motors()\n        spawn_obstacle_backoff(reverse_sec=1.0)\n        return SafetyStatus.OBSTACLE_AVOIDANCE\n    return SafetyStatus.NOMINAL`,
-        highlights: ["~45ms direct reflex path (30x faster than LLM)", "33Hz real-time multi-modal hardware safety guards", "OpenCV visual stasis & optical tilt detection"]
-      },
-      {
-        number: "02",
-        title: "Dynamic Tool RAG & LangGraph",
-        subtitle: "FAISS Vector Selection & Local Ollama Reasoning",
-        content: "Instead of bloating LLM prompts with 19+ static tool schemas—which degrades classification accuracy to 89.5% on local 3B models—MoKa leverages an in-memory FAISS vector index with BAAI/bge-small-en-v1.5 embeddings to dynamically inject only the top 2 candidate tool schemas into the qwen2.5:3b supervisor. The graph routes via a unified tool executor node scaling to 100+ tools, interfacing Tavily MCP stdio client subprocesses, n8n Google Calendar integrations, and an isolated ornith:9b Python sandbox for deterministic code execution.",
-        codeSnippet: `# Layer 2 LangGraph Dynamic Tool RAG Selection\ndef tool_retrieval_node(state: AgentState):\n    query_vector = embed_model.embed_query(state["user_query"])\n    top_tools = faiss_index.similarity_search_by_vector(query_vector, k=2)\n    \n    # Inject only relevant schemas into local Ollama supervisor prompt\n    prompt = build_dynamic_prompt(candidate_tools=top_tools)\n    decision = router_llm.invoke(prompt) # qwen2.5:3b\n    return {"next_route": decision.route_key}`,
-        highlights: ["93.0% routing accuracy (+3.5% over monolithic baseline)", "83% prompt token reduction via dynamic FAISS RAG", "Isolated ornith:9b deterministic Python sandbox"]
-      },
-      {
-        number: "03",
-        title: "Dual-Tier Memory & Voice Engine",
-        subtitle: "PostgresSaver Checkpoints & Local Kokoro-ONNX TTS",
-        content: "MoKa maintains stateful continuity without cloud lock-in through a dual memory substrate. Short-term dialogue is preserved with LangGraph PostgresSaver and rolling context summarization (pruning historical turns beyond 4 messages). Long-term biographical facts are stored in native PostgreSQL float arrays (REAL[]), evaluated with NumPy cosine similarity at a 0.82 deduplication threshold, and updated with O(1) dynamic entity resolution. Voice responses stream locally via Kokoro-ONNX for near-studio audio with zero disk I/O.",
-        codeSnippet: `# Long-Term Semantic Fact Deduplication & Retrieval\ndef update_biographical_memory(new_fact: str, category: str):\n    if category in O1_ENTITY_CATEGORIES:\n        return postgres_db.upsert_entity(category, new_fact)\n    \n    fact_emb = fastembed.embed(new_fact)\n    similarities = [np.dot(fact_emb, row.emb) / (norm(fact_emb)*norm(row.emb)) \n                    for row in postgres_db.get_facts()]\n    \n    if max(similarities, default=0) >= 0.82:\n        return postgres_db.update_fact(idx=argmax(similarities), text=new_fact)\n    return postgres_db.insert_fact(fact=new_fact, embedding=fact_emb)`,
-        highlights: ["Native PostgreSQL REAL[] array storage without pgvector binaries", "0.82 cosine similarity deduplication & O(1) entity resolution", "Zero-disk I/O Kokoro-ONNX local voice synthesis"]
-      }
-    ]
+    }
   },
   {
     id: "figma",
-    title: "Sawyer Robot",
-    subtitle: "Implementation of Waving Task, Shell Game, and Tracking Methods",
     roman: "II",
-    discipline: "Robotics & Vision",
-    note: "Dynamic perception, multi-object tracking, and MoveIt motion planning.",
-    deck: "A comprehensive robotics engineering treatise on the 7-DoF Rethink Robotics Sawyer cobot: real-time teleoperation waving routines, high-speed vision tracking for the classic Shell Game, Kalman filter momentum estimation, occlusion tethering, and collision-free MoveIt trajectory generation.",
-    binding: "Obsidian cloth · crimson foil",
-    format: "150 × 220 mm · FH Campus Wien Edition",
-    theme: "Sawyer Robot · visual servoing & cobots",
     motif: "7-DoF Articulator",
     motifKey: "modules",
     paletteLabel: "Obsidian · charcoal · crimson",
@@ -159,79 +125,11 @@ export const VOLUMES_DATA: VolumeProject[] = [
       shelfDark: "#1c0d0a",
       light: "#efb0aa",
       fill: "#a82424"
-    },
-    projectDetails: {
-      name: "Sawyer Robot: Waving Task & Shell Game",
-      category: "Autonomous Robotics & Visual Servoing",
-      timeframe: "June 2026",
-      institution: "Hochschule Campus Wien · Computer Science and Digital Communications",
-      role: "Robotics Systems & Computer Vision Engineer",
-      summary: "Implementation of interactive collaborative robotic behaviors on the 7-DoF Rethink Robotics Sawyer cobot: a full-stack WebSocket teleoperation waving task and an autonomous vision-driven Shell Game featuring Kalman Filter momentum tracking, occlusion tethering, Gazebo digital twin simulation, and collision-free MoveIt trajectory execution.",
-      problem: "Traditional robotic manipulators operate blindly on pre-programmed joint trajectories, making them incapable of dynamic environmental awareness, real-time object tracking through occlusions, or safe collision-free trajectory planning in human-interactive workspaces.",
-      solution: "Developed a modular ROS 1 Noetic visual servoing architecture combining low-latency HSV color segmentation, a custom Kalman Filter multi-object tracker with cosine momentum penalties and occlusion tethering (<10% ID switch rate), an S-curve Gazebo simulation twin, and MoveIt RRT-Connect motion planning with live Intera SDK quaternion orientation stabilization.",
-      keyMetrics: [
-        { label: "Tracking Success", value: "90% (9/10 Trials)" },
-        { label: "ID Switch Rate", value: "< 10% (vs 50% Base)" },
-        { label: "Planning Time", value: "~1.0s (RRT-Connect)" },
-        { label: "Manipulator DoF", value: "7 Degrees of Freedom" }
-      ],
-      techStack: ["ROS 1 Noetic", "MoveIt 1", "Gazebo 11", "Python 3", "OpenCV", "YOLOv8", "Intera SDK", "OMPL (RRT-Connect)", "scipy / numpy", "Node.js (rosbridge)", "WSL 2 / Ubuntu 20.04"],
-      githubUrl: "https://github.com/kaschefi/sawyerRobot-ShellGame",
-      liveUrl: "https://github.com/kaschefi/sawyerRobot-ShellGame",
-      architectureDescription: "Modular distributed ROS node ecosystem bridging camera streaming, OpenCV/YOLOv8 perception, Kalman momentum tracking with Hungarian data association, and MoveIt RRT-Connect motion planning with live Intera SDK quaternion pose stabilization."
-    },
-    chapters: [
-      {
-        number: "01",
-        title: "System Architecture & Waving Task",
-        subtitle: "Distributed ROS Nodes & WebSocket Teleoperation",
-        content: "Bridges a Node.js web interface with the 7-DoF Sawyer cobot via rosbridge_suite WebSockets. A hierarchical Design Tree enforces safe baseline postures, looping containers (5 continuous wave cycles), and linear Cartesian waypoints executed smoothly via standard trajectory controllers.",
-        codeSnippet: `# Waving Task Logic Node & Trajectory Execution\nclass SawyerWavingNode:\n    def on_wave_triggered(self, msg):\n        self.limb.move_to_neutral()\n        for cycle in range(5):\n            self.execute_waypoint_sweep("left", duration=0.8)\n            self.execute_waypoint_sweep("right", duration=0.8)\n        self.limb.move_to_neutral()`,
-        highlights: ["7-DoF Sawyer cobot with series elastic actuators", "Asynchronous rosbridge_suite WebSocket teleoperation", "Hierarchical Design Tree motion architecture"]
-      },
-      {
-        number: "02",
-        title: "Object Detection & Vision Benchmark",
-        subtitle: "YOLOv8 Deep Learning vs. Classical HSV Filtering",
-        content: "Evaluated OpenCV HSV color filtering against a custom YOLOv8 model trained on Roboflow's Red Solo Cups dataset. While YOLOv8 achieved 96% static accuracy, inference latency reduced dynamic tracking to 6/10 trials. Classical HSV filtering provided near-zero latency, achieving 100% detection and 9/10 successful tracking runs.",
-        highlights: ["Empirical benchmark: YOLOv8 (96% static) vs. HSV (100% controlled)", "Sub-millisecond HSV contour centroid extraction", "Inference latency analysis in closed-loop visual servoing"]
-      },
-      {
-        number: "03",
-        title: "Kalman MOT & Occlusion Tethering",
-        subtitle: "Momentum State Vectors & Hungarian Assignment",
-        content: "Integrates independent 4D linear Kalman Filters ([x, y, dx, dy]) with Hungarian bipartite matching. An augmented cost matrix introduces a cosine similarity velocity penalty to enforce momentum continuity, while dynamic tethering (80px overlap threshold) prevents identity swaps during close-quarters cup crossings, reducing ID switches from 50% to <10%.",
-        codeSnippet: `# Augmented Hungarian Cost Matrix with Momentum Penalty\nfor trk in trackers:\n    for det in detections:\n        cos_sim = np.dot(trk.vel, det - trk.pos) / (trk.vel_norm * disp_norm)\n        cost[i, j] = dist + lambda_vel * (1.0 - cos_sim)`,
-        highlights: ["4D state vector Kalman filter ([x, y, dx, dy]) with 0.85 velocity decay", "Augmented Hungarian assignment with cosine velocity penalty", "Dynamic occlusion tethering reducing ID switches from 50% to <10%"]
-      },
-      {
-        number: "04",
-        title: "MoveIt Kinematics & Gazebo Twin",
-        subtitle: "S-Curve Shuffling & RRT-Connect Trajectory Planning",
-        content: "Constructed a ROS Noetic / Gazebo 11 digital twin with S-curve velocity profiles and 0.16m radial arc separation. Maps 500x500 pixel camera coordinates to Sawyer's 0.5x0.5m Cartesian frame. MoveIt's RRT-Connect planner computes collision-free trajectories in ~1.0s, with live Intera SDK quaternion injection stabilizing downward gripper orientation.",
-        codeSnippet: `# MoveIt Cartesian Goal with Intera Quaternion Injection\npose_goal = PoseStamped()\npose_goal.pose.position.x, pose_goal.pose.position.y = pixel_to_world(u, v)\npose_goal.pose.position.z = table_z + 0.04 # 4cm hover\npose_goal.pose.orientation = limb.endpoint_pose()['orientation']\ngroup.set_pose_target(pose_goal)\ngroup.execute(group.plan())`,
-        highlights: ["Gazebo digital twin with collision-free S-curve shuffling", "2D pixel to 3D Cartesian base frame transformation matrix", "MoveIt RRT-Connect planning (~1.0s solve time) with quaternion pose stabilization"]
-      },
-      {
-        number: "05",
-        title: "Deployment Pipeline & Reachability",
-        subtitle: "WSL 2 Multi-Node Orchestration & Future Outlook",
-        content: "Documents the 5-terminal deployment runbook for Ubuntu 20.04 WSL 2 environments with explicit IP networking. Proposes a dynamic MoveIt Reachability Filter that pre-validates target coordinates against Sawyer's kinematic reach envelope before motion dispatch, preventing Inverse Kinematics solver failures.",
-        highlights: ["5-terminal synchronized ROS launch sequence on WSL 2", "Python 3 compatibility layer resolving exit code 127 crashes", "Dynamic reachability envelope filter preventing IK solver failures"]
-      }
-    ]
+    }
   },
   {
     id: "cursor",
-    title: "Semantic-ETL-Pipeline",
-    subtitle: "Multi-Modal Ingestion & Grounded RAG Microservice",
     roman: "III",
-    discipline: "Distributed Data Systems",
-    note: "High-density multi-modal document extraction, VLM transcription, and hybrid vector retrieval.",
-    deck: "An enterprise-grade, containerized multi-modal ETL and grounded RAG microservice: layout-aware document extraction via Docling v2, Groq LPU Vision Language Modeling, 70/30 hybrid dense-lexical vector retrieval, and Cross-Encoder reranking.",
-    binding: "Citron cloth · black gloss foil",
-    format: "140 × 210 mm · FH Campus Wien Edition",
-    theme: "Semantic ETL · multi-modal document intelligence",
     motif: "Directional caret",
     motifKey: "caret",
     paletteLabel: "Citron · ink · off-white",
@@ -249,76 +147,11 @@ export const VOLUMES_DATA: VolumeProject[] = [
       shelfDark: "#1c0f09",
       light: "#fff6ce",
       fill: "#dce37e"
-    },
-    projectDetails: {
-      name: "Semantic-ETL-Pipeline: Multi-Modal Ingestion & Grounded RAG",
-      category: "Distributed Systems & Vector Computing",
-      timeframe: "2026",
-      institution: "FH Campus Wien · Enterprise AI Systems",
-      role: "Lead Data & AI Systems Architect",
-      summary: "An enterprise-grade, containerized multi-modal ETL and grounded RAG microservice. Replaces fragile character slicing with Docling v2 layout parsing, Groq Vision Language Models for schematic transcription, 1024-d dense vector embeddings, calibrated 70/30 hybrid retrieval, and Groq GPT-OSS-120B Cross-Encoder reranking.",
-      problem: "Traditional PDF extraction flattens relational tables into noise, discards diagram image bytes, and fractures sentences with naive character chunking, causing massive downstream hallucination.",
-      solution: "Engineered an asynchronous 6-stage ETL lifecycle with structural breakpoint chunking, Groq LPU VLM processing, deterministic MD5 deduplication, and 70/30 hybrid vector fusion delivering +50% Recall@5 lift.",
-      keyMetrics: [
-        { label: "Recall@5 Lift", value: "+50.0% (0.20 → 0.30)" },
-        { label: "Table Fractures", value: "0 (100% Intact)" },
-        { label: "Concurrency Scaling", value: "14.75x (c=10)" },
-        { label: "Vector Index", value: "1024-d Dense (Pinecone)" }
-      ],
-      techStack: ["Python 3.13", "FastAPI", "Docling v2", "RapidOCR", "Groq LPU (Qwen-27B / GPT-OSS-120B)", "Pinecone Serverless", "Llama-Text-Embed-v2", "Pydantic", "Redis"],
-      githubUrl: "https://github.com/kaschefi",
-      liveUrl: "https://github.com/kaschefi",
-      architectureDescription: "6-stage asynchronous microservice pipeline: layout-aware Docling extraction, parallel Groq VLM diagram transcription, structural breakpoint chunking, Pydantic metadata synthesis, 1024-d dense vectorization, and 70/30 hybrid Pinecone search with Cross-Encoder reranking."
-    },
-    chapters: [
-      {
-        number: "01",
-        title: "Multi-Modal Ingestion Architecture",
-        subtitle: "Layout-Aware Parsing & Sub-Second Async Ingestion",
-        content: "Traditional PDF parsing collapses relational tables into unparseable single-column noise and ignores visual schematics. Semantic-ETL-Pipeline introduces a 6-stage lifecycle: Docling v2 layout parsing with RapidOCR (1.5x scale), parallel Groq Qwen-27B Vision transcription, structural breakpoint chunking (<1500 chars), Pydantic metadata synthesis, and 1024-d Pinecone upserts with non-blocking HTTP 202 job tracking.",
-        highlights: ["Docling v2 layout engine preserving markdown grid syntax", "Parallel Groq LPU Vision Language Modeling (Qwen-27B)", "Asynchronous HTTP 202 ingestion with deterministic UUID tracking", "Cryptographic MD5 content hashing for idempotent vector IDs"]
-      },
-      {
-        number: "02",
-        title: "Stream Processing & Concurrency",
-        subtitle: "Adaptive Backpressure, Redis JobStore & Dead-Letter Queues",
-        content: "Heavy document transformations create volatile compute demands. FastAPI async semaphores (CONCURRENCY_LIMIT=5) throttle LPU requests, pull-based token bucket rate limiting prevents worker OOM crashes, and multi-model fallback chains (GPT-OSS-120B -> 20B -> Allam-7B -> Qwen-27B) eliminate 429 rate-limit downtime during API quota exhaustion.",
-        highlights: ["Monotonic JobLifecycle state engine tracking real-time 0.0%–100.0% progress", "Adaptive pull-based backpressure preventing worker OOM crashes", "Multi-model fallback chain with exponential backoff", "Dead-Letter Queue (DLQ) isolation preserving stack traces and file provenance"]
-      },
-      {
-        number: "03",
-        title: "Semantic Boundary Chunking & VLMs",
-        subtitle: "Structural Breakpoints, Vision Transcriptions & Vector IDs",
-        content: "Rather than slicing text by arbitrary character counts, the chunker groups text by structural DOM elements (Headers, Sections, Tables). Chunks accumulate up to 1500 characters, triggering instant boundaries on new headers (>300 chars) with element-level overlap (N >= 1) to eliminate sentence truncation and preserve context.",
-        highlights: ["Structural breakpoint grouping eliminating table fracturing", "Element-level sliding overlap preserving section hierarchy", "Strict Pydantic JSON schema generating summaries and categories", "Deterministic MD5 vector hashing guaranteeing zero duplicate embeddings"]
-      },
-      {
-        number: "04",
-        title: "Hybrid Retrieval & Cross-Encoder Rerank",
-        subtitle: "70/30 Dense-Lexical Fusion & Groq LPU Scoring",
-        content: "Pure dense retrieval misses exact alphanumeric technical tokens, while lexical search lacks semantic generalization. The engine computes S_hybrid = 0.70 * S_dense + 0.30 * S_keyword, expanding candidates to K_fetch = max(2*top_k, 16) for deep Groq GPT-OSS-120B Cross-Encoder reranking, doubling top-1 precision.",
-        highlights: ["Calibrated 70% dense semantic / 30% lexical token score fusion", "Decoupled polyglot storage combining TTL scratchpad caches with Pinecone", "Groq LPU Cross-Encoder reranking evaluating full context snippets", "Digit-decomposition fallback parser preventing malformed JSON ranking drops"]
-      },
-      {
-        number: "05",
-        title: "Production Benchmarks & Grounded RAG",
-        subtitle: "Empirical Retrieval Lifts & Zero-Hallucination Guardrails",
-        content: "Production benchmarks demonstrate a +50.0% Recall@5 lift (0.20 -> 0.30) and +25.62% NDCG@5 lift over naive baselines, with 0 table fractures and 14.75x throughput scaling under concurrency (0.04 to 0.59 RPS). Retrieved contexts feed a grounded RAG agent operating at temperature 0.1 with mandatory page citations.",
-        highlights: ["+50.0% Recall@5 lift and +25.62% NDCG@5 lift over naive baselines", "14.75x throughput scaling under concurrency with 100% request success", "0 table fractures across benchmark corpora", "Grounded RAG agent enforcing strict page provenance citations"]
-      }
-    ]
+    }
   },
   {
     id: "antigravity",
-    title: "Roboflow",
-    subtitle: "Warehouse Routing and Scheduling System",
     roman: "IV",
-    discipline: "Warehouse Routing and Scheduling System",
-    note: "Ideas released from the flatness of the page.",
-    deck: "Warehouse routing and scheduling system optimizing multi-agent autonomous trajectories, collision avoidance, and real-time fleet dispatch.",
-    binding: "Cobalt cloth · cool-silver foil",
-    format: "162 × 240 mm · FH Campus Wien Edition",
-    theme: "Roboflow · warehouse routing & scheduling",
     motif: "Suspended orbits",
     motifKey: "orbits",
     paletteLabel: "Cobalt · sky · silver",
@@ -336,68 +169,11 @@ export const VOLUMES_DATA: VolumeProject[] = [
       shelfDark: "#1a0d08",
       light: "#e5edf2",
       fill: "#5f85dc"
-    },
-    projectDetails: {
-      name: "RoboFlow: Graph-Based Warehouse Simulation Engine",
-      category: "Graph Algorithms & Simulation",
-      timeframe: "2026",
-      institution: "FH Campus Wien",
-      role: "Algorithm & Software Engineer",
-      summary: "A graph-based warehouse management and simulation system built in Java and JavaFX, simulating autonomous robots on a 20x20 grid with Dijkstra shortest path routing, Prim MST facility cabling, and DFS topological task scheduling.",
-      problem: "Intralogistics and warehouse automation require simultaneous shortest-path robot routing, minimal-cost facility interconnects, and strict dependency-ordered task scheduling without deadlocks.",
-      solution: "Modeled the warehouse as an adjacency list graph and DAG, implementing Dijkstra's algorithm, Prim's MST, and 3-color DFS topological sort wrapped in clean Strategy and Service patterns with a rich JavaFX UI.",
-      keyMetrics: [
-        { label: "Grid Size", value: "20 × 20 Cells" },
-        { label: "Graph Solvers", value: "3 Algorithms" },
-        { label: "Tech Stack", value: "Java 21 / JavaFX" }
-      ],
-      techStack: ["Java 21", "JavaFX", "Graph Theory", "Dijkstra Algorithm", "Prim MST", "Topological Sort", "Strategy Pattern"],
-      githubUrl: "https://github.com/kaschefi/Warehouse-Routing-and-Scheduling-System",
-      liveUrl: "https://github.com/kaschefi/Warehouse-Routing-and-Scheduling-System",
-      architectureDescription: "Decoupled domain models, pluggable algorithmic strategy interfaces, 4-tier service layer, and interactive JavaFX canvas grid."
-    },
-    chapters: [
-      {
-        number: "01",
-        title: "Academic Origin & Grid Modeling",
-        subtitle: "Graph-Theoretic Warehouse Modeling at FH Campus Wien",
-        content: "Developed as a university project at FH Campus Wien to investigate, implement, and benchmark foundational graph-theory algorithms for autonomous warehouse logistics. The 20x20 floor is modeled as an adjacency list graph where walkable cells are nodes and navigable paths are weighted edges.",
-        highlights: ["20x20 Discrete Graph Model", "FH Campus Wien Academic Project", "Dynamic Obstacle Injection", "Real-time Adjacency List"]
-      },
-      {
-        number: "02",
-        title: "The Three Graph Algorithms",
-        subtitle: "Dijkstra Routing, Prim MST & DFS Topological Sort",
-        content: "Integrates Dijkstra's algorithm with priority queues for dynamic shortest-path navigation, Prim's Minimum Spanning Tree for optimal facility cabling costs, and DFS Topological Sort with 3-color node classification for deadlock-free task scheduling.",
-        highlights: ["Dijkstra Min-Heap Routing", "Prim Minimum Spanning Tree", "DFS Topological Sort", "3-Color Deadlock Detection"]
-      },
-      {
-        number: "03",
-        title: "Clean Architecture & Strategy Pattern",
-        subtitle: "Domain Models, Strategy Interfaces & Service Layer",
-        content: "Engineered with strict separation of concerns: domain models represent pure data, algorithms are encapsulated via ShortestPathStrategy, MinimumSpanningTreeStrategy, and TopologicalSortStrategy interfaces, and 4 dedicated services orchestrate business logic.",
-        highlights: ["Strategy Pattern Polymorphism", "Decoupled 4-Service Layer", "JavaFX Canvas & Controls", "Modular Extensibility"]
-      },
-      {
-        number: "04",
-        title: "Interactive Simulation & Deadlock Safety",
-        subtitle: "Real-Time 20x20 Grid & Pre-Dispatch Dependency Verification",
-        content: "Operators interactively place obstacles, robots, charging stations, and drop zones. The system provides real-time path rerouting upon obstacle placement and flags cyclic dependency deadlocks with visual alert dialogs prior to robot dispatch.",
-        highlights: ["Dynamic Path Rerouting", "Pre-Dispatch Deadlock Alerts", "Live Terminal Logger Console", "Step-by-Step Robot Motion"]
-      }
-    ]
+    }
   },
   {
     id: "claude-code",
-    title: "Cat-breed-recognition",
-    subtitle: "Deep Learning Multi-Class Vision & Breed Classification",
     roman: "V",
-    discipline: "Vision & Deep Learning",
-    note: "Multi-class convolutional classification, fine-grained feature extraction, and real-time inference.",
-    deck: "An annotated volume on deep learning vision architectures: fine-grained feline breed recognition, spatial feature attention, and real-time edge classification.",
-    binding: "Phthalo-green cloth · gold foil",
-    format: "156 × 228 mm · FH Campus Wien Edition",
-    theme: "Cat-breed-recognition · vision classification",
     motif: "Interlaced paths",
     motifKey: "paths",
     paletteLabel: "Phthalo green · gold · emerald",
@@ -415,69 +191,11 @@ export const VOLUMES_DATA: VolumeProject[] = [
       shelfDark: "#1c0d08",
       light: "#82bca2",
       fill: "#0e2e20"
-    },
-    projectDetails: {
-      name: "Cat Breed Recognition",
-      category: "Computer Vision & Deep Learning",
-      timeframe: "2024",
-      institution: "FH Campus Wien",
-      role: "ML Engineer / Vision Researcher (Team: Stefan Auer, Mohammad Kashefirad, Kilian Lorenz)",
-      summary: "Fine-grained visual classification of 12 cat breeds using transfer learning on the Oxford-IIIT Pet Dataset, systematically benchmarking ResNet50, EfficientNet-B2, and ConvNeXt-tiny with Grad-CAM explainability.",
-      problem: "Cat breed identification is a fine-grained visual classification (FGVC) task where subtle differences in ear shape, fur texture, and facial structure must be distinguished across varying poses, lighting, and backgrounds.",
-      solution: "Benchmarked three ImageNet-pretrained CNN baselines and developed an improved ConvNeXt-tiny pipeline using heavy regularization (label smoothing 0.1, dropout 0.4, random erasing p=0.2, weight decay 5e-2) reaching 96.67% accuracy, verified via Grad-CAM heatmaps.",
-      keyMetrics: [
-        { label: "Val Accuracy", value: "96.67%" },
-        { label: "F1 (Weighted)", value: "0.9666" },
-        { label: "Breeds Classified", value: "12 Classes" }
-      ],
-      techStack: ["Python", "PyTorch", "timm", "scikit-learn", "Grad-CAM", "Matplotlib", "Seaborn"],
-      githubUrl: "https://github.com/kaschefi/cat-breed-recognition",
-      liveUrl: "",
-      architectureDescription: "ConvNeXt-tiny backbone with custom classification head, trained with AdamW, label smoothing, random erasing, and Grad-CAM spatial explainability."
-    },
-    chapters: [
-      {
-        number: "01",
-        title: "Architecture Benchmarks",
-        subtitle: "ConvNeXt-tiny vs. ResNet50 & EfficientNet-B2",
-        content: "Systematic 5-epoch baseline comparison on Oxford-IIIT Pet dataset. ConvNeXt-tiny achieved 95.42% accuracy, outperforming ResNet50 (90.00%) and EfficientNet-B2 (90.00%) through ViT-inspired depthwise kernels and inverted bottlenecks.",
-        codeSnippet: `// Fine-Grained ConvNeXt-tiny Transfer Learning Head\nimport timm, torch.nn as nn\n\nmodel = timm.create_model('convnext_tiny', pretrained=True, num_classes=12, drop_rate=0.4)\noptimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=5e-2)\ncriterion = nn.CrossEntropyLoss(label_smoothing=0.1)`,
-        highlights: ["ConvNeXt-tiny 95.42% baseline accuracy", "5x parameter efficiency over ResNet50", "ViT-inspired inverted bottleneck design"]
-      },
-      {
-        number: "02",
-        title: "Iterative Regularization",
-        subtitle: "Overfitting Mitigation & Generalization Pass",
-        content: "Selected ConvNeXt-tiny as the best baseline and iterated with stronger regularization: weight decay 5e-2, dropout 0.4, label smoothing 0.1, random erasing (p=0.2), and 10 epochs. Achieved 96.67% val accuracy and 0.9666 weighted F1.",
-        highlights: ["96.67% top-1 validation accuracy", "0.9666 weighted F1 score", "Label smoothing calibration"]
-      },
-      {
-        number: "03",
-        title: "Explainability & Grad-CAM",
-        subtitle: "Spatial Attention & Morphological Feature Localization",
-        content: "Grad-CAM heatmaps consistently localize to the head and facial structures, confirming the model learns genuine morphological features rather than background cues. Attention diffuses in uncertain cases.",
-        highlights: ["Head/facial feature localization", "Visual attribution verification", "Confidence-correlated heatmap diffusion"]
-      },
-      {
-        number: "04",
-        title: "Fine-Grained Analysis",
-        subtitle: "Confusion Topology & Architectural Takeaways",
-        content: "Near-clean separation across all 12 breeds. Ragdoll vs. Birman remains the persistent confusion pair across all models due to genuine biological similarity. Proved architecture choice and regularization trump parameter count.",
-        highlights: ["12-breed confusion matrix analysis", "Ragdoll vs. Birman morphological boundary", "Architecture > raw parameter count"]
-      }
-    ]
+    }
   },
   {
     id: "xcode",
-    title: "JoinApp",
-    subtitle: "Scalable Community Event Hub & Distributed Coordination Engine",
     roman: "VI",
-    discipline: "Full-Stack Web Systems",
-    note: "A measured path from blueprint to living platform.",
-    deck: "A modern full-stack web platform engineering hyperlocal event discovery, atomic participation lifecycles, and automated transactional dispatch across Vienna's metropolitan districts.",
-    binding: "Violet cloth · neon lime foil",
-    format: "158 × 232 mm · FH Campus Wien Edition",
-    theme: "JoinApp · blueprint into living form",
     motif: "Drafting compass",
     motifKey: "compass",
     paletteLabel: "Violet · electric lime · slate",
@@ -495,59 +213,37 @@ export const VOLUMES_DATA: VolumeProject[] = [
       shelfDark: "#1b0e09",
       light: "#f3f4f6",
       fill: "#6830D1"
-    },
-    projectDetails: {
-      name: "JoinApp Community Event Platform",
-      category: "Full-Stack Web Systems & Distributed Application Architecture",
-      timeframe: "2025 - 2026",
-      institution: "FH Campus Wien · Software Engineering",
-      role: "Lead Full-Stack Architect & Backend Engineer",
-      summary: "A full-stack community event platform featuring 3-tier architecture (Express 5.x + PostgreSQL), stateless JWT/RBAC security, interactive Leaflet GIS discovery, automated 1-hour ticket dispatch via Node-Cron & Nodemailer, and real-time polling chat.",
-      problem: "Modern event discovery platforms suffer from heavyweight dependencies, intrusive monetization models, and fragmented community communication with poor reliability in local coordination.",
-      solution: "Architected a lightweight, decoupled 3-tier system (Controller-Service-Repository) on Express 5.x and PostgreSQL with atomic junction constraints, asynchronous background geocoding (Photon API), RFC 5545 iCalendar generation, and automated cron ticket pipelines.",
-      keyMetrics: [
-        { label: "Architecture", value: "3-Tier Layered" },
-        { label: "API Latency", value: "< 85ms p95" },
-        { label: "Relational Tables", value: "7 Entities" },
-        { label: "Supported Locales", value: "DE-AT & EN-US" }
-      ],
-      techStack: ["Node.js", "Express 5.x", "PostgreSQL (pg.Pool)", "Leaflet.js", "JavaScript (ES6+)", "JWT & Bcrypt", "Node-Cron", "Nodemailer", "Photon Geocoding API", "HTML5/CSS3"],
-      githubUrl: "https://github.com/kaschefi/joinApp",
-      liveUrl: "https://github.com/kaschefi/joinApp",
-      architectureDescription: "Decoupled 3-tier service-oriented architecture with stateless JWT authentication, atomic PostgreSQL unique constraints, non-blocking asynchronous GIS geocoding, and cron-driven transactional outbox email dispatch."
-    },
-    chapters: [
-      {
-        number: "01",
-        title: "Clean Architecture & RBAC",
-        subtitle: "Decoupled Express 5 Services & JWT",
-        content: "Enforces single-responsibility boundaries across controllers, services, and parameterized PostgreSQL repositories. Reusable middleware interceptors enforce stateless JWT authentication and granular role-based authorization (USER vs ADMIN) across all protected routes.",
-        highlights: ["Decoupled 3-tier architecture", "Stateless 7-day JWT token rotation", "Granular requireRole & requireSelfOrAdmin guards"]
-      },
-      {
-        number: "02",
-        title: "GIS Mapping & Live Chat",
-        subtitle: "Interactive Leaflet Pins & Capacity Gating",
-        content: "Synchronizes Vienna-wide event clusters on Leaflet.js with interactive search cards using bidirectional viewport panning. The event lifecycle prevents double-joining via PostgreSQL unique constraints (error 23505) and gates participant lists until 1 hour before kickoff.",
-        highlights: ["60 FPS Leaflet.js map marker binding", "Atomic participant capacity validation", "Polling chat engine with auto-scroll threshold"]
-      },
-      {
-        number: "03",
-        title: "PostgreSQL & Cron Outbox",
-        subtitle: "7-Entity Schema & Ticket Daemon",
-        content: "A normalized 7-table schema with foreign-key cascades, array types (tags TEXT[]), and subquery aggregations. An automated background daemon polls upcoming events (NOW() + INTERVAL '1 hour') and dispatches personalized HTML tickets via Nodemailer.",
-        highlights: ["7 normalized relational entities with ON DELETE CASCADE", "At-most-once ticket delivery via cron & PostgreSQL interval arithmetic", "Parallel attendee cancellation emails with Promise.allSettled"]
-      },
-      {
-        number: "04",
-        title: "Geocoding & Calendar Sync",
-        subtitle: "Photon Spatial API & RFC 5545 iCal",
-        content: "Offloads address coordinate resolution to Komoot's Photon API asynchronously without stalling HTTP responses. Implements a zero-dependency RFC 5545 iCalendar (.ics) generator on the client side with batch export and Google Calendar web intents.",
-        highlights: ["Non-blocking asynchronous background geocoding", "Standards-compliant RFC 5545 iCalendar generator", "Bilingual client-side i18n runtime (DE-AT / EN-US)"]
-      }
-    ]
+    }
   }
 ];
+
+// Eagerly load every JSON file in src/content/volumes/ at build time.
+// Editing/adding a .json file there is all that's needed to change a
+// book's text — no code change required.
+const contentModules = import.meta.glob('../content/volumes/*.json', {
+  eager: true
+}) as Record<string, { default: VolumeContent }>;
+
+const contentById = new Map<string, VolumeContent>();
+for (const path in contentModules) {
+  const content = contentModules[path].default;
+  if (contentById.has(content.id)) {
+    throw new Error(
+      `Duplicate volume content id "${content.id}" found in ${path}. Each content JSON file must have a unique "id".`
+    );
+  }
+  contentById.set(content.id, content);
+}
+
+export const VOLUMES_DATA: VolumeProject[] = VISUAL_IDENTITIES.map((visual) => {
+  const content = contentById.get(visual.id);
+  if (!content) {
+    throw new Error(
+      `Missing content JSON for volume id "${visual.id}". Add a file under src/content/volumes/ with "id": "${visual.id}".`
+    );
+  }
+  return { ...visual, ...content };
+});
 
 export const STUDENT_PROFILE = {
   name: "M. Kashefirad",
@@ -560,9 +256,9 @@ export const STUDENT_PROFILE = {
   github: "https://github.com/kaschefi",
   linkedin: "https://www.linkedin.com/in/mkashefirad/",
   skills: {
-    languages: ["TypeScript / JavaScript", "Python", "Rust", "C / C++", "Swift", "GLSL / WGSL", "SQL", "Dart / Flutter"],
-    threeD_creative: ["Three.js (r165)", "WebGL & WebGPU", "GLSL Shaders", "Blender 3D", "Figma Design Systems", "Framer Motion", "Canvas API"],
-    ai_autonomous: ["Autonomous Agents (LangGraph / Codex)", "RAG & Vector Embeddings", "Contextual Reasoning", "OpenAI / Claude APIs", "PyTorch", "AST Code Analysis"],
-    systems_robotics: ["Sawyer 7-DOF Kinematics", "ROS2 & WebSockets", "Docker & Kubernetes", "FastAPI & Node.js", "Redis & PostgreSQL", "FreeRTOS & Embedded IoT"]
+    languages: ["Python", "Java", "Kotlin", "TypeScript / JavaScript", "React", "Rust", "C / C++", "Swift", "SQL", "GLSL / WGSL"],
+    agentic_ai: ["LangGraph & LangChain", "n8n & Semantic Router", "Local LLMs (Ollama)", "Tool-Calling & Multi-Step Reasoning", "LangSmith Observability", "RAG (Pinecone, FAISS)", "PyTorch & CNNs"],
+    backend_systems: ["FastAPI & RESTful APIs", "OAuth2 Integration", "Webhook Management", "PostgreSQL & Redis Streams", "ROS / ROS2 Middleware"],
+    devops_graphics: ["Docker & Docker Compose", "Three.js & WebGL Shaders", "Computer Vision (OpenCV)", "Graph Theory (Dijkstra, MST)", "Blender 3D", "Figma Systems"]
   }
 };

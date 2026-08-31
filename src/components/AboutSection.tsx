@@ -16,7 +16,10 @@ import {
   Coffee,
   Globe,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Cpu,
+  Bot,
+  ShieldCheck
 } from 'lucide-react';
 import { SteamCard3D } from './SteamCard3D';
 
@@ -28,12 +31,69 @@ interface SkillItem {
 }
 
 const SKILLS_DATA: SkillItem[] = [
+  // Page 1: Agentic AI, LLM Systems, Search, Backend & Cloud Infra
   {
-    name: 'LangGraph & Multi-Agent',
-    category: 'AI Architectures',
+    name: 'LangGraph & LangChain',
+    category: 'Agentic Frameworks',
     icon: <BrainCircuit size={15} />,
     accentColor: '#3884ff'
   },
+  {
+    name: 'n8n & Semantic Router',
+    category: 'Workflow Automation',
+    icon: <Workflow size={15} />,
+    accentColor: '#a855f7'
+  },
+  {
+    name: 'Ollama & Local LLMs',
+    category: 'Local Deployment',
+    icon: <Cpu size={15} />,
+    accentColor: '#00d2ff'
+  },
+  {
+    name: 'Tool-Calling & Reasoning',
+    category: 'Multi-Step Agent Loops',
+    icon: <Bot size={15} />,
+    accentColor: '#3884ff'
+  },
+  {
+    name: 'LangSmith Observability',
+    category: 'AI Evaluation & Tracing',
+    icon: <Activity size={15} />,
+    accentColor: '#10b981'
+  },
+  {
+    name: 'Pinecone, FAISS & Vector DBs',
+    category: 'Vector Search & Architecture',
+    icon: <Database size={15} />,
+    accentColor: '#f59e0b'
+  },
+  {
+    name: 'Semantic Search & RAG',
+    category: 'Cognitive Pipelines',
+    icon: <Sparkles size={15} />,
+    accentColor: '#3884ff'
+  },
+  {
+    name: 'FastAPI & RESTful APIs',
+    category: 'Backend Systems',
+    icon: <Server size={15} />,
+    accentColor: '#10b981'
+  },
+  {
+    name: 'OAuth2 & Webhooks',
+    category: 'Security & Integrations',
+    icon: <ShieldCheck size={15} />,
+    accentColor: '#f97316'
+  },
+  {
+    name: 'Docker & Docker Compose',
+    category: 'DevOps & Containerization',
+    icon: <Layers size={15} />,
+    accentColor: '#06b6d4'
+  },
+
+  // Page 2: Languages, Systems Engineering, Vision & 3D
   {
     name: 'Python & PyTorch',
     category: 'Core Systems & ML',
@@ -45,6 +105,36 @@ const SKILLS_DATA: SkillItem[] = [
     category: 'Object-Oriented & JVM',
     icon: <Coffee size={15} />,
     accentColor: '#f97316'
+  },
+  {
+    name: 'Kotlin',
+    category: 'Android & Mobile',
+    icon: <Smartphone size={15} />,
+    accentColor: '#a855f7'
+  },
+  {
+    name: 'JavaScript & React',
+    category: 'Frontend Engineering',
+    icon: <Globe size={15} />,
+    accentColor: '#eab308'
+  },
+  {
+    name: 'TypeScript & Modern Web',
+    category: 'Web Engineering',
+    icon: <Terminal size={15} />,
+    accentColor: '#3884ff'
+  },
+  {
+    name: 'PostgreSQL & Redis Streams',
+    category: 'Data & Persistence',
+    icon: <Database size={15} />,
+    accentColor: '#f59e0b'
+  },
+  {
+    name: 'Computer Vision & OpenCV',
+    category: 'Neural Vision & Tracking',
+    icon: <Eye size={15} />,
+    accentColor: '#a855f7'
   },
   {
     name: 'Three.js & WebGL Shaders',
@@ -59,58 +149,10 @@ const SKILLS_DATA: SkillItem[] = [
     accentColor: '#10b981'
   },
   {
-    name: 'TypeScript & React',
-    category: 'Web Engineering',
-    icon: <Terminal size={15} />,
-    accentColor: '#3884ff'
-  },
-  {
-    name: 'Computer Vision & OpenCV',
-    category: 'Neural Vision',
-    icon: <Eye size={15} />,
-    accentColor: '#a855f7'
-  },
-  {
-    name: 'FastAPI & Microservices',
-    category: 'Backend Systems',
-    icon: <Server size={15} />,
-    accentColor: '#10b981'
-  },
-  {
-    name: 'PostgreSQL & Redis Streams',
-    category: 'Data & Persistence',
-    icon: <Database size={15} />,
-    accentColor: '#f59e0b'
-  },
-  {
-    name: 'Vector RAG & FastEmbed',
-    category: 'Cognitive Pipelines',
-    icon: <Sparkles size={15} />,
-    accentColor: '#3884ff'
-  },
-  {
-    name: 'Docker & Containerization',
-    category: 'DevOps & Tooling',
-    icon: <Layers size={15} />,
-    accentColor: '#06b6d4'
-  },
-  {
     name: 'Graph Theory & Algorithms',
     category: 'Dijkstra & MST',
     icon: <Workflow size={15} />,
     accentColor: '#ec4899'
-  },
-  {
-    name: 'Kotlin',
-    category: 'Android & Mobile',
-    icon: <Smartphone size={15} />,
-    accentColor: '#a855f7'
-  },
-  {
-    name: 'HTML, CSS & JavaScript',
-    category: 'Frontend Core',
-    icon: <Globe size={15} />,
-    accentColor: '#eab308'
   }
 ];
 

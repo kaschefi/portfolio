@@ -667,7 +667,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
     // Intro state: starts displaying cybernetic Layer 1, then organically transforms into human Layer 2
     let introStartTime: number | null = null;
     let introProgress = 0.0;
-    const INTRO_DELAY_MS = 800; // Snappy 350ms hold on Layer 1 so user registers initial state
+    const INTRO_DELAY_MS = 500; // Snappy 350ms hold on Layer 1 so user registers initial state
     const INTRO_DURATION_MS = 1500; // 1.4s fluid energy wave transition transforming Layer 1 to Layer 2
 
     // Interaction Hint & Caption Orchestration
@@ -752,7 +752,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       idleTimer = window.setTimeout(() => {
         idleTimer = null;
         playPhantomSplatSequence();
-      }, 2500);
+      }, 2000);
     };
 
     let currentProgress = 0;

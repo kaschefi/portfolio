@@ -1,0 +1,115 @@
+{
+  "id": "cursor",
+  "title": "Semantic-ETL-Pipeline",
+  "subtitle": "Multi-Modal Ingestion & Grounded RAG Microservice",
+  "discipline": "Distributed Data Systems",
+  "note": "High-density multi-modal document extraction, VLM transcription, and hybrid vector retrieval.",
+  "deck": "An enterprise-grade, containerized multi-modal ETL and grounded RAG microservice: layout-aware document extraction via Docling v2, Groq LPU Vision Language Modeling, 70/30 hybrid dense-lexical vector retrieval, and Cross-Encoder reranking.",
+  "binding": "Citron cloth · black gloss foil",
+  "format": "140 × 210 mm · FH Campus Wien Edition",
+  "theme": "Semantic ETL · multi-modal document intelligence",
+  "projectDetails": {
+    "name": "Semantic-ETL-Pipeline: Multi-Modal Ingestion & Grounded RAG",
+    "category": "Distributed Systems & Vector Computing",
+    "timeframe": "2026",
+    "institution": "FH Campus Wien · Enterprise AI Systems",
+    "role": "Lead Data & AI Systems Architect",
+    "summary": "An enterprise-grade, containerized multi-modal ETL and grounded RAG microservice. Replaces fragile character slicing with Docling v2 layout parsing, Groq Vision Language Models for schematic transcription, 1024-d dense vector embeddings, calibrated 70/30 hybrid retrieval, and Groq GPT-OSS-120B Cross-Encoder reranking.",
+    "problem": "Traditional PDF extraction flattens relational tables into noise, discards diagram image bytes, and fractures sentences with naive character chunking, causing massive downstream hallucination.",
+    "solution": "Engineered an asynchronous 6-stage ETL lifecycle with structural breakpoint chunking, Groq LPU VLM processing, deterministic MD5 deduplication, and 70/30 hybrid vector fusion delivering +50% Recall@5 lift.",
+    "keyMetrics": [
+      {
+        "label": "Recall@5 Lift",
+        "value": "+50.0% (0.20 → 0.30)"
+      },
+      {
+        "label": "Table Fractures",
+        "value": "0 (100% Intact)"
+      },
+      {
+        "label": "Concurrency Scaling",
+        "value": "14.75x (c=10)"
+      },
+      {
+        "label": "Vector Index",
+        "value": "1024-d Dense (Pinecone)"
+      }
+    ],
+    "techStack": [
+      "Python 3.13",
+      "FastAPI",
+      "Docling v2",
+      "RapidOCR",
+      "Groq LPU (Qwen-27B / GPT-OSS-120B)",
+      "Pinecone Serverless",
+      "Llama-Text-Embed-v2",
+      "Pydantic",
+      "Redis"
+    ],
+    "githubUrl": "https://github.com/kaschefi",
+    "liveUrl": "https://github.com/kaschefi",
+    "architectureDescription": "6-stage asynchronous microservice pipeline: layout-aware Docling extraction, parallel Groq VLM diagram transcription, structural breakpoint chunking, Pydantic metadata synthesis, 1024-d dense vectorization, and 70/30 hybrid Pinecone search with Cross-Encoder reranking."
+  },
+  "chapters": [
+    {
+      "number": "01",
+      "title": "Multi-Modal Ingestion Architecture",
+      "subtitle": "Layout-Aware Parsing & Sub-Second Async Ingestion",
+      "content": "Traditional PDF parsing collapses relational tables into unparseable single-column noise and ignores visual schematics. Semantic-ETL-Pipeline introduces a 6-stage lifecycle: Docling v2 layout parsing with RapidOCR (1.5x scale), parallel Groq Qwen-27B Vision transcription, structural breakpoint chunking (<1500 chars), Pydantic metadata synthesis, and 1024-d Pinecone upserts with non-blocking HTTP 202 job tracking.",
+      "highlights": [
+        "Docling v2 layout engine preserving markdown grid syntax",
+        "Parallel Groq LPU Vision Language Modeling (Qwen-27B)",
+        "Asynchronous HTTP 202 ingestion with deterministic UUID tracking",
+        "Cryptographic MD5 content hashing for idempotent vector IDs"
+      ]
+    },
+    {
+      "number": "02",
+      "title": "Stream Processing & Concurrency",
+      "subtitle": "Adaptive Backpressure, Redis JobStore & Dead-Letter Queues",
+      "content": "Heavy document transformations create volatile compute demands. FastAPI async semaphores (CONCURRENCY_LIMIT=5) throttle LPU requests, pull-based token bucket rate limiting prevents worker OOM crashes, and multi-model fallback chains (GPT-OSS-120B -> 20B -> Allam-7B -> Qwen-27B) eliminate 429 rate-limit downtime during API quota exhaustion.",
+      "highlights": [
+        "Monotonic JobLifecycle state engine tracking real-time 0.0%–100.0% progress",
+        "Adaptive pull-based backpressure preventing worker OOM crashes",
+        "Multi-model fallback chain with exponential backoff",
+        "Dead-Letter Queue (DLQ) isolation preserving stack traces and file provenance"
+      ]
+    },
+    {
+      "number": "03",
+      "title": "Semantic Boundary Chunking & VLMs",
+      "subtitle": "Structural Breakpoints, Vision Transcriptions & Vector IDs",
+      "content": "Rather than slicing text by arbitrary character counts, the chunker groups text by structural DOM elements (Headers, Sections, Tables). Chunks accumulate up to 1500 characters, triggering instant boundaries on new headers (>300 chars) with element-level overlap (N >= 1) to eliminate sentence truncation and preserve context.",
+      "highlights": [
+        "Structural breakpoint grouping eliminating table fracturing",
+        "Element-level sliding overlap preserving section hierarchy",
+        "Strict Pydantic JSON schema generating summaries and categories",
+        "Deterministic MD5 vector hashing guaranteeing zero duplicate embeddings"
+      ]
+    },
+    {
+      "number": "04",
+      "title": "Hybrid Retrieval & Cross-Encoder Rerank",
+      "subtitle": "70/30 Dense-Lexical Fusion & Groq LPU Scoring",
+      "content": "Pure dense retrieval misses exact alphanumeric technical tokens, while lexical search lacks semantic generalization. The engine computes S_hybrid = 0.70 * S_dense + 0.30 * S_keyword, expanding candidates to K_fetch = max(2*top_k, 16) for deep Groq GPT-OSS-120B Cross-Encoder reranking, doubling top-1 precision.",
+      "highlights": [
+        "Calibrated 70% dense semantic / 30% lexical token score fusion",
+        "Decoupled polyglot storage combining TTL scratchpad caches with Pinecone",
+        "Groq LPU Cross-Encoder reranking evaluating full context snippets",
+        "Digit-decomposition fallback parser preventing malformed JSON ranking drops"
+      ]
+    },
+    {
+      "number": "05",
+      "title": "Production Benchmarks & Grounded RAG",
+      "subtitle": "Empirical Retrieval Lifts & Zero-Hallucination Guardrails",
+      "content": "Production benchmarks demonstrate a +50.0% Recall@5 lift (0.20 -> 0.30) and +25.62% NDCG@5 lift over naive baselines, with 0 table fractures and 14.75x throughput scaling under concurrency (0.04 to 0.59 RPS). Retrieved contexts feed a grounded RAG agent operating at temperature 0.1 with mandatory page citations.",
+      "highlights": [
+        "+50.0% Recall@5 lift and +25.62% NDCG@5 lift over naive baselines",
+        "14.75x throughput scaling under concurrency with 100% request success",
+        "0 table fractures across benchmark corpora",
+        "Grounded RAG agent enforcing strict page provenance citations"
+      ]
+    }
+  ]
+}

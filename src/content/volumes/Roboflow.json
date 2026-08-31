@@ -1,0 +1,97 @@
+{
+  "id": "antigravity",
+  "title": "Roboflow",
+  "subtitle": "Warehouse Routing and Scheduling System",
+  "discipline": "Warehouse Routing and Scheduling System",
+  "note": "Ideas released from the flatness of the page.",
+  "deck": "Warehouse routing and scheduling system optimizing multi-agent autonomous trajectories, collision avoidance, and real-time fleet dispatch.",
+  "binding": "Cobalt cloth · cool-silver foil",
+  "format": "162 × 240 mm · FH Campus Wien Edition",
+  "theme": "Roboflow · warehouse routing & scheduling",
+  "projectDetails": {
+    "name": "RoboFlow: Graph-Based Warehouse Simulation Engine",
+    "category": "Graph Algorithms & Simulation",
+    "timeframe": "2026",
+    "institution": "FH Campus Wien",
+    "role": "Algorithm & Software Engineer",
+    "summary": "A graph-based warehouse management and simulation system built in Java and JavaFX, simulating autonomous robots on a 20x20 grid with Dijkstra shortest path routing, Prim MST facility cabling, and DFS topological task scheduling.",
+    "problem": "Intralogistics and warehouse automation require simultaneous shortest-path robot routing, minimal-cost facility interconnects, and strict dependency-ordered task scheduling without deadlocks.",
+    "solution": "Modeled the warehouse as an adjacency list graph and DAG, implementing Dijkstra's algorithm, Prim's MST, and 3-color DFS topological sort wrapped in clean Strategy and Service patterns with a rich JavaFX UI.",
+    "keyMetrics": [
+      {
+        "label": "Grid Size",
+        "value": "20 × 20 Cells"
+      },
+      {
+        "label": "Graph Solvers",
+        "value": "3 Algorithms"
+      },
+      {
+        "label": "Tech Stack",
+        "value": "Java 21 / JavaFX"
+      }
+    ],
+    "techStack": [
+      "Java 21",
+      "JavaFX",
+      "Graph Theory",
+      "Dijkstra Algorithm",
+      "Prim MST",
+      "Topological Sort",
+      "Strategy Pattern"
+    ],
+    "githubUrl": "https://github.com/kaschefi/Warehouse-Routing-and-Scheduling-System",
+    "liveUrl": "https://github.com/kaschefi/Warehouse-Routing-and-Scheduling-System",
+    "architectureDescription": "Decoupled domain models, pluggable algorithmic strategy interfaces, 4-tier service layer, and interactive JavaFX canvas grid."
+  },
+  "chapters": [
+    {
+      "number": "01",
+      "title": "Academic Origin & Grid Modeling",
+      "subtitle": "Graph-Theoretic Warehouse Modeling at FH Campus Wien",
+      "content": "Developed as a university project at FH Campus Wien to investigate, implement, and benchmark foundational graph-theory algorithms for autonomous warehouse logistics. The 20x20 floor is modeled as an adjacency list graph where walkable cells are nodes and navigable paths are weighted edges.",
+      "highlights": [
+        "20x20 Discrete Graph Model",
+        "FH Campus Wien Academic Project",
+        "Dynamic Obstacle Injection",
+        "Real-time Adjacency List"
+      ]
+    },
+    {
+      "number": "02",
+      "title": "The Three Graph Algorithms",
+      "subtitle": "Dijkstra Routing, Prim MST & DFS Topological Sort",
+      "content": "Integrates Dijkstra's algorithm with priority queues for dynamic shortest-path navigation, Prim's Minimum Spanning Tree for optimal facility cabling costs, and DFS Topological Sort with 3-color node classification for deadlock-free task scheduling.",
+      "highlights": [
+        "Dijkstra Min-Heap Routing",
+        "Prim Minimum Spanning Tree",
+        "DFS Topological Sort",
+        "3-Color Deadlock Detection"
+      ]
+    },
+    {
+      "number": "03",
+      "title": "Clean Architecture & Strategy Pattern",
+      "subtitle": "Domain Models, Strategy Interfaces & Service Layer",
+      "content": "Engineered with strict separation of concerns: domain models represent pure data, algorithms are encapsulated via ShortestPathStrategy, MinimumSpanningTreeStrategy, and TopologicalSortStrategy interfaces, and 4 dedicated services orchestrate business logic.",
+      "highlights": [
+        "Strategy Pattern Polymorphism",
+        "Decoupled 4-Service Layer",
+        "JavaFX Canvas & Controls",
+        "Modular Extensibility"
+      ]
+    },
+    {
+      "number": "04",
+      "title": "Interactive Simulation & Deadlock Safety",
+      "subtitle": "Real-Time 20x20 Grid & Pre-Dispatch Dependency Verification",
+      "content": "Operators interactively place obstacles, robots, charging stations, and drop zones. The system provides real-time path rerouting upon obstacle placement and flags cyclic dependency deadlocks with visual alert dialogs prior to robot dispatch.",
+      "highlights": [
+        "Dynamic Path Rerouting",
+        "Pre-Dispatch Deadlock Alerts",
+        "Live Terminal Logger Console",
+        "Step-by-Step Robot Motion"
+      ]
+    }
+  ]
+}

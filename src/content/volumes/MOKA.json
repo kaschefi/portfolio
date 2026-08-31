@@ -1,0 +1,94 @@
+{
+  "id": "codex",
+  "title": "MOKA",
+  "subtitle": "Two-Tier Autonomous Physical & Digital AI Assistant",
+  "discipline": "AI Assistant",
+  "note": "Two-tier cognitive hierarchy: 45ms reflexes and dynamic LangGraph brain.",
+  "deck": "An AI-powered robotic assistant built around the Anki Cozmo robot. Features a dual-layer cognitive pipeline: Layer 1 fast semantic reflexes (50ms) for hardware safety and laptop automation, and Layer 2 dynamic LangGraph AI brain with FAISS Tool RAG, local Ollama LLMs, and persistent dual-tier PostgreSQL memory.",
+  "binding": "Ultramarine cloth · copper foil",
+  "format": "148 × 216 mm · Anki Cozmo Edition",
+  "theme": "MoKa · two-tier intelligence pipeline",
+  "projectDetails": {
+    "name": "MoKa AI Assistant (Anki Cozmo)",
+    "category": "Autonomous Robotics & Agentic Systems",
+    "timeframe": "2026",
+    "institution": "FH Campus Wien · Autonomous AI Systems",
+    "role": "Lead AI Architect & Robotics Systems Engineer",
+    "summary": "An AI-powered robotic assistant built around the Anki Cozmo robot featuring a two-layer intelligence pipeline: Layer 1 fast semantic reflexes (~45ms) for real-time hardware safety and OS automation, and Layer 2 dynamic LangGraph AI brain with FAISS Tool RAG, local LLMs (qwen2.5:3b via Ollama), and persistent dual-tier PostgreSQL memory.",
+    "problem": "Traditional conversational LLM assistants suffer from 1.5s+ latency, prompt bloat when managing dozens of tools, zero hardware safety rails, and cloud dependency for physical robot interactions.",
+    "solution": "Architected a hybrid two-tier routing hierarchy: Layer 1 sub-50ms FastEmbed semantic reflexes for critical motor safety (anti-fall, anti-dump, visual stasis) & PC routines, paired with a Layer 2 stateful LangGraph brain with FAISS vector tool retrieval, Kokoro-ONNX local TTS, and dual-mode PostgreSQL session memory.",
+    "keyMetrics": [
+      {
+        "label": "Reflex Latency",
+        "value": "45ms (~30x faster)"
+      },
+      {
+        "label": "Routing Accuracy",
+        "value": "93.0% (vs 89.5% baseline)"
+      },
+      {
+        "label": "Token Savings",
+        "value": "83% reduction"
+      },
+      {
+        "label": "Safety Loop Rate",
+        "value": "33Hz real-time"
+      }
+    ],
+    "techStack": [
+      "Python",
+      "LangGraph",
+      "PyCozmo",
+      "FAISS",
+      "FastEmbed",
+      "FastAPI",
+      "Ollama (qwen2.5 / ornith)",
+      "PostgreSQL",
+      "OpenCV",
+      "Kokoro-ONNX",
+      "Tavily MCP",
+      "n8n"
+    ],
+    "githubUrl": "https://github.com/kaschefi/cozmo_ai_assistant",
+    "liveUrl": "https://github.com/kaschefi/cozmo_ai_assistant",
+    "architectureDescription": "Two-Tier Fallback Hierarchy: Layer 1 Semantic Router (FastEmbed) directly triggers PyCozmo motor actions & PC routines in ~45ms; Layer 2 routes complex multi-step reasoning through LangGraph with FAISS dynamic Tool RAG, dual-tier PostgreSQL memory, and Kokoro-ONNX TTS."
+  },
+  "chapters": [
+    {
+      "number": "01",
+      "title": "The Two-Tier Reflex Hierarchy",
+      "subtitle": "Sub-50ms Spinal Reflexes & 33Hz Hardware Safety",
+      "content": "Physical robotic assistants cannot afford the 1.5s+ latency of standard LLM reasoning loops for motor safety. MoKa implements a Layer 1 FastEmbed semantic router executing in 45ms (~30x faster), intercepting commands to trigger PyCozmo motor routines directly. At 33Hz, the ReflexSafetyGuard actively evaluates IMU pitch tilt (>20°), true forward deceleration, cliff sensors, and OpenCV optical flow visual stasis to autonomously trigger evasive backup maneuvers before table falls or motor stalls occur.",
+      "codeSnippet": "# Layer 1 Reflex Safety & Anti-Fall Interceptor\n@reflex_guard.intercept_motion(rate_hz=33)\ndef handle_motor_step(telemetry: CozmoTelemetry):\n    if telemetry.cliff_detected or telemetry.is_falling:\n        emergency_stop_motors()\n        spawn_evasive_thread(reverse_sec=1.2, turn_deg=180)\n        return SafetyStatus.TRIPPED\n    if telemetry.imu_pitch > 0.35 or detect_visual_stasis(telemetry.camera_frame):\n        emergency_stop_motors()\n        spawn_obstacle_backoff(reverse_sec=1.0)\n        return SafetyStatus.OBSTACLE_AVOIDANCE\n    return SafetyStatus.NOMINAL",
+      "highlights": [
+        "~45ms direct reflex path (30x faster than LLM)",
+        "33Hz real-time multi-modal hardware safety guards",
+        "OpenCV visual stasis & optical tilt detection"
+      ]
+    },
+    {
+      "number": "02",
+      "title": "Dynamic Tool RAG & LangGraph",
+      "subtitle": "FAISS Vector Selection & Local Ollama Reasoning",
+      "content": "Instead of bloating LLM prompts with 19+ static tool schemas—which degrades classification accuracy to 89.5% on local 3B models—MoKa leverages an in-memory FAISS vector index with BAAI/bge-small-en-v1.5 embeddings to dynamically inject only the top 2 candidate tool schemas into the qwen2.5:3b supervisor. The graph routes via a unified tool executor node scaling to 100+ tools, interfacing Tavily MCP stdio client subprocesses, n8n Google Calendar integrations, and an isolated ornith:9b Python sandbox for deterministic code execution.",
+      "codeSnippet": "# Layer 2 LangGraph Dynamic Tool RAG Selection\ndef tool_retrieval_node(state: AgentState):\n    query_vector = embed_model.embed_query(state[\"user_query\"])\n    top_tools = faiss_index.similarity_search_by_vector(query_vector, k=2)\n    \n    # Inject only relevant schemas into local Ollama supervisor prompt\n    prompt = build_dynamic_prompt(candidate_tools=top_tools)\n    decision = router_llm.invoke(prompt) # qwen2.5:3b\n    return {\"next_route\": decision.route_key}",
+      "highlights": [
+        "93.0% routing accuracy (+3.5% over monolithic baseline)",
+        "83% prompt token reduction via dynamic FAISS RAG",
+        "Isolated ornith:9b deterministic Python sandbox"
+      ]
+    },
+    {
+      "number": "03",
+      "title": "Dual-Tier Memory & Voice Engine",
+      "subtitle": "PostgresSaver Checkpoints & Local Kokoro-ONNX TTS",
+      "content": "MoKa maintains stateful continuity without cloud lock-in through a dual memory substrate. Short-term dialogue is preserved with LangGraph PostgresSaver and rolling context summarization (pruning historical turns beyond 4 messages). Long-term biographical facts are stored in native PostgreSQL float arrays (REAL[]), evaluated with NumPy cosine similarity at a 0.82 deduplication threshold, and updated with O(1) dynamic entity resolution. Voice responses stream locally via Kokoro-ONNX for near-studio audio with zero disk I/O.",
+      "codeSnippet": "# Long-Term Semantic Fact Deduplication & Retrieval\ndef update_biographical_memory(new_fact: str, category: str):\n    if category in O1_ENTITY_CATEGORIES:\n        return postgres_db.upsert_entity(category, new_fact)\n    \n    fact_emb = fastembed.embed(new_fact)\n    similarities = [np.dot(fact_emb, row.emb) / (norm(fact_emb)*norm(row.emb)) \n                    for row in postgres_db.get_facts()]\n    \n    if max(similarities, default=0) >= 0.82:\n        return postgres_db.update_fact(idx=argmax(similarities), text=new_fact)\n    return postgres_db.insert_fact(fact=new_fact, embedding=fact_emb)",
+      "highlights": [
+        "Native PostgreSQL REAL[] array storage without pgvector binaries",
+        "0.82 cosine similarity deduplication & O(1) entity resolution",
+        "Zero-disk I/O Kokoro-ONNX local voice synthesis"
+      ]
+    }
+  ]
+}

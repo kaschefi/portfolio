@@ -1,0 +1,115 @@
+{
+  "id": "figma",
+  "title": "Sawyer Robot",
+  "subtitle": "Implementation of Waving Task, Shell Game, and Tracking Methods",
+  "discipline": "Robotics & Vision",
+  "note": "Dynamic perception, multi-object tracking, and MoveIt motion planning.",
+  "deck": "A comprehensive robotics engineering treatise on the 7-DoF Rethink Robotics Sawyer cobot: real-time teleoperation waving routines, high-speed vision tracking for the classic Shell Game, Kalman filter momentum estimation, occlusion tethering, and collision-free MoveIt trajectory generation.",
+  "binding": "Obsidian cloth · crimson foil",
+  "format": "150 × 220 mm · FH Campus Wien Edition",
+  "theme": "Sawyer Robot · visual servoing & cobots",
+  "projectDetails": {
+    "name": "Sawyer Robot: Waving Task & Shell Game",
+    "category": "Autonomous Robotics & Visual Servoing",
+    "timeframe": "June 2026",
+    "institution": "Hochschule Campus Wien · Computer Science and Digital Communications",
+    "role": "Robotics Systems & Computer Vision Engineer",
+    "summary": "Implementation of interactive collaborative robotic behaviors on the 7-DoF Rethink Robotics Sawyer cobot: a full-stack WebSocket teleoperation waving task and an autonomous vision-driven Shell Game featuring Kalman Filter momentum tracking, occlusion tethering, Gazebo digital twin simulation, and collision-free MoveIt trajectory execution.",
+    "problem": "Traditional robotic manipulators operate blindly on pre-programmed joint trajectories, making them incapable of dynamic environmental awareness, real-time object tracking through occlusions, or safe collision-free trajectory planning in human-interactive workspaces.",
+    "solution": "Developed a modular ROS 1 Noetic visual servoing architecture combining low-latency HSV color segmentation, a custom Kalman Filter multi-object tracker with cosine momentum penalties and occlusion tethering (<10% ID switch rate), an S-curve Gazebo simulation twin, and MoveIt RRT-Connect motion planning with live Intera SDK quaternion orientation stabilization.",
+    "keyMetrics": [
+      {
+        "label": "Tracking Success",
+        "value": "90% (9/10 Trials)"
+      },
+      {
+        "label": "ID Switch Rate",
+        "value": "< 10% (vs 50% Base)"
+      },
+      {
+        "label": "Planning Time",
+        "value": "~1.0s (RRT-Connect)"
+      },
+      {
+        "label": "Manipulator DoF",
+        "value": "7 Degrees of Freedom"
+      }
+    ],
+    "techStack": [
+      "ROS 1 Noetic",
+      "MoveIt 1",
+      "Gazebo 11",
+      "Python 3",
+      "OpenCV",
+      "YOLOv8",
+      "Intera SDK",
+      "OMPL (RRT-Connect)",
+      "scipy / numpy",
+      "Node.js (rosbridge)",
+      "WSL 2 / Ubuntu 20.04"
+    ],
+    "githubUrl": "https://github.com/kaschefi/sawyerRobot-ShellGame",
+    "liveUrl": "https://github.com/kaschefi/sawyerRobot-ShellGame",
+    "architectureDescription": "Modular distributed ROS node ecosystem bridging camera streaming, OpenCV/YOLOv8 perception, Kalman momentum tracking with Hungarian data association, and MoveIt RRT-Connect motion planning with live Intera SDK quaternion pose stabilization."
+  },
+  "chapters": [
+    {
+      "number": "01",
+      "title": "System Architecture & Waving Task",
+      "subtitle": "Distributed ROS Nodes & WebSocket Teleoperation",
+      "content": "Bridges a Node.js web interface with the 7-DoF Sawyer cobot via rosbridge_suite WebSockets. A hierarchical Design Tree enforces safe baseline postures, looping containers (5 continuous wave cycles), and linear Cartesian waypoints executed smoothly via standard trajectory controllers.",
+      "codeSnippet": "# Waving Task Logic Node & Trajectory Execution\nclass SawyerWavingNode:\n    def on_wave_triggered(self, msg):\n        self.limb.move_to_neutral()\n        for cycle in range(5):\n            self.execute_waypoint_sweep(\"left\", duration=0.8)\n            self.execute_waypoint_sweep(\"right\", duration=0.8)\n        self.limb.move_to_neutral()",
+      "highlights": [
+        "7-DoF Sawyer cobot with series elastic actuators",
+        "Asynchronous rosbridge_suite WebSocket teleoperation",
+        "Hierarchical Design Tree motion architecture"
+      ]
+    },
+    {
+      "number": "02",
+      "title": "Object Detection & Vision Benchmark",
+      "subtitle": "YOLOv8 Deep Learning vs. Classical HSV Filtering",
+      "content": "Evaluated OpenCV HSV color filtering against a custom YOLOv8 model trained on Roboflow's Red Solo Cups dataset. While YOLOv8 achieved 96% static accuracy, inference latency reduced dynamic tracking to 6/10 trials. Classical HSV filtering provided near-zero latency, achieving 100% detection and 9/10 successful tracking runs.",
+      "highlights": [
+        "Empirical benchmark: YOLOv8 (96% static) vs. HSV (100% controlled)",
+        "Sub-millisecond HSV contour centroid extraction",
+        "Inference latency analysis in closed-loop visual servoing"
+      ]
+    },
+    {
+      "number": "03",
+      "title": "Kalman MOT & Occlusion Tethering",
+      "subtitle": "Momentum State Vectors & Hungarian Assignment",
+      "content": "Integrates independent 4D linear Kalman Filters ([x, y, dx, dy]) with Hungarian bipartite matching. An augmented cost matrix introduces a cosine similarity velocity penalty to enforce momentum continuity, while dynamic tethering (80px overlap threshold) prevents identity swaps during close-quarters cup crossings, reducing ID switches from 50% to <10%.",
+      "codeSnippet": "# Augmented Hungarian Cost Matrix with Momentum Penalty\nfor trk in trackers:\n    for det in detections:\n        cos_sim = np.dot(trk.vel, det - trk.pos) / (trk.vel_norm * disp_norm)\n        cost[i, j] = dist + lambda_vel * (1.0 - cos_sim)",
+      "highlights": [
+        "4D state vector Kalman filter ([x, y, dx, dy]) with 0.85 velocity decay",
+        "Augmented Hungarian assignment with cosine velocity penalty",
+        "Dynamic occlusion tethering reducing ID switches from 50% to <10%"
+      ]
+    },
+    {
+      "number": "04",
+      "title": "MoveIt Kinematics & Gazebo Twin",
+      "subtitle": "S-Curve Shuffling & RRT-Connect Trajectory Planning",
+      "content": "Constructed a ROS Noetic / Gazebo 11 digital twin with S-curve velocity profiles and 0.16m radial arc separation. Maps 500x500 pixel camera coordinates to Sawyer's 0.5x0.5m Cartesian frame. MoveIt's RRT-Connect planner computes collision-free trajectories in ~1.0s, with live Intera SDK quaternion injection stabilizing downward gripper orientation.",
+      "codeSnippet": "# MoveIt Cartesian Goal with Intera Quaternion Injection\npose_goal = PoseStamped()\npose_goal.pose.position.x, pose_goal.pose.position.y = pixel_to_world(u, v)\npose_goal.pose.position.z = table_z + 0.04 # 4cm hover\npose_goal.pose.orientation = limb.endpoint_pose()['orientation']\ngroup.set_pose_target(pose_goal)\ngroup.execute(group.plan())",
+      "highlights": [
+        "Gazebo digital twin with collision-free S-curve shuffling",
+        "2D pixel to 3D Cartesian base frame transformation matrix",
+        "MoveIt RRT-Connect planning (~1.0s solve time) with quaternion pose stabilization"
+      ]
+    },
+    {
+      "number": "05",
+      "title": "Deployment Pipeline & Reachability",
+      "subtitle": "WSL 2 Multi-Node Orchestration & Future Outlook",
+      "content": "Documents the 5-terminal deployment runbook for Ubuntu 20.04 WSL 2 environments with explicit IP networking. Proposes a dynamic MoveIt Reachability Filter that pre-validates target coordinates against Sawyer's kinematic reach envelope before motion dispatch, preventing Inverse Kinematics solver failures.",
+      "highlights": [
+        "5-terminal synchronized ROS launch sequence on WSL 2",
+        "Python 3 compatibility layer resolving exit code 127 crashes",
+        "Dynamic reachability envelope filter preventing IK solver failures"
+      ]
+    }
+  ]
+}
