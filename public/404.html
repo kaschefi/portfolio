@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404: Not Found — M.Kashefirad</title>
+  <meta name="description" content="404 Error — Page Not Found in M.Kashefirad Engineering Portfolio Monograph." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate icon" type="image/x-icon" href="/antigravity_icon.ico" />
+
+  <!-- High-Priority Font Loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-primary: #16181d;
+      --ink: #f4eee6;
+      --ink-soft: #716e6a;
+      --accent-blue: #3884ff;
+      --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+      --font-serif: 'Cinzel', serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      background-color: var(--bg-primary);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .notfound-page {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(1.5rem, 4vw, 3.5rem);
+      padding-top: max(clamp(1.5rem, 4vw, 3.5rem), env(safe-area-inset-top));
+      padding-bottom: max(clamp(1.5rem, 4vw, 3.5rem), env(safe-area-inset-bottom));
+    }
+
+    /* Ambient atmospheric glow orbs */
+    .notfound-bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(110px);
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .notfound-bg-orb--blue {
+      width: clamp(380px, 45vw, 700px);
+      height: clamp(380px, 45vw, 700px);
+      top: -12%;
+      left: -8%;
+      background: radial-gradient(circle, rgba(56, 132, 255, 0.16) 0%, transparent 70%);
+      animation: notfoundOrbDrift 18s ease-in-out infinite alternate;
+    }
+
+    .notfound-bg-orb--purple {
+      width: clamp(320px, 40vw, 600px);
+      height: clamp(320px, 40vw, 600px);
+      bottom: -10%;
+      right: -5%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.14) 0%, transparent 70%);
+      animation: notfoundOrbDrift 22s ease-in-out infinite alternate-reverse;
+    }
+
+    .notfound-bg-orb--warm {
+      width: clamp(250px, 30vw, 450px);
+      height: clamp(250px, 30vw, 450px);
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(239, 193, 109, 0.08) 0%, transparent 70%);
+      animation: notfoundOrbDrift 15s ease-in-out infinite alternate;
+    }
+
+    @keyframes notfoundOrbDrift {
+      from {
+        transform: translate(0, 0) scale(1);
+      }
+
+      to {
+        transform: translate(25px, 15px) scale(1.05);
+      }
+    }
+
+    /* Subtle dot-grid texture */
+    .notfound-grid-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: radial-gradient(circle, rgba(244, 238, 230, 0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(ellipse at 50% 50%, black 0%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 0%, transparent 80%);
+    }
+
+    /* Main Editorial Content Column */
+    .notfound-content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 640px;
+      margin: auto 0;
+      padding: 1rem 0;
+    }
+
+    .notfound-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      color: var(--ink-soft);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 0.85rem;
+    }
+
+    /* ── SteamDigit3D — Standalone 3D Holographic Numerals ── */
+    .notfound-digits-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(0.4rem, 3vw, 1.5rem);
+      margin-bottom: 2rem;
+      padding: 0.5rem 1rem;
+    }
+
+    .steam-digit-container {
+      perspective: 1000px;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      outline: none;
+      background: transparent;
+      border: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .steam-digit-container:focus-visible .steam-digit-body {
+      filter: drop-shadow(0 0 20px var(--accent-blue));
+    }
+
+    .steam-digit-body {
+      position: relative;
+      display: inline-block;
+      transform-style: preserve-3d;
+      background: transparent;
+      border: none;
+      will-change: transform, filter;
+      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 1px rgba(255, 255, 255, 0.08));
+      transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), filter 0.5s ease-out;
+    }
+
+    .steam-digit-text {
+      font-family: var(--font-display);
+      font-size: clamp(6.5rem, 20vw, 13.5rem);
+      font-weight: 800;
+      line-height: 0.92;
+      letter-spacing: -0.04em;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      user-select: none;
+      display: block;
+    }
+
+    /* Layer 1: Dark Obsidian Slate Base with crisp white border outline */
+    .steam-digit-base {
+      background-image: linear-gradient(175deg, #242c3d 0%, #151a26 55%, #0c0f18 100%);
+      -webkit-text-stroke: 1.5px rgba(244, 238, 230, 0.75);
+    }
+
+    /* Layer 2: Prismatic Holographic Foil Shimmer */
+    .steam-digit-holo {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      mix-blend-mode: color-dodge;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.4s ease-out;
+      background-image: linear-gradient(
+        135deg,
+        rgba(255, 0, 128, 0) 0%,
+        rgba(0, 210, 255, 0.5) 25%,
+        rgba(255, 230, 0, 0.55) 50%,
+        rgba(16, 185, 129, 0.5) 75%,
+        rgba(255, 0, 128, 0) 100%
+      );
+    }
+
+    /* Layer 3: Dynamic White Light Glare Reflection */
+    .steam-digit-glare {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 0.4s ease-out;
+      background-image: radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.55) 25%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0) 70%
+      );
+    }
+
+    /* Typography */
+    .notfound-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 1.06;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+
+    .hero-title-name {
+      font-weight: 700;
+      background: linear-gradient(180deg, #ffffff 0%, #e6dfd5 60%, #c4bdb2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .notfound-subhead {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #c5bfb6;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid rgba(244, 238, 230, 0.18);
+    }
+
+    .notfound-description {
+      font-size: clamp(0.88rem, 1.15vw, 1.05rem);
+      color: rgba(244, 238, 230, 0.8);
+      font-weight: 300;
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 2rem;
+      text-wrap: pretty;
+    }
+
+    /* CTA Button */
+    .notfound-cta-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2.25rem;
+    }
+
+    .hero-outline-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-height: 44px;
+      padding: 0 1.5rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(244, 238, 230, 0.55);
+      background: rgba(244, 238, 230, 0.05);
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.22s var(--ease-smooth);
+    }
+
+    .hero-outline-btn:hover {
+      color: var(--bg-primary);
+      background: var(--ink);
+      border-color: var(--ink);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    .hero-btn-arrow {
+      width: 14px;
+      height: 14px;
+      transition: transform 0.22s var(--ease-smooth);
+    }
+
+    .hero-outline-btn:hover .hero-btn-arrow {
+      transform: translateX(-2px);
+    }
+
+    .notfound-footer-mono {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      opacity: 0.75;
+    }
+
+    @media (max-width: 600px) {
+      .steam-digit-text {
+        font-size: clamp(4.8rem, 26vw, 7.5rem);
+      }
+
+      .notfound-digits-row {
+        gap: 0.35rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .notfound-title {
+        font-size: clamp(1.85rem, 8vw, 2.5rem);
+      }
+
+      .hero-outline-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .notfound-bg-orb {
+        animation: none;
+      }
+
+      .steam-digit-body {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="notfound-page" role="main">
+    <!-- Ambient glow atmosphere -->
+    <div class="notfound-bg-orb notfound-bg-orb--blue" aria-hidden="true"></div>
+    <div class="notfound-bg-orb notfound-bg-orb--purple" aria-hidden="true"></div>
+    <div class="notfound-bg-orb notfound-bg-orb--warm" aria-hidden="true"></div>
+
+    <!-- Dot-grid texture overlay -->
+    <div class="notfound-grid-overlay" aria-hidden="true"></div>
+
+    <!-- Main Editorial Content Column -->
+    <main class="notfound-content">
+      <!-- Monospace Eyebrow Indicator -->
+      <div class="notfound-eyebrow">
+        <span>HTTP_STATUS // 404 NOT_FOUND</span>
+      </div>
+
+      <!-- ── 4 0 4 Digits Row (Interactive SteamCard3D holographic tilt) ── -->
+      <div class="notfound-digits-row" aria-label="404 — Page not found">
+        <!-- Digit 4 -->
+        <div class="steam-digit-container" tabindex="0" role="img" aria-label="Digit 4">
+          <div class="steam-digit-body">
+            <span class="steam-digit-text steam-digit-base" aria-hidden="true">4</span>
+            <span class="steam-digit-text steam-digit-holo" aria-hidden="true">4</span>
+            <span class="steam-digit-text steam-digit-glare" aria-hidden="true">4</span>
+          </div>
+        </div>
+
+        <!-- Digit 0 -->
+        <div class="steam-digit-container" tabindex="0" role="img" aria-label="Digit 0">
+          <div class="steam-digit-body">
+            <span class="steam-digit-text steam-digit-base" aria-hidden="true">0</span>
+            <span class="steam-digit-text steam-digit-holo" aria-hidden="true">0</span>
+            <span class="steam-digit-text steam-digit-glare" aria-hidden="true">0</span>
+          </div>
+        </div>
+
+        <!-- Digit 4 -->
+        <div class="steam-digit-container" tabindex="0" role="img" aria-label="Digit 4">
+          <div class="steam-digit-body">
+            <span class="steam-digit-text steam-digit-base" aria-hidden="true">4</span>
+            <span class="steam-digit-text steam-digit-holo" aria-hidden="true">4</span>
+            <span class="steam-digit-text steam-digit-glare" aria-hidden="true">4</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Editorial Title -->
+      <h1 class="notfound-title">
+        Lost in the <br />
+        <span class="hero-title-name">Digital Void</span>
+      </h1>
+
+      <!-- Subhead line -->
+      <div class="notfound-subhead">
+        <span>HTTP 404 // Route Does Not Exist</span>
+      </div>
+
+      <!-- Narrative Description -->
+      <p class="notfound-description">
+        Looks like you've ventured beyond the mapped territory. The page you are looking for doesn't exist, has been
+        relocated, or the URL might be mistyped.
+      </p>
+
+      <!-- Action CTA Button -->
+      <div class="notfound-cta-row">
+        <a href="/" class="hero-outline-btn">
+          <svg class="hero-btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Return to Portfolio</span>
+        </a>
+      </div>
+
+      <!-- Monograph telemetry footer -->
+      <p class="notfound-footer-mono" aria-hidden="true">
+        KASCHEFIRAD // MONOGRAPH ARCHIVE // 2026
+      </p>
+    </main>
+  </div>
+
+  <!-- Interactive 3D Holographic Tilt Physics Engine (identical to SteamCard3D.tsx) -->
+  <script>
+    (function () {
+      const maxTilt = 14;
+      const scaleHover = 1.04;
+      const containers = document.querySelectorAll('.steam-digit-container');
+
+      containers.forEach(function (container) {
+        const body = container.querySelector('.steam-digit-body');
+        const holo = container.querySelector('.steam-digit-holo');
+        const glare = container.querySelector('.steam-digit-glare');
+        let rafId = null;
+
+        function handleMove(clientX, clientY) {
+          const rect = container.getBoundingClientRect();
+          const x = clientX - rect.left;
+          const y = clientY - rect.top;
+          const width = rect.width;
+          const height = rect.height;
+
+          if (rafId) cancelAnimationFrame(rafId);
+
+          rafId = requestAnimationFrame(function () {
+            const percentX = (x / width) * 2 - 1;
+            const percentY = (y / height) * 2 - 1;
+
+            const rotateX = -percentY * maxTilt;
+            const rotateY = percentX * maxTilt;
+
+            const glareX = (x / width) * 100;
+            const glareY = (y / height) * 100;
+            const glareAngle = Math.atan2(y - height / 2, x - width / 2) * (180 / Math.PI) + 90;
+
+            const distanceFromCenter = Math.min(Math.sqrt(percentX * percentX + percentY * percentY), 1.2);
+            const glareOpacity = Math.min(0.25 + distanceFromCenter * 0.5, 0.9);
+
+            const shadowX = -percentX * 14;
+            const shadowY = -percentY * 14 + 10;
+
+            body.style.transform = 'perspective(1000px) rotateX(' + rotateX.toFixed(2) + 'deg) rotateY(' + rotateY.toFixed(2) + 'deg) scale3d(' + scaleHover + ', ' + scaleHover + ', 1)';
+            body.style.filter = 'drop-shadow(' + shadowX.toFixed(1) + 'px ' + shadowY.toFixed(1) + 'px 24px rgba(0,0,0,0.75)) drop-shadow(0 0 1px rgba(255,255,255,0.18))';
+            body.style.transition = 'filter 0.1s ease-out';
+
+            holo.style.backgroundImage = 'linear-gradient(' + glareAngle.toFixed(1) + 'deg, rgba(255,0,128,0) 0%, rgba(0,210,255,0.5) 25%, rgba(255,230,0,0.55) 50%, rgba(16,185,129,0.5) 75%, rgba(255,0,128,0) 100%)';
+            holo.style.opacity = '0.65';
+            holo.style.transition = 'opacity 0.2s ease-out';
+
+            glare.style.backgroundImage = 'radial-gradient(circle at ' + glareX.toFixed(1) + '% ' + glareY.toFixed(1) + '%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.55) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 70%)';
+            glare.style.opacity = glareOpacity.toFixed(2);
+            glare.style.transition = 'opacity 0.1s ease-out';
+          });
+        }
+
+        function handleLeave() {
+          if (rafId) cancelAnimationFrame(rafId);
+          body.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+          body.style.filter = 'drop-shadow(0 8px 20px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 1px rgba(255, 255, 255, 0.08))';
+          body.style.transition = 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), filter 0.5s ease-out';
+
+          holo.style.opacity = '0';
+          holo.style.transition = 'opacity 0.4s ease-out';
+
+          glare.style.opacity = '0';
+          glare.style.transition = 'opacity 0.4s ease-out';
+        }
+
+        container.addEventListener('mousemove', function (e) {
+          handleMove(e.clientX, e.clientY);
+        });
+
+        container.addEventListener('mouseleave', handleLeave);
+
+        container.addEventListener('touchmove', function (e) {
+          if (e.touches.length > 0) {
+            handleMove(e.touches[0].clientX, e.touches[0].clientY);
+          }
+        }, { passive: true });
+
+        container.addEventListener('touchend', handleLeave);
+        container.addEventListener('touchcancel', handleLeave);
+      });
+    })();
+  </script>
+</body>
+
+</html>
