@@ -5242,3 +5242,335 @@ body {
   color: var(--ink, #f4eee6);
   transform: translateX(2px) translateY(-2px);
 }
+
+/* ==========================================================================
+   404 Not Found Page — Monograph Editorial Aesthetic
+   ========================================================================== */
+
+.notfound-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #0e1018;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  font-family: var(--font-sans);
+  color: var(--text-primary, #f5f7fa);
+}
+
+/* Ambient atmospheric orbs */
+.notfound-bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.notfound-bg-orb--blue {
+  width: clamp(380px, 45vw, 720px);
+  height: clamp(380px, 45vw, 720px);
+  top: -15%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(56, 132, 255, 0.14) 0%, transparent 70%);
+  animation: notfoundOrbDrift 18s ease-in-out infinite alternate;
+}
+
+.notfound-bg-orb--purple {
+  width: clamp(300px, 35vw, 560px);
+  height: clamp(300px, 35vw, 560px);
+  bottom: -10%;
+  right: -8%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
+  animation: notfoundOrbDrift 22s ease-in-out infinite alternate-reverse;
+}
+
+.notfound-bg-orb--teal {
+  width: clamp(200px, 25vw, 380px);
+  height: clamp(200px, 25vw, 380px);
+  top: 55%;
+  left: 40%;
+  background: radial-gradient(circle, rgba(0, 210, 255, 0.07) 0%, transparent 70%);
+  animation: notfoundOrbDrift 14s ease-in-out infinite alternate;
+}
+
+@keyframes notfoundOrbDrift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(30px, 18px) scale(1.06); }
+}
+
+/* Subtle dot-grid texture */
+.notfound-grid-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at 50% 50%, black 0%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 0%, transparent 75%);
+}
+
+/* ==========================================================================
+   404 Not Found Page — Monograph Editorial Aesthetic
+   ========================================================================== */
+
+.notfound-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #16181d;
+  color: var(--ink, #f4eee6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  overflow-x: hidden;
+  padding: clamp(1.25rem, 4vw, 3.5rem);
+  padding-top: max(clamp(1.25rem, 4vw, 3.5rem), env(safe-area-inset-top));
+  padding-bottom: max(clamp(1.25rem, 4vw, 3.5rem), env(safe-area-inset-bottom));
+  font-family: var(--font-sans);
+}
+
+/* Ambient atmospheric glow orbs */
+.notfound-bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(110px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.notfound-bg-orb--blue {
+  width: clamp(380px, 45vw, 700px);
+  height: clamp(380px, 45vw, 700px);
+  top: -12%;
+  left: -8%;
+  background: radial-gradient(circle, rgba(56, 132, 255, 0.16) 0%, transparent 70%);
+  animation: notfoundOrbDrift 18s ease-in-out infinite alternate;
+}
+
+.notfound-bg-orb--purple {
+  width: clamp(320px, 40vw, 600px);
+  height: clamp(320px, 40vw, 600px);
+  bottom: -10%;
+  right: -5%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.14) 0%, transparent 70%);
+  animation: notfoundOrbDrift 22s ease-in-out infinite alternate-reverse;
+}
+
+.notfound-bg-orb--warm {
+  width: clamp(250px, 30vw, 450px);
+  height: clamp(250px, 30vw, 450px);
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(239, 193, 109, 0.08) 0%, transparent 70%);
+  animation: notfoundOrbDrift 15s ease-in-out infinite alternate;
+}
+
+@keyframes notfoundOrbDrift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(25px, 15px) scale(1.05); }
+}
+
+/* Subtle dot-grid texture */
+.notfound-grid-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(244, 238, 230, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at 50% 50%, black 0%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 0%, transparent 80%);
+}
+
+/* Top Navigation Bar */
+.notfound-top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1320px;
+  z-index: 20;
+  margin-bottom: 1.5rem;
+}
+
+/* Main Editorial Content Column */
+.notfound-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 640px;
+  margin: auto 0;
+  padding: 1rem 0;
+}
+
+.notfound-eyebrow {
+  margin-bottom: 0.85rem;
+}
+
+.notfound-title {
+  font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+  line-height: 1.06;
+  margin-bottom: 1rem;
+}
+
+.notfound-subhead {
+  margin-bottom: 1.25rem;
+}
+
+.notfound-description {
+  max-width: 520px;
+  margin-bottom: 2rem;
+}
+
+/* ── SteamDigit3D — Standalone 3D Holographic Numerals ── */
+.notfound-digits-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.4rem, 3vw, 1.5rem);
+  margin-bottom: 2rem;
+  padding: 0.5rem 1rem;
+}
+
+/* Container for each digit — zero card background, zero border */
+.steam-digit-container {
+  perspective: 1000px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  background: transparent;
+  border: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.steam-digit-container:focus-visible .steam-digit-body {
+  filter: drop-shadow(0 0 20px var(--accent-blue, #3884ff));
+}
+
+/* 3D Transform Body for the digit */
+.steam-digit-body {
+  position: relative;
+  display: inline-block;
+  transform-style: preserve-3d;
+  background: transparent;
+  border: none;
+  will-change: transform, filter;
+}
+
+/* Shared typography and text-clipping tokens for all layers */
+.steam-digit-text {
+  font-family: var(--font-display, 'Outfit', 'Plus Jakarta Sans', sans-serif);
+  font-size: clamp(6.5rem, 20vw, 13.5rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  user-select: none;
+  display: block;
+}
+
+/* Layer 1: Dark Obsidian Slate Base with crisp white border outline */
+.steam-digit-base {
+  background-image: linear-gradient(175deg, #242c3d 0%, #151a26 55%, #0c0f18 100%);
+  -webkit-text-stroke: 1.5px rgba(244, 238, 230, 0.75);
+}
+
+/* Layer 2: Prismatic Holographic Foil Shimmer */
+.steam-digit-holo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: color-dodge;
+  z-index: 2;
+}
+
+/* Layer 3: Dynamic White Light Glare Reflection (following cursor) */
+.steam-digit-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: 3;
+}
+
+/* Action CTAs row */
+.notfound-cta-row {
+  margin-bottom: 2.25rem;
+}
+
+/* Monograph telemetry footer stamp */
+.notfound-footer-mono {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft, #716e6a);
+  opacity: 0.75;
+}
+
+/* ── Responsive Adaptations ── */
+@media (max-width: 600px) {
+  .notfound-top-nav {
+    margin-bottom: 1rem;
+  }
+
+  .steam-digit-text {
+    font-size: clamp(4.8rem, 26vw, 7.5rem);
+  }
+
+  .notfound-digits-row {
+    gap: 0.35rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .notfound-title {
+    font-size: clamp(1.85rem, 8vw, 2.5rem);
+  }
+
+  .notfound-cta-row {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.65rem;
+  }
+
+  .notfound-cta-row .hero-outline-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .steam-digit-text {
+    font-size: clamp(4rem, 28vw, 6rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notfound-bg-orb {
+    animation: none;
+  }
+
+  .steam-digit-body {
+    transition: none;
+  }
+}
+
+
+
