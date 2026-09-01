@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
-import { NotFoundPage } from './components/NotFoundPage.tsx'
+import { NotFoundPage } from './not-found.tsx'
 
 /**
  * Lightweight path-based routing — no react-router needed.
