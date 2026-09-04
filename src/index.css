@@ -11,7 +11,7 @@
   --font-mono: 'JetBrains Mono', monospace;
 
   /* Color System */
-  --bg-primary: #0a0d14;
+  --bg-primary: #121418;
   --bg-secondary: #10141f;
   --bg-card: rgba(18, 23, 35, 0.72);
   --bg-card-hover: rgba(28, 35, 52, 0.85);
@@ -1854,6 +1854,7 @@ body {
     opacity: 0;
     transform: scale(0.985);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -5479,7 +5480,7 @@ body {
   outline: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 250ms var(--ease-spring);
+  perspective: 1000px;
 }
 
 .simple-lux-card-inner {
@@ -5498,21 +5499,29 @@ body {
   box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.55);
   overflow: hidden;
   text-align: left;
-  transition:
-    border-color 250ms ease,
-    background-color 250ms ease,
-    box-shadow 250ms ease;
+  transform-style: preserve-3d;
 }
 
 .simple-lux-card.is-active .simple-lux-card-inner {
   border-color: rgba(255, 255, 255, 0.22);
   background: rgba(20, 26, 40, 0.9);
-  box-shadow: 0 24px 60px -8px rgba(0, 0, 0, 0.75);
 }
 
-.simple-lux-card:hover .simple-lux-card-inner {
-  border-color: rgba(255, 255, 255, 0.32);
-  transform: translateY(-4px);
+.simple-lux-card .steam-card-holo-layer,
+.simple-lux-card .steam-card-glare-layer,
+.simple-lux-card .steam-card-reticle {
+  border-radius: 16px;
+}
+
+.simple-lux-steam-content {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  transform: translateZ(8px);
+  transform-style: preserve-3d;
 }
 
 /* Card Top Metadata */
@@ -5619,17 +5628,38 @@ body {
 }
 
 .simple-lux-cta {
-  font-family: var(--font-mono, monospace);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-primary, #f5f7fa);
-  transition: color 200ms ease;
+  position: relative;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(244, 238, 230, 0.12);
+  color: #d1cbc2;
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  pointer-events: auto;
+  flex-shrink: 0;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  transform: translateZ(10px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.simple-lux-card:hover .simple-lux-cta {
+.simple-lux-cta:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(244, 238, 230, 0.28);
   color: #ffffff;
+  transform: translateZ(14px) translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.simple-lux-cta:active {
+  transform: translateZ(10px) translateY(0);
 }
 
 .simple-lux-timeframe {
@@ -5644,6 +5674,7 @@ body {
 }
 
 @media (max-width: 880px) {
+
   .bookshelf-2d-card-track,
   .bookshelf-2d-card-slot {
     width: 320px;
@@ -5757,8 +5788,13 @@ body {
 }
 
 @keyframes notfoundOrbDrift {
-  from { transform: translate(0, 0) scale(1); }
-  to   { transform: translate(30px, 18px) scale(1.06); }
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+
+  to {
+    transform: translate(30px, 18px) scale(1.06);
+  }
 }
 
 /* Subtle dot-grid texture */
@@ -5766,7 +5802,7 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
   background-size: 32px 32px;
   mask-image: radial-gradient(ellipse at 50% 50%, black 0%, transparent 75%);
   -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 0%, transparent 75%);
@@ -5832,8 +5868,13 @@ body {
 }
 
 @keyframes notfoundOrbDrift {
-  from { transform: translate(0, 0) scale(1); }
-  to   { transform: translate(25px, 15px) scale(1.05); }
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+
+  to {
+    transform: translate(25px, 15px) scale(1.05);
+  }
 }
 
 /* Subtle dot-grid texture */
@@ -6029,6 +6070,3 @@ body {
     transition: none;
   }
 }
-
-
-
