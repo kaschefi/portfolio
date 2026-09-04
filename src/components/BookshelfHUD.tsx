@@ -8,17 +8,22 @@ import { FIGMA_PAGES_DATA, type FigmaPageContent } from '../data/figmaPagesData'
 import { CURSOR_PAGES_DATA, type CursorPageContent } from '../data/cursorPagesData';
 import { CLAUDE_CODE_PAGES_DATA, type ClaudeCodePageContent } from '../data/claudeCodePagesData';
 import { ANTIGRAVITY_PAGES_DATA, type AntigravityPageContent } from '../data/antigravityPagesData';
+import { ViewModeToggle } from './ViewModeToggle';
 
 interface BookshelfHUDProps {
   sceneState: { isOpen: boolean; isInspecting: boolean; page: number };
   volume: VolumeProject;
+  viewMode?: '2d' | '3d';
+  onToggleViewMode?: (mode: '2d' | '3d') => void;
 }
 
 const pad = (val: number) => String(val).padStart(2, '0');
 
 export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
   sceneState,
-  volume
+  volume,
+  viewMode = '3d',
+  onToggleViewMode
 }) => {
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
   const [expandedPage, setExpandedPage] = React.useState<number>(1);
@@ -201,9 +206,10 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
         <div className="editorial-identity">
           <strong>Projects</strong>
         </div>
-        <div className="editorial-index">
-          <span>Edition 02 · 2026</span>
-          <span id="palette-label">{volume.paletteLabel}</span>
+        <div className="editorial-view-toggle">
+          {onToggleViewMode && (
+            <ViewModeToggle mode={viewMode} onChange={onToggleViewMode} />
+          )}
         </div>
       </header>
 

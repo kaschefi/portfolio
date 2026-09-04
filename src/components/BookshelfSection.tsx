@@ -3,7 +3,15 @@ import { BookshelfContainer } from './BookshelfContainer';
 import { BookshelfHUD } from './BookshelfHUD';
 import { VOLUMES_DATA } from '../data/portfolioData';
 
-export const BookshelfSection: React.FC = () => {
+export interface BookshelfSectionProps {
+  viewMode?: '2d' | '3d';
+  onToggleViewMode?: (mode: '2d' | '3d') => void;
+}
+
+export const BookshelfSection: React.FC<BookshelfSectionProps> = ({
+  viewMode = '3d',
+  onToggleViewMode
+}) => {
   const [currentVolumeId, setCurrentVolumeId] = useState<string>('codex');
   const [sceneState, setSceneState] = useState<{ isOpen: boolean; isInspecting: boolean; page: number }>({
     isOpen: false,
@@ -30,6 +38,8 @@ export const BookshelfSection: React.FC = () => {
         <BookshelfHUD
           sceneState={sceneState}
           volume={currentVolume}
+          viewMode={viewMode}
+          onToggleViewMode={onToggleViewMode}
         />
       </BookshelfContainer>
     </main>

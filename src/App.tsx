@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { HeroFluidReveal } from './components/HeroFluidReveal';
 import { MobileHero } from './components/MobileHero';
-import { MobileProjectCards } from './components/MobileProjectCards';
+import { ProjectCarousel2D } from './components/ProjectCarousel2D';
 import { AboutSectionSkeleton } from './components/AboutSectionSkeleton';
 import { BookshelfSkeleton } from './components/BookshelfSkeleton';
 import { ContactFooterSkeleton } from './components/ContactFooterSkeleton';
@@ -28,9 +28,23 @@ export function App() {
   const [selectedModalVolume, setSelectedModalVolume] = useState<VolumeProject | null>(null);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState<boolean>(false);
 
+  // User override for 2D vs 3D project view mode (defaults to 2d on mobile, 3d on desktop)
+  const [viewMode, setViewMode] = useState<'2d' | '3d' | null>(null);
+  const activeViewMode: '2d' | '3d' = viewMode ?? (isMobile ? '2d' : '3d');
+
   // Track when the user is approaching or requesting the 3D Bookshelf
   const [shouldLoadBookshelf, setShouldLoadBookshelf] = useState<boolean>(false);
   const bookshelfTriggerRef = useRef<HTMLDivElement>(null);
+
+  const handleToggleViewMode = (mode: '2d' | '3d') => {
+    if (mode === '3d') {
+      setShouldLoadBookshelf(true);
+    }
+    setViewMode(mode);
+    requestAnimationFrame(() => {
+      window.dispatchEvent(new Event('resize'));
+    });
+  };
 
   // Scroll restoration
   useEffect(() => {
@@ -67,7 +81,7 @@ export function App() {
   };
 
   const handleScrollToSection = (sectionId: string) => {
-    if (sectionId === 'bookshelf') {
+    if (sectionId === 'bookshelf' && activeViewMode === '3d') {
       setShouldLoadBookshelf(true);
     }
     const el = document.getElementById(sectionId);
@@ -120,25 +134,38 @@ export function App() {
       </Suspense>
 
       {/* 3. Bookshelf Section Trigger & Container */}
-      <div ref={bookshelfTriggerRef} style={{ position: 'relative', width: '100%' }}>
-        {isMobile ? (
-          <MobileProjectCards onSelectVolume={setSelectedModalVolume} />
-        ) : shouldLoadBookshelf ? (
-          <Suspense
-            fallback={
-              <main className="bookshelf-section" id="bookshelf">
-                <div className="bookshelf-wrapper">
-                  <div className="bookshelf-stage">
-                    <BookshelfSkeleton />
+      <div ref={bookshelfTriggerRef} id="bookshelf" style={{ position: 'relative', width: '100%' }}>
+        {activeViewMode === '2d' && (
+          <ProjectCarousel2D
+            onSelectVolume={setSelectedModalVolume}
+            viewMode={activeViewMode}
+            onToggleViewMode={handleToggleViewMode}
+          />
+        )}
+
+        {shouldLoadBookshelf && (
+          <div style={{ display: activeViewMode === '3d' ? 'block' : 'none' }}>
+            <Suspense
+              fallback={
+                <main className="bookshelf-section">
+                  <div className="bookshelf-wrapper">
+                    <div className="bookshelf-stage">
+                      <BookshelfSkeleton />
+                    </div>
                   </div>
-                </div>
-              </main>
-            }
-          >
-            <LazyBookshelfSection />
-          </Suspense>
-        ) : (
-          <main className="bookshelf-section" id="bookshelf">
+                </main>
+              }
+            >
+              <LazyBookshelfSection
+                viewMode={activeViewMode}
+                onToggleViewMode={handleToggleViewMode}
+              />
+            </Suspense>
+          </div>
+        )}
+
+        {!shouldLoadBookshelf && activeViewMode === '3d' && (
+          <main className="bookshelf-section">
             <div className="bookshelf-wrapper">
               <div className="bookshelf-stage">
                 <BookshelfSkeleton />
@@ -160,6 +187,7 @@ export function App() {
             volume={selectedModalVolume}
             isOpen={Boolean(selectedModalVolume)}
             onClose={handleCloseModal}
+            onSelectVolume={setSelectedModalVolume}
           />
         </Suspense>
       )}
