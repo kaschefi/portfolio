@@ -2,17 +2,58 @@
 // Lightweight interior page generator with full book-specific chapter content (512x768).
 
 export function applyPagePatches(code) {
-  const pnStartIdx = code.indexOf('function Pn(e) {');
+  if (code.includes('const _bookPagesCache =')) {
+    return code;
+  }
+  const snStartIdx = code.indexOf('function Sn(e) {');
   const erStartIdx = code.indexOf('function er() {');
-  if (pnStartIdx === -1 || erStartIdx === -1) {
+  if (snStartIdx === -1 || erStartIdx === -1) {
     return code;
   }
 
-  const newPnFunction = `function Pn(e) {
+  const newPnFunction = `
+  const _endpaperCache = new Map();
+  function renderEndpaperOnDemand(e) {
+    if (_endpaperCache.has(e.id)) return _endpaperCache.get(e.id);
+    const o = document.createElement("canvas");
+    o.width = 512, o.height = 768;
+    const t = o.getContext("2d"), r = ye(pe(\`\${e.id}-endpaper\`) + e.seed);
+    to(t, o.width, o.height, r);
+    t.save();
+    t.fillStyle = e.color;
+    t.globalAlpha = 0.14;
+    t.fillRect(0, 0, o.width, o.height);
+    t.globalAlpha = 0.18;
+    t.strokeStyle = e.foil;
+    t.lineWidth = 1;
+    t.beginPath();
+    for (let n = 28; n < o.width; n += 48) {
+      t.moveTo(n, 0); t.lineTo(n, o.height);
+    }
+    for (let n = 24; n < o.height; n += 48) {
+      t.moveTo(0, n); t.lineTo(o.width, n);
+    }
+    t.stroke();
+    t.globalAlpha = 0.42;
+    $t(t, { ...e, foil: e.palette.inkSoft }, o.width, o.height);
+    t.restore();
+    const a = Q(new l.CanvasTexture(o), { anisotropy: 4 });
+    a.name = \`\${e.id}-patterned-endpaper\`;
+    _endpaperCache.set(e.id, a);
+    return a;
+  }
+
+  function Sn(e) {
+    return _t || Tn(e, false);
+  }
+
+  const _bookPagesCache = new Map();
+  function renderBookPagesOnDemand(e) {
+    if (_bookPagesCache.has(e.id)) return _bookPagesCache.get(e.id);
     const r = \`#\${new l.Color(e.color).lerp(new l.Color(2169622), 0.62).getHexString()}\`;
     const i = 512, d = 768;
 
-    return Array.from({ length: 12 }, (a, n) => {
+    const pages = Array.from({ length: 12 }, (a, n) => {
       const c = document.createElement("canvas");
       c.width = i;
       c.height = d;
@@ -224,7 +265,47 @@ export function applyPagePatches(code) {
       texture.name = \`\${e.id}-interior-page-\${n + 1}\`;
       return texture;
     });
+    _bookPagesCache.set(e.id, pages);
+    return pages;
+  }
+
+  function hydrateBookPages(bookObj) {
+    if (!bookObj || bookObj.pagesHydrated) return;
+    const realTextures = renderBookPagesOnDemand(bookObj.data);
+    if (bookObj.pageMaterials && Array.isArray(bookObj.pageMaterials)) {
+      for (let pIdx = 0; pIdx < 12; pIdx++) {
+        if (realTextures[pIdx] && bookObj.pageMaterials[pIdx]) {
+          bookObj.pageMaterials[pIdx].map = realTextures[pIdx];
+          bookObj.pageMaterials[pIdx].needsUpdate = true;
+        }
+      }
+    }
+    if (bookObj.interiorPageTextures) {
+      bookObj.interiorPageTextures = realTextures;
+    }
+    if (typeof renderEndpaperOnDemand === "function" && bookObj.endpaperMaterial) {
+      bookObj.endpaperMaterial.map = renderEndpaperOnDemand(bookObj.data);
+      bookObj.endpaperMaterial.needsUpdate = true;
+    }
+    if (typeof renderBackCloth === "function" && bookObj.backCoverMaterial) {
+      bookObj.backCoverMaterial.map = renderBackCloth(bookObj.data);
+      bookObj.backCoverMaterial.needsUpdate = true;
+    }
+    if (typeof renderBackFoil === "function" && bookObj.backFoilMaterial) {
+      const bf = renderBackFoil(bookObj.data);
+      bookObj.backFoilMaterial.map = bf;
+      bookObj.backFoilMaterial.alphaMap = bf;
+      bookObj.backFoilMaterial.bumpMap = bf;
+      bookObj.backFoilMaterial.needsUpdate = true;
+    }
+    bookObj.pagesHydrated = true;
+    if (typeof __wake === "function") __wake(60);
+  }
+
+  function Pn(e) {
+    const placeholder = _t || Tn(e, false);
+    return Array.from({ length: 12 }, () => placeholder);
   };\n`;
 
-  return code.slice(0, pnStartIdx) + newPnFunction + code.slice(erStartIdx);
+  return code.slice(0, snStartIdx) + newPnFunction + code.slice(erStartIdx);
 }

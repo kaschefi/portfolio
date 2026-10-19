@@ -16,6 +16,12 @@ export function applyEnginePatches(rawCode) {
     'D.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.0))'
   );
 
+  // 3b. Right-size Key light shadow map from 2048 to 1024 for 4x faster rasterization and 12MB VRAM savings
+  code = code.replace(
+    'e.shadow.mapSize.set(2048, 2048)',
+    'e.shadow.mapSize.set(1024, 1024)'
+  );
+
   // 4. Add Motion Frames keeper, __wake helper, and heroDrag at top of fa()
   if (!code.includes('const heroDrag = {')) {
     code = code.replace(
@@ -25,29 +31,34 @@ export function applyEnginePatches(rawCode) {
   }
 
   // 5. Update the render loop $n to universally sleep across EVERY 3D state (0 FPS Idle)
-  const loopRegex = /const a = Math\.abs\(oe - V\) > 5e-4 \|\| Ne > 0;\s*[\s\S]*?!Ae && U\(\);/;
-  const replacementLoop = `if (spineAnim.active && u) {
-      spineAnim.progress += o / spineAnim.duration;
-      const st = ct(A(spineAnim.progress, 0, 1));
-      u.root.quaternion.slerpQuaternions(spineAnim.fromQuat, spineAnim.toQuat, st);
-      if (spineAnim.progress >= 1) {
-        spineAnim.active = false;
-        u.root.quaternion.copy(spineAnim.toQuat);
+  if (!code.includes('const shouldKeepRendering =')) {
+    const loopRegex = /const a = Math\.abs\(oe - V\) > 5e-4 \|\| Ne > 0;\s*[\s\S]*?!Ae && U\(\);/;
+    const replacementLoop = `if (spineAnim.active && u) {
+        spineAnim.progress += o / spineAnim.duration;
+        const st = ct(A(spineAnim.progress, 0, 1));
+        u.root.quaternion.slerpQuaternions(spineAnim.fromQuat, spineAnim.toQuat, st);
+        if (spineAnim.progress >= 1) {
+          spineAnim.active = false;
+          u.root.quaternion.copy(spineAnim.toQuat);
+        }
+        __wake(5);
       }
-      __wake(5);
-    }
-    const a = Math.abs(oe - V) > 5e-4 || Ne > 0;
-    const shouldKeepRendering = (__motionFrames > 0) || spineAnim.active || b === "opening" || b === "closing" || a || r || (p && p.active) || (typeof Ne !== "undefined" && Ne > 0) || (typeof te !== "undefined" && te < 1 && te > 0) || (typeof ft !== "undefined" && ft);
-    if (__motionFrames > 0) __motionFrames--;
-    shouldKeepRendering && !Ae && U();`;
+      const a = Math.abs(oe - V) > 5e-4 || Ne > 0;
+      const shouldKeepRendering = (__motionFrames > 0) || spineAnim.active || b === "opening" || b === "closing" || a || r || (p && p.active) || (typeof Ne !== "undefined" && Ne > 0) || (typeof te !== "undefined" && te < 1 && te > 0) || (typeof ft !== "undefined" && ft);
+      if (__motionFrames > 0) __motionFrames--;
+      shouldKeepRendering && !Ae && U();`;
 
-  if (loopRegex.test(code)) {
-    code = code.replace(loopRegex, replacementLoop);
+    if (loopRegex.test(code)) {
+      code = code.replace(loopRegex, replacementLoop);
+    }
   }
 
   // 6. Connect all interaction and transition triggers to __wake()
-  if (code.includes('function ve(e, o = !0) {') && !code.includes('__wake(75);')) {
-    code = code.replace('function ve(e, o = !0) {', 'function ve(e, o = !0) { __wake(75);');
+  if (code.includes('function ve(e, o = !0) {') && !code.includes('hydrateBookPages(u)')) {
+    code = code.replace(
+      'function ve(e, o = !0) {',
+      'function ve(e, o = !0) { __wake(75); if (e && u && !u.pagesHydrated && typeof hydrateBookPages === "function") hydrateBookPages(u);'
+    );
   }
   if (code.includes('function ze(e) {') && !code.includes('function ze(e) { __wake(75);')) {
     code = code.replace('function ze(e) {', 'function ze(e) { __wake(75);');
@@ -58,14 +69,30 @@ export function applyEnginePatches(rawCode) {
   if (code.includes('function Lr() {') && !code.includes('function Lr() { __wake(60);')) {
     code = code.replace('function Lr() {', 'function Lr() { __wake(60);');
   }
-  if (code.includes('function xe(e) {') && !code.includes('function xe(e) { __wake(75);')) {
-    code = code.replace('function xe(e) {', 'function xe(e) { __wake(75);');
+  if (code.includes('function xe(e = ie) {') && !code.includes('hydrateBookPages(pt[O])')) {
+    code = code.replace(
+      'function xe(e = ie) {',
+      'function xe(e = ie) { __wake(75); if (pt[O] && !pt[O].pagesHydrated && typeof hydrateBookPages === "function") hydrateBookPages(pt[O]);'
+    );
+  } else if (code.includes('function xe(e) {') && !code.includes('hydrateBookPages(pt[O])')) {
+    code = code.replace(
+      'function xe(e) {',
+      'function xe(e) { __wake(75); if (pt[O] && !pt[O].pagesHydrated && typeof hydrateBookPages === "function") hydrateBookPages(pt[O]);'
+    );
   }
   if (code.includes('function Ie(e, o = !1) {') && !code.includes('function Ie(e, o = !1) { __wake(60);')) {
     code = code.replace('function Ie(e, o = !1) {', 'function Ie(e, o = !1) { __wake(60);');
   }
   if (code.includes('function mr(e) {') && !code.includes('function mr(e) { __wake(45);')) {
     code = code.replace('function mr(e) {', 'function mr(e) { __wake(45);');
+  }
+
+  // 6a. Attach materials and hydration flag in En(e, o) return object
+  if (code.includes('contactShadow: tt,') && !code.includes('pageMaterials: Ct,')) {
+    code = code.replace(
+      'contactShadow: tt,',
+      'contactShadow: tt,\n      pageMaterials: Ct,\n      backCoverMaterial: uo,\n      backFoilMaterial: go,\n      endpaperMaterial: et,\n      pagesHydrated: !1,'
+    );
   }
 
   // 6b. Connect dr(e) to hero dragging

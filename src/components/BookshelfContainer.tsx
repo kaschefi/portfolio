@@ -67,27 +67,16 @@ export const BookshelfContainer: React.FC<BookshelfContainerProps> = ({
         setIsScrolledIntoView(inView);
         const canvas = root.querySelector('canvas');
         if (canvas) {
-          if (!inView) {
-            canvas.style.visibility = 'hidden';
-          } else {
-            canvas.style.visibility = 'visible';
-            window.dispatchEvent(new Event('resize'));
-          }
+          canvas.style.visibility = inView ? 'visible' : 'hidden';
         }
       },
       { threshold: 0.05 }
     );
 
-    const resizeObserver = new ResizeObserver(() => {
-      window.dispatchEvent(new Event('resize'));
-    });
-
-    resizeObserver.observe(root);
     observer.observe(root);
 
     return () => {
       observer.disconnect();
-      resizeObserver.disconnect();
     };
   }, []);
 

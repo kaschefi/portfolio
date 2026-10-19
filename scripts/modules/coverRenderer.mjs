@@ -2,6 +2,9 @@
 // Front cover cloth textures (wn) and dynamic foil mask layers (Cn) for Three.js Bookshelf.
 
 export function applyCoverPatches(code) {
+  if (code.includes('WORKING VOLUMES  /  01')) {
+    return code;
+  }
   const wnStartIdx = code.indexOf('function wn(e) {');
   const anStartIdx = code.indexOf('function An(e)');
   if (wnStartIdx === -1 || anStartIdx === -1) {
