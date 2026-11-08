@@ -1,13 +1,7 @@
 import React from 'react';
 import { sound } from '../utils/audio';
-import type { VolumeProject } from '../data/portfolioData';
+import type { VolumeProject, BookPageSpread } from '../data/portfolioData';
 import { VOLUMES_DATA } from '../data/portfolioData';
-import { MOKA_PAGES_DATA, type MokaPageContent } from '../data/mokaPagesData';
-import { XCODE_PAGES_DATA, type XcodePageContent } from '../data/xcodePagesData';
-import { FIGMA_PAGES_DATA, type FigmaPageContent } from '../data/figmaPagesData';
-import { CURSOR_PAGES_DATA, type CursorPageContent } from '../data/cursorPagesData';
-import { CLAUDE_CODE_PAGES_DATA, type ClaudeCodePageContent } from '../data/claudeCodePagesData';
-import { ANTIGRAVITY_PAGES_DATA, type AntigravityPageContent } from '../data/antigravityPagesData';
 import { ViewModeToggle } from './ViewModeToggle';
 
 interface BookshelfHUDProps {
@@ -168,23 +162,11 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
     }
   };
 
-  // Resolve Active Page Content for MOKA, Xcode, Figma, Cursor, Claude Code, or Antigravity (RoboFlow)
+  // Resolve Active Page Content directly from unified volume.pages
   const activePageNumber = isExpanded ? expandedPage : sceneState.page;
-  const activePageKey = `page0${Math.min(Math.max(activePageNumber, 1), 5)}`;
-  const richContent: MokaPageContent | XcodePageContent | FigmaPageContent | CursorPageContent | ClaudeCodePageContent | AntigravityPageContent | undefined =
-    volume.id === 'codex'
-      ? MOKA_PAGES_DATA[activePageKey]
-      : volume.id === 'xcode'
-        ? XCODE_PAGES_DATA[activePageKey]
-        : volume.id === 'figma'
-          ? FIGMA_PAGES_DATA[activePageKey]
-          : volume.id === 'cursor'
-            ? CURSOR_PAGES_DATA[activePageKey]
-            : volume.id === 'claude-code'
-              ? CLAUDE_CODE_PAGES_DATA[activePageKey]
-              : volume.id === 'antigravity'
-                ? ANTIGRAVITY_PAGES_DATA[activePageKey]
-                : undefined;
+  const pages = volume.pages || [];
+  const activePageIdx = Math.min(Math.max(activePageNumber, 1), Math.max(pages.length, 1)) - 1;
+  const richContent: BookPageSpread | undefined = pages[activePageIdx];
 
   const getPageTitle = (page: number) => {
     if (richContent) {

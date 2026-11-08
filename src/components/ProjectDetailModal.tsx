@@ -1,22 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { type VolumeProject } from '../data/portfolioData';
-import { mokaPagesData, type MokaPageContent } from '../data/mokaPagesData';
-import { xcodePagesData, type XcodePageContent } from '../data/xcodePagesData';
-import { figmaPagesData, type FigmaPageContent } from '../data/figmaPagesData';
-import { cursorPagesData, type CursorPageContent } from '../data/cursorPagesData';
-import { claudeCodePagesData, type ClaudeCodePageContent } from '../data/claudeCodePagesData';
-import { antigravityPagesData, type AntigravityPageContent } from '../data/antigravityPagesData';
+import { type VolumeProject, type BookPageSpread } from '../data/portfolioData';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { GithubIcon } from './Icons';
 import { sound } from '../utils/audio';
 
-type GenericPageContent =
-  | MokaPageContent
-  | XcodePageContent
-  | FigmaPageContent
-  | CursorPageContent
-  | ClaudeCodePageContent
-  | AntigravityPageContent;
+type GenericPageContent = BookPageSpread;
 
 interface ProjectDetailModalProps {
   volume: VolumeProject | null;
@@ -68,27 +56,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
   if (!isOpen || !volume) return null;
 
-  // Resolve identical rich 5-spread datasets as 3D Three.js bookshelf
-  const getPages = (volId: string): GenericPageContent[] => {
-    switch (volId) {
-      case 'codex':
-        return mokaPagesData;
-      case 'figma':
-        return figmaPagesData;
-      case 'cursor':
-        return cursorPagesData;
-      case 'antigravity':
-        return antigravityPagesData;
-      case 'claude-code':
-        return claudeCodePagesData;
-      case 'xcode':
-        return xcodePagesData;
-      default:
-        return mokaPagesData;
-    }
-  };
-
-  const pages = getPages(volume.id);
+  // Spreads are loaded directly from unified VolumeProject / JSON source of truth
+  const pages = volume.pages || [];
   const currentSpread = pages[activeSpread - 1] || pages[0];
 
   const githubUrl =

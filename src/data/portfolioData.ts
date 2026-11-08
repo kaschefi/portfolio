@@ -1,3 +1,5 @@
+import { generateVolumePages, type BookPageSpread } from './volumePages';
+
 export interface Chapter {
   number: string;
   title: string;
@@ -52,6 +54,7 @@ export interface VolumeProject {
     architectureDescription: string;
   };
   chapters: Chapter[];
+  pages: BookPageSpread[];
 }
 
 // The editable text for every book lives in its own JSON file under
@@ -242,8 +245,12 @@ export const VOLUMES_DATA: VolumeProject[] = VISUAL_IDENTITIES.map((visual) => {
       `Missing content JSON for volume id "${visual.id}". Add a file under src/content/volumes/ with "id": "${visual.id}".`
     );
   }
-  return { ...visual, ...content };
+  const project = { ...visual, ...content } as VolumeProject;
+  project.pages = generateVolumePages(project);
+  return project;
 });
+
+export { generateVolumePages, type BookPageSpread } from './volumePages';
 
 export const STUDENT_PROFILE = {
   name: "M. Kashefirad",

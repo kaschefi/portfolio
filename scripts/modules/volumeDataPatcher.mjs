@@ -1,33 +1,15 @@
 // scripts/modules/volumeDataPatcher.mjs
-// Patches the embedded volume data inside bookshelfRenderer.js so that
-// e.title, e.discipline, etc. reflect the values in portfolioData.ts.
-// The renderer bundles its own copy of the data — this keeps them in sync.
+// Dynamically patches embedded volume data inside bookshelfRenderer.js so that
+// e.title, e.discipline, e.note, e.deck, e.color, e.palette, etc. stay in sync.
 
-const VOLUME_OVERRIDES = [
-  {
-    id: 'figma',
-    title: 'Sawyer Robot',
-    discipline: 'Shell Game',
-  },
-  {
-    id: 'cursor',
-    title: 'Semantic-ETL-Pipeline',
-    discipline: 'Directed editing',
-  },
-  {
-    id: 'xcode',
-    title: 'JoinApp',
-    discipline: 'Full-Stack Web Systems',
-    color: '#6830D1'
-  },
-  {
-    id: 'claude-code',
-    title: 'Cat-breed-recognition',
-    discipline: 'Vision & Deep Learning',
-    binding: 'Phthalo-green cloth · gold foil',
-    paletteLabel: 'Phthalo green · gold · emerald',
+import fs from 'fs';
+import path from 'path';
+
+const DEFAULT_VISUALS = {
+  'claude-code': {
     color: '#123524',
     foil: '#efc16d',
+    paletteLabel: 'Phthalo green · gold · emerald',
     palette: {
       paper: '#123524',
       paperDeep: '#091c13',
@@ -41,92 +23,119 @@ const VOLUME_OVERRIDES = [
       fill: '#0e2e20'
     }
   },
-  {
-    id: 'antigravity',
-    title: 'Roboflow',
-    discipline: 'Warehouse Routing and Scheduling System'
+  'xcode': {
+    color: '#6830D1',
+    foil: '#a3e635',
+    paletteLabel: 'Violet · electric lime · slate',
+    palette: {
+      paper: '#1a0b36',
+      paperDeep: '#100624',
+      paperPale: '#f3f4f6',
+      ink: '#ffffff',
+      inkSoft: '#a78bfa',
+      wall: '#1a0b36',
+      shelf: '#382017',
+      shelfDark: '#1b0e09',
+      light: '#f3f4f6',
+      fill: '#6830D1'
+    }
   }
-];
+};
 
 export function applyVolumeDataPatches(code) {
-  for (const override of VOLUME_OVERRIDES) {
-    // Patch title: "OldTitle" -> "NewTitle" scoped near the id field
-    if (override.title) {
-      code = code.replace(
-        new RegExp(
-          `(id:\\s*"${override.id}"[\\s\\S]{0,300}?title:\\s*)"([^"]+)"`,
-          ''
-        ),
-        `$1"${override.title}"`
-      );
-    }
+  const volumesDir = path.resolve('src/content/volumes');
+  if (!fs.existsSync(volumesDir)) {
+    return code;
+  }
 
-    // Patch discipline field near the same id block
-    if (override.discipline) {
-      code = code.replace(
-        new RegExp(
-          `(id:\\s*"${override.id}"[\\s\\S]{0,500}?discipline:\\s*)"([^"]+)"`,
-          ''
-        ),
-        `$1"${override.discipline}"`
-      );
-    }
+  const files = fs.readdirSync(volumesDir).filter(f => f.endsWith('.json'));
 
-    // Patch binding field near the same id block
-    if (override.binding) {
-      code = code.replace(
-        new RegExp(
-          `(id:\\s*"${override.id}"[\\s\\S]{0,800}?binding:\\s*)"([^"]+)"`,
-          ''
-        ),
-        `$1"${override.binding}"`
-      );
-    }
+  for (const file of files) {
+    try {
+      const vol = JSON.parse(fs.readFileSync(path.join(volumesDir, file), 'utf8'));
+      if (!vol || !vol.id) continue;
 
-    // Patch paletteLabel field near the same id block
-    if (override.paletteLabel) {
-      code = code.replace(
-        new RegExp(
-          `(id:\\s*"${override.id}"[\\s\\S]{0,900}?paletteLabel:\\s*)"([^"]+)"`,
-          ''
-        ),
-        `$1"${override.paletteLabel}"`
-      );
-    }
+      const defaultVisual = DEFAULT_VISUALS[vol.id] || {};
 
-    // Patch color field near the same id block
-    if (override.color) {
-      code = code.replace(
-        new RegExp(
-          `(id:\\s*"${override.id}"[\\s\\S]{0,1000}?color:\\s*)"([^"]+)"`,
-          ''
-        ),
-        `$1"${override.color}"`
-      );
-    }
-
-    // Patch foil field near the same id block
-    if (override.foil) {
-      code = code.replace(
-        new RegExp(
-          `(id:\\s*"${override.id}"[\\s\\S]{0,1100}?foil:\\s*)"([^"]+)"`,
-          ''
-        ),
-        `$1"${override.foil}"`
-      );
-    }
-
-    // Patch palette fields near the same id block
-    if (override.palette) {
-      for (const [key, val] of Object.entries(override.palette)) {
+      // Patch title: "OldTitle" -> "NewTitle" scoped near the id field
+      if (vol.title) {
         code = code.replace(
-          new RegExp(
-            `(id:\\s*"${override.id}"[\\s\\S]{0,1400}?${key}:\\s*)"([^"]+)"`,
-            ''
-          ),
-          `$1"${val}"`
+          new RegExp(`(id:\\s*"${vol.id}"[\\s\\S]{0,300}?title:\\s*)"([^"]+)"`),
+          `$1"${vol.title}"`
         );
       }
+
+      // Patch discipline
+      if (vol.discipline) {
+        code = code.replace(
+          new RegExp(`(id:\\s*"${vol.id}"[\\s\\S]{0,500}?discipline:\\s*)"([^"]+)"`),
+          `$1"${vol.discipline}"`
+        );
+      }
+
+      // Patch note
+      if (vol.note) {
+        code = code.replace(
+          new RegExp(`(id:\\s*"${vol.id}"[\\s\\S]{0,700}?note:\\s*)"([^"]+)"`),
+          `$1"${vol.note.replace(/"/g, '\\"')}"`
+        );
+      }
+
+      // Patch deck
+      if (vol.deck) {
+        code = code.replace(
+          new RegExp(`(id:\\s*"${vol.id}"[\\s\\S]{0,1000}?deck:\\s*)"([^"]+)"`),
+          `$1"${vol.deck.replace(/"/g, '\\"')}"`
+        );
+      }
+
+      // Patch binding
+      if (vol.binding) {
+        code = code.replace(
+          new RegExp(`(id:\\s*"${vol.id}"[\\s\\S]{0,800}?binding:\\s*)"([^"]+)"`),
+          `$1"${vol.binding}"`
+        );
+      }
+
+      // Patch paletteLabel
+      const paletteLabel = vol.paletteLabel || defaultVisual.paletteLabel;
+      if (paletteLabel) {
+        code = code.replace(
+          new RegExp(`(id:\\s*"${vol.id}"[\\s\\S]{0,900}?paletteLabel:\\s*)"([^"]+)"`),
+          `$1"${paletteLabel}"`
+        );
+      }
+
+      // Patch color
+      const color = vol.color || defaultVisual.color;
+      if (color) {
+        code = code.replace(
+          new RegExp(`(id:\\s*"${vol.id}"[\\s\\S]{0,1000}?color:\\s*)"([^"]+)"`),
+          `$1"${color}"`
+        );
+      }
+
+      // Patch foil
+      const foil = vol.foil || defaultVisual.foil;
+      if (foil) {
+        code = code.replace(
+          new RegExp(`(id:\\s*"${vol.id}"[\\s\\S]{0,1100}?foil:\\s*)"([^"]+)"`),
+          `$1"${foil}"`
+        );
+      }
+
+      // Patch palette fields
+      const palette = vol.palette || defaultVisual.palette;
+      if (palette) {
+        for (const [key, val] of Object.entries(palette)) {
+          code = code.replace(
+            new RegExp(`(id:\\s*"${vol.id}"[\\s\\S]{0,1400}?${key}:\\s*)"([^"]+)"`),
+            `$1"${val}"`
+          );
+        }
+      }
+    } catch (e) {
+      console.warn(`[volumeDataPatcher] Failed to read ${file}:`, e);
     }
   }
 

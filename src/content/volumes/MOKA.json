@@ -1,93 +1,113 @@
 {
   "id": "codex",
   "title": "MOKA",
-  "subtitle": "Two-Tier Autonomous Physical & Digital AI Assistant",
-  "discipline": "AI Assistant",
-  "note": "Two-tier cognitive hierarchy: 45ms reflexes and dynamic LangGraph brain.",
-  "deck": "An AI-powered robotic assistant built around the Anki Cozmo robot. Features a dual-layer cognitive pipeline: Layer 1 fast semantic reflexes (50ms) for hardware safety and laptop automation, and Layer 2 dynamic LangGraph AI brain with FAISS Tool RAG, local Ollama LLMs, and persistent dual-tier PostgreSQL memory.",
+  "subtitle": "Two-Tier Autonomous Robotics Assistant & Scalable Tool-Routing Ecosystem",
+  "discipline": "Autonomous Robotics & Agentic Systems",
+  "note": "Two-tier cognitive hierarchy: sub-6ms FastEmbed reflexes, 95.8% LAYA decision cross-encoder, and stateful LangGraph brain.",
+  "deck": "A local-first multimodal robotic companion and scientific tool-routing benchmark ecosystem for large tool registries (N = 20–100). Features sub-6ms FastEmbed semantic reflexes for physical kinematics and hardware safety, a filtered Layer 2 decision layer combining FAISS candidate pruning with the zero-token LAYA cross-encoder (95.8% accuracy), stateful LangGraph execution with dual-layer PostgreSQL memory (PostgresSaver + Mem0 pgvector), and foundational DINOv3 vision with Bidirectional A* navigation.",
   "binding": "Ultramarine cloth · copper foil",
-  "format": "148 × 216 mm · Anki Cozmo Edition",
-  "theme": "MoKa · two-tier intelligence pipeline",
+  "format": "148 × 216 mm · Anki Cozmo & Benchmark Edition",
+  "theme": "MoKa · two-tier intelligence pipeline & scalable tool routing",
   "projectDetails": {
-    "name": "MoKa AI Assistant (Anki Cozmo)",
+    "name": "MoKa AI Assistant & Tool-Routing Benchmark Ecosystem",
     "category": "Autonomous Robotics & Agentic Systems",
-    "timeframe": "2026",
+    "timeframe": "2026 – 2027",
     "institution": "FH Campus Wien · Autonomous AI Systems",
-    "role": "Lead AI Architect & Robotics Systems Engineer",
-    "summary": "An AI-powered robotic assistant built around the Anki Cozmo robot featuring a two-layer intelligence pipeline: Layer 1 fast semantic reflexes (~45ms) for real-time hardware safety and OS automation, and Layer 2 dynamic LangGraph AI brain with FAISS Tool RAG, local LLMs (qwen2.5:3b via Ollama), and persistent dual-tier PostgreSQL memory.",
-    "problem": "Traditional conversational LLM assistants suffer from 1.5s+ latency, prompt bloat when managing dozens of tools, zero hardware safety rails, and cloud dependency for physical robot interactions.",
-    "solution": "Architected a hybrid two-tier routing hierarchy: Layer 1 sub-50ms FastEmbed semantic reflexes for critical motor safety (anti-fall, anti-dump, visual stasis) & PC routines, paired with a Layer 2 stateful LangGraph brain with FAISS vector tool retrieval, Kokoro-ONNX local TTS, and dual-mode PostgreSQL session memory.",
+    "role": "Lead AI Architect & Robotics Systems Engineer (Author)",
+    "summary": "A hybrid embodied AI companion and empirical research evaluation suite. Designed for dual deployment on physical Anki Cozmo hardware and 100% hardware-free in simulation, MoKa implements a two-tier cognitive routing pipeline: Layer 1 sub-6ms FastEmbed semantic reflexes for real-time motor kinematics and safety halts, paired with a Layer 2 filtered cognitive decision layer combining FAISS Top-k Tool RAG with the 135M parameter LAYA cross-encoder (95.8% accuracy, 0 generative output tokens) or local Ollama LLMs (qwen2.5:3b). Backed by dual-layer PostgreSQL persistence (PostgresSaver connection pooling + Mem0 pgvector memory reconciliation), Silero VAD / Kokoro-ONNX neural speech, and DINOv3 vision with sub-35ms Bidirectional A* path planning.",
+    "problem": "Conventional embodied LLM assistants suffer from 1.5s+ reasoning latency, prompt pre-fill explosion (O(N) token bloat) as tool catalogs scale (20 to 100+ tools), softmax attention dilution / hallucination on semantically adjacent tools, lack of decoupled hardware safety halts, and cloud telemetry dependencies for physical robot interactions.",
+    "solution": "Architected a decoupled two-tier routing and control hierarchy: Tier 1 sub-6ms FastEmbed semantic reflexes for instant motor kinematics and system commands; Tier 2 bounded O(k) FAISS candidate pruning feeding the lightweight 135M parameter LAYA cross-encoder (eliminating output tokens) or local Ollama; persistent dual-tier PostgreSQL memory (PostgresSaver checkpoints + Mem0 pgvector biographical profile with few-shot reconciliation); DINOv3 foundational vision with SVD PCA heatmaps; and hardware ReflexSafetyGuard with sub-35ms Bidirectional A* planning.",
     "keyMetrics": [
       {
         "label": "Reflex Latency",
-        "value": "45ms (~30x faster)"
+        "value": "5.5ms P50 (sub-6ms)"
       },
       {
         "label": "Routing Accuracy",
-        "value": "93.0% (vs 89.5% baseline)"
+        "value": "95.8% (vs 87.5% baseline)"
       },
       {
         "label": "Token Savings",
-        "value": "83% reduction"
+        "value": "0 Output Tokens (100% elimination)"
       },
       {
-        "label": "Safety Loop Rate",
-        "value": "33Hz real-time"
+        "label": "Motion Planning",
+        "value": "<35ms Bidirectional A* (10mm grid)"
       }
     ],
     "techStack": [
       "Python",
-      "LangGraph",
-      "PyCozmo",
-      "FAISS",
-      "FastEmbed",
       "FastAPI",
-      "Ollama (qwen2.5 / ornith)",
-      "PostgreSQL",
+      "LangGraph",
+      "LAYA (135M Cross-Encoder)",
+      "Ollama (qwen2.5:3b)",
+      "FastEmbed (bge-small-en-v1.5)",
+      "FAISS",
+      "PostgreSQL (pgvector & PostgresSaver)",
+      "Mem0",
+      "PyCozmo",
+      "DINOv3 (ViT-Small 384-D)",
       "OpenCV",
       "Kokoro-ONNX",
-      "Tavily MCP",
-      "n8n"
+      "faster-whisper & Silero VAD",
+      "React 19 & TypeScript",
+      "Tailwind CSS v4 & Three.js"
     ],
     "githubUrl": "https://github.com/kaschefi/cozmo_ai_assistant",
     "liveUrl": "https://github.com/kaschefi/cozmo_ai_assistant",
-    "architectureDescription": "Two-Tier Fallback Hierarchy: Layer 1 Semantic Router (FastEmbed) directly triggers PyCozmo motor actions & PC routines in ~45ms; Layer 2 routes complex multi-step reasoning through LangGraph with FAISS dynamic Tool RAG, dual-tier PostgreSQL memory, and Kokoro-ONNX TTS."
+    "architectureDescription": "Two-Tier Fallback Hierarchy: Layer 1 Semantic Router (FastEmbed bge-small-en-v1.5) directly executes PyCozmo motor actions & system utilities in 5.5ms (0 tokens); Layer 2 routes complex multi-step reasoning through FAISS Top-k (k=3) candidate pruning into the 135M LAYA typed decision cross-encoder (95.8% accuracy, 0 output tokens) or local Ollama qwen2.5:3b. Stateful execution is orchestrated by LangGraph with dual-layer PostgreSQL memory (PostgresSaver connection pooling + Mem0 pgvector long-term profile), Kokoro-ONNX voice synthesis, and DINOv3 vision with Bidirectional A* motion planning."
   },
   "chapters": [
     {
       "number": "01",
       "title": "The Two-Tier Reflex Hierarchy",
-      "subtitle": "Sub-50ms Spinal Reflexes & 33Hz Hardware Safety",
-      "content": "Physical robotic assistants cannot afford the 1.5s+ latency of standard LLM reasoning loops for motor safety. MoKa implements a Layer 1 FastEmbed semantic router executing in 45ms (~30x faster), intercepting commands to trigger PyCozmo motor routines directly. At 33Hz, the ReflexSafetyGuard actively evaluates IMU pitch tilt (>20°), true forward deceleration, cliff sensors, and OpenCV optical flow visual stasis to autonomously trigger evasive backup maneuvers before table falls or motor stalls occur.",
-      "codeSnippet": "# Layer 1 Reflex Safety & Anti-Fall Interceptor\n@reflex_guard.intercept_motion(rate_hz=33)\ndef handle_motor_step(telemetry: CozmoTelemetry):\n    if telemetry.cliff_detected or telemetry.is_falling:\n        emergency_stop_motors()\n        spawn_evasive_thread(reverse_sec=1.2, turn_deg=180)\n        return SafetyStatus.TRIPPED\n    if telemetry.imu_pitch > 0.35 or detect_visual_stasis(telemetry.camera_frame):\n        emergency_stop_motors()\n        spawn_obstacle_backoff(reverse_sec=1.0)\n        return SafetyStatus.OBSTACLE_AVOIDANCE\n    return SafetyStatus.NOMINAL",
+      "subtitle": "Sub-6ms Semantic Reflexes & Hardware Safety Interceptor",
+      "content": "Physical robotic assistants cannot afford the 1,500ms+ latency of standard LLM reasoning loops for motor safety. MoKa implements a Layer 1 FastEmbed semantic router (BAAI/bge-small-en-v1.5) executing in 5.5ms (median P50), intercepting physical kinematics, emergency halts, and system utilities with 0 LLM tokens and 100% accuracy on physical commands. Completely decoupled from host AI lag, the ReflexSafetyGuard intercepts PyCozmo motor methods, monitoring 4 infrared cliff sensors, desk pick-up, upward pitch bumps (>20° / 0.35 rad), deceleration shocks (<-2200 mm/s²), and camera visual motion stasis to halt motors in <10ms and trigger autonomous evasive maneuvers before table falls or motor stalls occur.",
+      "codeSnippet": "# Layer 1 Sub-6ms Reflex Interceptor & PyCozmo Safety Guard\nclass ReflexSafetyGuard:\n    def __init__(self, cli: pycozmo.Client):\n        self.cli = cli\n        self.safety_tripped = threading.Event()\n        self.PITCH_BUMP_THRESHOLD = 0.35  # ~20° tilt upward\n        self.ACCEL_SHOCK_DELTA_THRESHOLD = -2200.0  # mm/s² deceleration\n        self.cli.add_handler(pycozmo.event.EvtCliffDetectedChange, self._on_cliff)\n        self.cli.add_handler(pycozmo.event.EvtRobotPickedUpChange, self._on_pickup)\n        self._patch_client_motor_methods()\n\n    def guarded_drive_wheels(self, lwheel_speed=0.0, rwheel_speed=0.0):\n        if self.safety_tripped.is_set() or self.is_evasive_active:\n            return  # Instant hardware lock-out (<10ms)\n        self._orig_drive_wheels(lwheel_speed, rwheel_speed)",
       "highlights": [
-        "~45ms direct reflex path (30x faster than LLM)",
-        "33Hz real-time multi-modal hardware safety guards",
-        "OpenCV visual stasis & optical tilt detection"
+        "5.5ms median reflex path (over 200x faster than LLM)",
+        "100% accuracy on physical robot movement commands",
+        "<10ms hardware cliff cut & event-driven motor interception",
+        "Sliding-window accelerometer shock & OpenCV visual stasis detection"
       ]
     },
     {
       "number": "02",
-      "title": "Dynamic Tool RAG & LangGraph",
-      "subtitle": "FAISS Vector Selection & Local Ollama Reasoning",
-      "content": "Instead of bloating LLM prompts with 19+ static tool schemas—which degrades classification accuracy to 89.5% on local 3B models—MoKa leverages an in-memory FAISS vector index with BAAI/bge-small-en-v1.5 embeddings to dynamically inject only the top 2 candidate tool schemas into the qwen2.5:3b supervisor. The graph routes via a unified tool executor node scaling to 100+ tools, interfacing Tavily MCP stdio client subprocesses, n8n Google Calendar integrations, and an isolated ornith:9b Python sandbox for deterministic code execution.",
-      "codeSnippet": "# Layer 2 LangGraph Dynamic Tool RAG Selection\ndef tool_retrieval_node(state: AgentState):\n    query_vector = embed_model.embed_query(state[\"user_query\"])\n    top_tools = faiss_index.similarity_search_by_vector(query_vector, k=2)\n    \n    # Inject only relevant schemas into local Ollama supervisor prompt\n    prompt = build_dynamic_prompt(candidate_tools=top_tools)\n    decision = router_llm.invoke(prompt) # qwen2.5:3b\n    return {\"next_route\": decision.route_key}",
+      "title": "Scalable Tool Routing & LangGraph",
+      "subtitle": "FAISS Top-k Pruning & Zero-Token LAYA Cross-Encoder",
+      "content": "In conventional LLM architectures, passing 15 to 100+ tool schemas into a monolithic prompt degrades classification accuracy, bloats prompt pre-fill latency to 2,000–8,000ms, and causes softmax attention dilution (dropping monolithic LAYA to 60.4%). MoKa solves this via a Two-Layer Top-K architecture: an in-memory FAISS vector index with BAAI/bge-small-en-v1.5 pre-filters the catalog to top-k (k=3) candidates, reducing input complexity to O(k) constant space. The pruned choices are evaluated by the 135M parameter LAYA cross-encoder (convaiinnovations/laya-typed-decisions), achieving 95.8% Top-1 accuracy with 0 generative output tokens—matching local Ollama qwen2.5:3b while slashing mean latency from 1,455.6ms to 205.3ms.",
+      "codeSnippet": "# Layer 2 Bounded O(k) Tool RAG & LAYA Typed Decision Cross-Encoder\ndef route_query(state: AgentState):\n    active_tools = state.get(\"active_tools\", []) # Pre-filtered to Top-3 by FAISS\n    if not active_tools or is_conversational_query(state[\"messages\"][-1].content):\n        return {\"next_route\": \"none\"}\n        \n    criteria = {t[\"name\"]: t[\"description\"] for t in active_tools}\n    criteria[\"none\"] = \"Core conversational channel for casual chat and personal facts.\"\n    \n    questions = {\"tool_selection\": {\n        \"type\": \"choice\",\n        \"instructions\": \"Select the appropriate tool or 'none' for conversational chat.\",\n        \"criteria\": criteria\n    }}\n    \n    laya_agent = get_laya_agent(\"convaiinnovations/laya-typed-decisions\")\n    decision = laya_agent.predict(state[\"messages\"][-1].content, questions)\n    return {\"next_route\": decision[\"answers\"][\"tool_selection\"][\"choice\"]}",
       "highlights": [
-        "93.0% routing accuracy (+3.5% over monolithic baseline)",
-        "83% prompt token reduction via dynamic FAISS RAG",
-        "Isolated ornith:9b deterministic Python sandbox"
+        "95.8% routing accuracy (matching 3B LLM, +8.3% over monolithic baseline)",
+        "0 generative output tokens via 135M LAYA cross-encoder",
+        "O(k) constant context complexity scaling across 20 to 100 tools",
+        "Mean latency slashed from 1,455.6ms to 205.3ms (P50: 5.5ms)"
       ]
     },
     {
       "number": "03",
-      "title": "Dual-Tier Memory & Voice Engine",
-      "subtitle": "PostgresSaver Checkpoints & Local Kokoro-ONNX TTS",
-      "content": "MoKa maintains stateful continuity without cloud lock-in through a dual memory substrate. Short-term dialogue is preserved with LangGraph PostgresSaver and rolling context summarization (pruning historical turns beyond 4 messages). Long-term biographical facts are stored in native PostgreSQL float arrays (REAL[]), evaluated with NumPy cosine similarity at a 0.82 deduplication threshold, and updated with O(1) dynamic entity resolution. Voice responses stream locally via Kokoro-ONNX for near-studio audio with zero disk I/O.",
-      "codeSnippet": "# Long-Term Semantic Fact Deduplication & Retrieval\ndef update_biographical_memory(new_fact: str, category: str):\n    if category in O1_ENTITY_CATEGORIES:\n        return postgres_db.upsert_entity(category, new_fact)\n    \n    fact_emb = fastembed.embed(new_fact)\n    similarities = [np.dot(fact_emb, row.emb) / (norm(fact_emb)*norm(row.emb)) \n                    for row in postgres_db.get_facts()]\n    \n    if max(similarities, default=0) >= 0.82:\n        return postgres_db.update_fact(idx=argmax(similarities), text=new_fact)\n    return postgres_db.insert_fact(fact=new_fact, embedding=fact_emb)",
+      "title": "Dual-Tier Memory & Multimodal Voice",
+      "subtitle": "Pooled PostgresSaver Checkpoints & Mem0 pgvector Reconciliation",
+      "content": "MoKa maintains contextual continuity without cloud lock-in through a dual memory substrate. Short-term dialogue threads are preserved via LangGraph PostgresSaver backed by an auto-reconnecting psycopg3 connection pool that effortlessly survives serverless scale-to-zero idle disconnects on Neon. When sessions exceed 6 turns, older messages are summarized and pruned via RemoveMessage, bounding context bloat. Long-term biographical facts are managed by Mem0 backed by PostgreSQL pgvector (collection moka_user_memories, 384-D FastEmbed vectors), featuring an Intelligent Memory Reconciliation engine that runs few-shot dialogue evaluation to execute in-place UPDATEs, explicit DELETEs (forgetting negated facts), and ADDs, synchronized two-way with user_profile.md. Multimodal voice pairs Silero VAD (250ms silence threshold) with faster-whisper and Kokoro-ONNX 24kHz neural synthesis, executing conversational barge-in with sub-50ms audio queue flushing.",
+      "codeSnippet": "# Dual-Layer Persistence: Resilient Checkpointer & Mem0 pgvector\npool = ConnectionPool(\n    conninfo=os.getenv(\"DATABASE_URL\"),\n    min_size=1, max_size=10,\n    check=ConnectionPool.check_connection, max_idle=300\n)\ncheckpointer = PostgresSaver(pool) # Neon serverless scale-to-zero resilient\n\n# Intelligent Few-Shot Biographical Memory Reconciliation\ndef _reconcile_dialogue(self, dialogue_text: str, user_id: str = \"cozmo_owner\"):\n    existing_records = self.get_all_memories_with_details(user_id=user_id)\n    # LLM reconciliation pass evaluates dialogue against existing traits\n    reconciliation = self.llm.invoke(format_reconcile_prompt(existing_records, dialogue_text))\n    for op in reconciliation[\"operations\"]:\n        if op[\"action\"] == \"UPDATE\": self.client.update(memory_id=op[\"id\"], data=op[\"new_fact\"])\n        elif op[\"action\"] == \"DELETE\": self.client.delete(memory_id=op[\"id\"])\n        elif op[\"action\"] == \"ADD\": self.client.add(messages=op[\"fact\"], user_id=user_id)",
       "highlights": [
-        "Native PostgreSQL REAL[] array storage without pgvector binaries",
-        "0.82 cosine similarity deduplication & O(1) entity resolution",
-        "Zero-disk I/O Kokoro-ONNX local voice synthesis"
+        "Resilient Neon PostgreSQL connection pool surviving serverless idle disconnections",
+        "Mem0 pgvector persistent profile with intelligent UPDATE/DELETE/ADD reconciliation",
+        "Rolling summarizer pruning active history beyond 6 messages via RemoveMessage",
+        "Silero VAD + faster-whisper + Kokoro-ONNX TTS with <50ms conversational barge-in"
+      ]
+    },
+    {
+      "number": "04",
+      "title": "Cyber-Physical Perception & Path Planning",
+      "subtitle": "Foundational DINOv3 Vision & Sub-35ms Bidirectional A*",
+      "content": "Embodied desktop robotics requires spatial awareness and robust navigation under real-world track slip and lighting variations. MoKa integrates a foundational DINOv3 Vision Transformer backbone extracting 384-dimensional dense patch embeddings at >=15 FPS. A TemporalDebouncer verifies visual landmarks across 3 consecutive frames (cosine similarity > 0.75) to anchor features in Landmark SLAM, compensating for odometry drift. Motion planning runs over a 10mm discretized 2D occupancy grid using a Bidirectional A* search algorithm: expanding frontiers simultaneously from Cozmo's start pose and the charger pre-dock approach point, reducing state-space complexity to O(b^(d/2)) and converging in <35ms with a strict 50mm obstacle buffer. The system seamlessly degrades to simulated autonomy (--dry-run and --source webcam) when physical hardware is detached.",
+      "codeSnippet": "# Sub-35ms Bidirectional A* Motion Planning with 50mm Safety Clearance\ndef plan_bidirectional_astar(start: Tuple[float, float], goal: Tuple[float, float],\n                             obstacles: List[BlockObstacle]) -> PathPlanningResult:\n    # Inflate blocks with 50mm safety buffer + robot track radius (35mm)\n    grid = OccupancyGrid(resolution_mm=10.0, clearance_mm=50.0 + 35.0)\n    grid.rasterize_obstacles(obstacles)\n    \n    # Simultaneous forward & backward search -> O(b^(d/2)) convergence (<35ms)\n    forward_frontier, backward_frontier = PriorityQueue(), PriorityQueue()\n    intersect_node = search_frontiers(forward_frontier, backward_frontier, grid)\n    \n    smooth_waypoints = decimate_string_pulling(reconstruct_path(intersect_node))\n    return PathPlanningResult(success=True, waypoints=smooth_waypoints)",
+      "highlights": [
+        "DINOv3 ViT dense 384-D patch embeddings at >=15 FPS with SVD PCA heatmaps",
+        "TemporalDebouncer (3-frame verification) & Landmark SLAM drift compensation",
+        "Sub-35ms Bidirectional A* path planning over 10mm grid with 50mm safety clearance",
+        "100% hardware-free execution via simulation dry-run & webcam fallback"
       ]
     }
   ]

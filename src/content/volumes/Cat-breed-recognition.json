@@ -8,6 +8,22 @@
   "binding": "Phthalo-green cloth · gold foil",
   "format": "156 × 228 mm · FH Campus Wien Edition",
   "theme": "Cat-breed-recognition · vision classification",
+  "paletteLabel": "Phthalo green · gold · emerald",
+  "color": "#123524",
+  "foil": "#efc16d",
+  "accent": "#f5c563",
+  "palette": {
+    "paper": "#123524",
+    "paperDeep": "#091c13",
+    "paperPale": "#e6f4ed",
+    "ink": "#f2faf6",
+    "inkSoft": "#a3cfbb",
+    "wall": "#123524",
+    "shelf": "#3a2016",
+    "shelfDark": "#1c0d08",
+    "light": "#82bca2",
+    "fill": "#0e2e20"
+  },
   "projectDetails": {
     "name": "Cat Breed Recognition",
     "category": "Computer Vision & Deep Learning",
