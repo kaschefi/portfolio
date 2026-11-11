@@ -78,11 +78,14 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       gl.attachShader(p, vs);
       gl.attachShader(p, fs);
       gl.linkProgram(p);
-      if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+      const linked = gl.getProgramParameter(p, gl.LINK_STATUS);
+      if (!linked) {
         console.error('Program link error:', gl.getProgramInfoLog(p));
-        return null;
+        gl.deleteProgram(p);
       }
-      return p;
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      return linked ? p : null;
     };
 
     // Full-screen Quad Buffer
@@ -548,6 +551,8 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       ? import.meta.env.BASE_URL
       : `${import.meta.env.BASE_URL}/`;
 
+    const pendingImages: HTMLImageElement[] = [];
+
     const loadTexture = (url: string, onLoad?: (img: HTMLImageElement) => void) => {
       const tex = gl.createTexture();
       gl.activeTexture(gl.TEXTURE0);
@@ -573,25 +578,23 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.src = url;
+      pendingImages.push(img);
+
+      const uploadTexture = () => {
+        if (!isRunning || gl.isContextLost()) return;
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        motionFrames = Math.max(motionFrames, 120);
+        if (onLoad) onLoad(img);
+      };
 
       img.decode()
-        .then(() => {
-          gl.activeTexture(gl.TEXTURE0);
-          gl.bindTexture(gl.TEXTURE_2D, tex);
-          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-          motionFrames = Math.max(motionFrames, 120);
-          if (onLoad) onLoad(img);
-        })
+        .then(uploadTexture)
         .catch(() => {
-          img.onload = () => {
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, tex);
-            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-            motionFrames = Math.max(motionFrames, 120);
-            if (onLoad) onLoad(img);
-          };
+          if (!isRunning) return;
+          img.onload = uploadTexture;
         });
 
       return tex;
@@ -746,6 +749,7 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
 
     let currentProgress = 0;
     let progressTimer: number | null = null;
+    let introTimer: number | null = null;
     let texturesReady = false;
 
     const updateProgress = () => {
@@ -768,7 +772,8 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
         } else {
           setProgress(100);
           setIsLoaded(true);
-          window.setTimeout(() => {
+          introTimer = window.setTimeout(() => {
+            introTimer = null;
             if (!isRunning) return;
             introStartTime = performance.now();
             wake(360);
@@ -1122,14 +1127,57 @@ export const HeroFluidReveal: React.FC<HeroFluidRevealProps> = ({ onExploreBooks
       if (idleTimer !== null) clearTimeout(idleTimer);
       if (captionTimer !== null) clearTimeout(captionTimer);
       if (progressTimer !== null) clearTimeout(progressTimer);
+      if (introTimer !== null) clearTimeout(introTimer);
       for (const tid of hintTimeouts) {
         clearTimeout(tid);
+      }
+      for (const img of pendingImages) {
+        img.onload = null;
       }
       window.removeEventListener('mousemove', onPointerMove);
       window.removeEventListener('touchmove', onPointerMove);
       window.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('touchstart', onPointerDown);
       window.removeEventListener('resize', onResize);
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      gl.useProgram(null);
+
+      const disposeFBO = (target: { fbo: WebGLFramebuffer | null; tex: WebGLTexture | null }) => {
+        if (target.fbo) gl.deleteFramebuffer(target.fbo);
+        if (target.tex) gl.deleteTexture(target.tex);
+      };
+      const disposeDoubleFBO = (dbl: {
+        read: { fbo: WebGLFramebuffer | null; tex: WebGLTexture | null };
+        write: { fbo: WebGLFramebuffer | null; tex: WebGLTexture | null };
+      }) => {
+        disposeFBO(dbl.read);
+        disposeFBO(dbl.write);
+      };
+
+      disposeDoubleFBO(velocity);
+      disposeDoubleFBO(density);
+      disposeDoubleFBO(pressure);
+      disposeFBO(divergence);
+      disposeFBO(curl);
+      if (layer1Texture) gl.deleteTexture(layer1Texture);
+      if (layer2Texture) gl.deleteTexture(layer2Texture);
+      if (quadBuffer) gl.deleteBuffer(quadBuffer);
+
+      for (const prog of [
+        progSplat,
+        progCurl,
+        progVorticity,
+        progDivergence,
+        progPressure,
+        progGradSub,
+        progAdvect,
+        progClear,
+        progComposite
+      ]) {
+        gl.deleteProgram(prog);
+      }
     };
   }, []);
 

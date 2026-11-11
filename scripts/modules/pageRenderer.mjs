@@ -1,5 +1,7 @@
 // scripts/modules/pageRenderer.mjs
-// Lightweight interior page generator driven dynamically by src/content/volumes/*.json (512x768).
+// Lazy interior page geometry & texture generator driven by src/content/volumes/*.json.
+// Defers all 12 flexible PlaneGeometry meshes, Float32Arrays, and 512x768 page textures
+// until the user inspects or opens a book (hydrateBookPages).
 
 import fs from 'fs';
 import path from 'path';
@@ -14,7 +16,6 @@ export function applyPagePatches(code) {
     return code;
   }
 
-  // Load all volume content directly from JSON files to make them the single source of truth
   const volumesDir = path.resolve('src/content/volumes');
   const volumeDataMap = {};
   if (fs.existsSync(volumesDir)) {
@@ -48,7 +49,7 @@ export function applyPagePatches(code) {
     if (_endpaperCache.has(e.id)) return _endpaperCache.get(e.id);
     const o = document.createElement("canvas");
     o.width = 512, o.height = 768;
-    const t = o.getContext("2d"), r = ye(pe(\`\${e.id}-endpaper\`) + e.seed);
+    const t = o.getContext("2d", { alpha: false }), r = ye(pe(\`\${e.id}-endpaper\`) + e.seed);
     to(t, o.width, o.height, r);
     t.save();
     t.fillStyle = e.color;
@@ -68,7 +69,7 @@ export function applyPagePatches(code) {
     t.globalAlpha = 0.42;
     $t(t, { ...e, foil: e.palette.inkSoft }, o.width, o.height);
     t.restore();
-    const a = Q(new l.CanvasTexture(o), { anisotropy: 4 });
+    const a = Q(new l.CanvasTexture(o), { anisotropy: 2 });
     a.name = \`\${e.id}-patterned-endpaper\`;
     _endpaperCache.set(e.id, a);
     return a;
@@ -81,6 +82,23 @@ export function applyPagePatches(code) {
   const _volumeDataMap = ${JSON.stringify(volumeDataMap)};
   const _bookPagesCache = new Map();
 
+  function drawPlateImageOrWait(ctx, img, x, y, imgW, texture) {
+    if (!img) return;
+    const drawNow = () => {
+      if (img.naturalWidth > 0) {
+        const imgH = Math.round((imgW / img.naturalWidth) * img.naturalHeight);
+        ctx.drawImage(img, x, y, imgW, imgH);
+        if (texture) texture.needsUpdate = true;
+        if (typeof __wake === "function") __wake(12);
+      }
+    };
+    if (img.naturalWidth > 0) {
+      drawNow();
+    } else if (typeof ensureLazyImage === "function") {
+      ensureLazyImage(img, drawNow);
+    }
+  }
+
   function renderBookPagesOnDemand(e) {
     if (_bookPagesCache.has(e.id)) return _bookPagesCache.get(e.id);
     const vol = _volumeDataMap[e.id] || e;
@@ -91,8 +109,10 @@ export function applyPagePatches(code) {
       const c = document.createElement("canvas");
       c.width = i;
       c.height = d;
-      const s = c.getContext("2d", { willReadFrequently: false });
-      
+      const s = c.getContext("2d", { alpha: false, willReadFrequently: false });
+      const texture = Q(new l.CanvasTexture(c), { anisotropy: 2 });
+      texture.name = \`\${e.id}-interior-page-\${n + 1}\`;
+
       const h = ye(pe(\`\${e.id}-leaf-\${n}\`) + e.seed);
       to(s, i, d, h);
 
@@ -116,10 +136,8 @@ export function applyPagePatches(code) {
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("PLATE 01  /  LANGSMITH ROUTER BENCHMARK", 54, 146);
-        if (typeof customBenchmarkImg !== "undefined" && customBenchmarkImg && customBenchmarkImg.naturalWidth > 0) {
-          const imgW = 404;
-          const imgH = Math.round((imgW / customBenchmarkImg.naturalWidth) * customBenchmarkImg.naturalHeight);
-          s.drawImage(customBenchmarkImg, 54, 190, imgW, imgH);
+        if (typeof customBenchmarkImg !== "undefined") {
+          drawPlateImageOrWait(s, customBenchmarkImg, 54, 190, 404, texture);
         }
         s.globalAlpha = 0.52;
         s.font = '400 15px "Iowan Old Style", Georgia, serif';
@@ -128,10 +146,8 @@ export function applyPagePatches(code) {
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("PLATE 02  /  PHYSICAL ROBOTIC CHASSIS", 54, 146);
-        if (typeof customCozmoSketchImg !== "undefined" && customCozmoSketchImg && customCozmoSketchImg.naturalWidth > 0) {
-          const imgW = 404;
-          const imgH = Math.round((imgW / customCozmoSketchImg.naturalWidth) * customCozmoSketchImg.naturalHeight);
-          s.drawImage(customCozmoSketchImg, 54, 176, imgW, imgH);
+        if (typeof customCozmoSketchImg !== "undefined") {
+          drawPlateImageOrWait(s, customCozmoSketchImg, 54, 176, 404, texture);
         }
         s.globalAlpha = 0.52;
         s.font = '400 15px "Iowan Old Style", Georgia, serif';
@@ -170,11 +186,9 @@ export function applyPagePatches(code) {
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("PLATE 01  /  CONVNEXT-TINY ARCHITECTURE & GRAD-CAM", 54, 146);
-        if (typeof customClaudeDiagramImg !== "undefined" && customClaudeDiagramImg && customClaudeDiagramImg.naturalWidth > 0) {
-          const imgW = 404;
-          const imgH = Math.round((imgW / customClaudeDiagramImg.naturalWidth) * customClaudeDiagramImg.naturalHeight);
-          s.drawImage(customClaudeDiagramImg, 54, 180, imgW, imgH);
-        }
+        const imgX = 54, imgY = 180, imgW = 404, imgH = 250;
+        s.fillStyle = "rgba(18, 53, 36, 0.88)";
+        s.fillRect(imgX, imgY, imgW, imgH);
         s.globalAlpha = 0.52;
         s.font = '400 15px "Iowan Old Style", Georgia, serif';
         de(s, "Fine-grained feline vision pipeline: ImageNet transfer learning on Oxford-IIIT Pet dataset, aggressive regularization pass, and Grad-CAM spatial attribution.", 54, 460, 38, 22, 5);
@@ -197,7 +211,6 @@ export function applyPagePatches(code) {
       const ch3 = vol.chapters?.[3];
 
       if (n === 0) {
-        // Title Page (Spread 1)
         s.font = '500 12px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2.3px";
         s.fillText((vol.discipline || e.discipline).toUpperCase(), 54, 174);
@@ -209,7 +222,6 @@ export function applyPagePatches(code) {
         s.font = '400 18px "Iowan Old Style", Georgia, serif';
         de(s, vol.note || vol.deck || e.note || e.deck, 54, 430, 36, 26, 5);
       } else if (n === 2) {
-        // Chapter 01
         const title = ch0?.title || "Chapter 01";
         const sub = ch0?.subtitle || "";
         const body = ch0?.content || vol.note || "";
@@ -227,7 +239,6 @@ export function applyPagePatches(code) {
         s.font = '400 17px "Iowan Old Style", Georgia, serif';
         de(s, body, 54, 440, 38, 24, 6);
       } else if (n === 4) {
-        // Chapter 02
         const title = ch1?.title || "Chapter 02";
         const sub = ch1?.subtitle || "";
         const body = ch1?.content || vol.deck || "";
@@ -245,7 +256,6 @@ export function applyPagePatches(code) {
         s.font = '400 17px "Iowan Old Style", Georgia, serif';
         de(s, body, 54, 440, 38, 24, 6);
       } else if (n === 6) {
-        // Chapter 03
         const title = ch2?.title || "Chapter 03";
         const sub = ch2?.subtitle || "";
         const body = ch2?.content || vol.note || "";
@@ -263,7 +273,6 @@ export function applyPagePatches(code) {
         s.font = '400 17px "Iowan Old Style", Georgia, serif';
         de(s, body, 54, 440, 38, 24, 6);
       } else if (n === 8) {
-        // Chapter 04
         const title = ch3?.title || "Chapter 04";
         const sub = ch3?.subtitle || "";
         const body = ch3?.content || vol.deck || "";
@@ -281,7 +290,6 @@ export function applyPagePatches(code) {
         s.font = '400 17px "Iowan Old Style", Georgia, serif';
         de(s, body, 54, 440, 38, 24, 6);
       } else if (n === 10) {
-        // Colophon & Spec Page
         s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
         s.letterSpacing = "2px";
         s.fillText("COLOPHON & SPECIFICATIONS", 54, 164);
@@ -300,9 +308,7 @@ export function applyPagePatches(code) {
       s.globalAlpha = 0.25;
       s.fillRect(48, d - 48, i - 96, 1);
       s.globalAlpha = 1;
-
-      const texture = Q(new l.CanvasTexture(c), { anisotropy: 2 });
-      texture.name = \`\${e.id}-interior-page-\${n + 1}\`;
+      texture.needsUpdate = true;
       return texture;
     });
     _bookPagesCache.set(e.id, pages);
@@ -311,40 +317,103 @@ export function applyPagePatches(code) {
 
   function hydrateBookPages(bookObj) {
     if (!bookObj || bookObj.pagesHydrated) return;
-    const realTextures = renderBookPagesOnDemand(bookObj.data);
-    if (bookObj.pageMaterials && Array.isArray(bookObj.pageMaterials)) {
+    const e = bookObj.data;
+    const realTextures = renderBookPagesOnDemand(e);
+    const paperFace = bookObj.paperFaceTexture || Tn(e);
+
+    // Lazily create the 12 pageSheet materials on first inspection/open
+    if (!bookObj.pageMaterials || bookObj.pageMaterials.length === 0) {
+      bookObj.pageMaterials = realTextures.map((tex) => {
+        const mat = ut(P.pageSheet);
+        mat.map = tex;
+        mat.bumpMap = paperFace;
+        mat.bumpScale = 12e-4;
+        mat.roughness = 0.96;
+        mat.side = l.FrontSide;
+        mat.needsUpdate = !0;
+        bookObj.fadeMaterials.push(mat);
+        bookObj.materials.push(mat);
+        return mat;
+      });
+    } else {
       for (let pIdx = 0; pIdx < 12; pIdx++) {
         if (realTextures[pIdx] && bookObj.pageMaterials[pIdx]) {
           bookObj.pageMaterials[pIdx].map = realTextures[pIdx];
-          bookObj.pageMaterials[pIdx].needsUpdate = true;
+          bookObj.pageMaterials[pIdx].needsUpdate = !0;
         }
       }
     }
-    if (bookObj.interiorPageTextures) {
-      bookObj.interiorPageTextures = realTextures;
+
+    // Lazily build the 6 flexible page pivot meshes (12 PlaneGeometries) if deferred at boot
+    if (bookObj.pagePivots && bookObj.pagePivots.length === 0 && bookObj.pageDims) {
+      const { a, c, i, f, g, v, C } = bookObj.pageDims;
+      const kt = g - f * 0.42;
+      for (let Z = 0; Z < 6; Z += 1) {
+        const q = 5 - Z;
+        const ot = bookObj.pageMaterials[q * 2];
+        const ra = bookObj.pageMaterials[q * 2 + 1];
+        const ae = new l.Group();
+        ae.name = \`\${e.id}-page-\${Z}\`;
+        ae.position.set(-a * 0.5 + f * 0.65, 0, C * 0.5 + 15e-4 + Z * 15e-4);
+        ae.userData.restZ = ae.position.z;
+        ae.userData.turnedZ = c * 0.5 + i + 4e-3 + q * 15e-4;
+
+        const Dt = new l.PlaneGeometry(1, 1, Qt, Qo);
+        const Kt = new l.PlaneGeometry(1, 1, Qt, Qo);
+        const Mt = T(Dt, ot, \`\${e.id}-page-sheet-\${Z}-front\`, !1, !0);
+        Mt.scale.set(kt, v - 0.014, 1);
+        Mt.position.set(kt * 0.5, 0, 22e-5);
+        ae.add(Mt);
+
+        const rt = T(Kt, ra, \`\${e.id}-page-sheet-\${Z}-back\`, !1, !0);
+        rt.scale.set(kt, v - 0.014, 1);
+        rt.position.set(kt * 0.5, 0, -22e-5);
+        rt.rotation.y = Math.PI;
+        ae.add(rt);
+
+        ae.userData.flex = {
+          curve: 0,
+          curveVelocity: 0,
+          twist: 0,
+          twistVelocity: 0,
+          surfaces: [
+            { geometry: Dt, position: Dt.attributes.position, base: Float32Array.from(Dt.attributes.position.array), direction: 1 },
+            { geometry: Kt, position: Kt.attributes.position, base: Float32Array.from(Kt.attributes.position.array), direction: -1 }
+          ]
+        };
+        bookObj.motion.add(ae);
+        bookObj.pagePivots.push(ae);
+        bookObj.pageSurfaces.push(Mt, rt);
+        bookObj.pageGestureSurfaces.push(Mt, rt);
+      }
     }
+
+    bookObj.interiorPageTextures = realTextures;
+
     if (typeof renderEndpaperOnDemand === "function" && bookObj.endpaperMaterial) {
-      bookObj.endpaperMaterial.map = renderEndpaperOnDemand(bookObj.data);
-      bookObj.endpaperMaterial.needsUpdate = true;
+      bookObj.endpaperMaterial.map = renderEndpaperOnDemand(e);
+      bookObj.endpaperMaterial.needsUpdate = !0;
     }
     if (typeof renderBackCloth === "function" && bookObj.backCoverMaterial) {
-      bookObj.backCoverMaterial.map = renderBackCloth(bookObj.data);
-      bookObj.backCoverMaterial.needsUpdate = true;
+      bookObj.backCoverMaterial.map = renderBackCloth(e);
+      bookObj.backCoverMaterial.needsUpdate = !0;
     }
     if (typeof renderBackFoil === "function" && bookObj.backFoilMaterial) {
-      const bf = renderBackFoil(bookObj.data);
+      const bf = renderBackFoil(e);
       bookObj.backFoilMaterial.map = bf;
       bookObj.backFoilMaterial.alphaMap = bf;
       bookObj.backFoilMaterial.bumpMap = bf;
-      bookObj.backFoilMaterial.needsUpdate = true;
+      bookObj.backFoilMaterial.needsUpdate = !0;
     }
-    bookObj.pagesHydrated = true;
+    if (bookObj.backFoilMesh) {
+      bookObj.backFoilMesh.visible = !0;
+    }
+    bookObj.pagesHydrated = !0;
     if (typeof __wake === "function") __wake(60);
   }
 
   function Pn(e) {
-    const placeholder = _t || Tn(e, false);
-    return Array.from({ length: 12 }, () => placeholder);
+    return [];
   };\n`;
 
   return code.slice(0, startIdx) + newPnFunction + code.slice(erStartIdx);

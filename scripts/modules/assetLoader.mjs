@@ -1,5 +1,5 @@
 // scripts/modules/assetLoader.mjs
-// Provides static asset paths for Three.js textures instead of multi-megabyte Base64 strings.
+// Provides static asset paths for Three.js textures instead of inline Base64 strings.
 
 export function getAssetDataUris() {
   return {
@@ -8,51 +8,64 @@ export function getAssetDataUris() {
     cozmoSketchDataUri: '/cozmo_hardware_sketch.webp',
     joinAppDataUri: '/joinapp.webp',
     figmaDataUri: '/sawyerRobot.webp',
-    figmaDiagramDataUri: '/token_architecture.webp',
     claudeCodeDataUri: '/claude_code.webp',
+    cursorCoverDataUri: '/cursor_cover.webp',
+    roboflowCoverDataUri: '/roboflow_cover.webp',
   };
 }
 
 export function injectAssetDeclarations(code, assets) {
   let cleanedCode = code
-    .replace(/const customMokaIcon =[\s\S]*?;\s*}/g, '')
-    .replace(/const customBenchmarkImg =[\s\S]*?;\s*}/g, '')
-    .replace(/const customCozmoSketchImg =[\s\S]*?;\s*}/g, '')
-    .replace(/const customJoinAppImg =[\s\S]*?;\s*}/g, '')
-    .replace(/const customFigmaImg =[\s\S]*?;\s*}/g, '')
-    .replace(/const customFigmaDiagramImg =[\s\S]*?;\s*}/g, '')
-    .replace(/const customClaudeCodeImg =[\s\S]*?;\s*}/g, '')
-    .replace(/const customClaudeDiagramImg =[\s\S]*?;\s*}/g, '');
+    .replace(/\/\* __ASSET_INJECT_START__ \*\/[\s\S]*?\/\* __ASSET_INJECT_END__ \*\//g, '')
+    .replace(/const customMokaIcon =[\s\S]*?;\s*\}/g, '')
+    .replace(/const customBenchmarkImg =[\s\S]*?;\s*\}/g, '')
+    .replace(/const customCozmoSketchImg =[\s\S]*?;\s*\}/g, '')
+    .replace(/const customJoinAppImg =[\s\S]*?;\s*\}/g, '')
+    .replace(/const customFigmaImg =[\s\S]*?;\s*\}/g, '')
+    .replace(/const customFigmaDiagramImg =[\s\S]*?;\s*\}/g, '')
+    .replace(/const customClaudeCodeImg =[\s\S]*?;\s*\}/g, '')
+    .replace(/const customClaudeDiagramImg =[\s\S]*?;\s*\}/g, '');
 
-  let declarations = '';
+  const lines = [
+    '/* __ASSET_INJECT_START__ */',
+    'const createAsyncImg = (src) => { if (typeof Image === "undefined") return null; const img = new Image(); img.decoding = "async"; if (src) img.src = src; return img; };',
+    'const createLazyImg = (src) => { if (typeof Image === "undefined") return null; const img = new Image(); img.decoding = "async"; img.datasetSrc = src; return img; };',
+  ];
+
+  // Cover images are loaded immediately with decoding="async"
   if (assets.mokaDataUri) {
-    declarations += `const customMokaIcon = typeof Image !== "undefined" ? new Image() : null;\n  if (customMokaIcon) { customMokaIcon.src = "${assets.mokaDataUri}"; }\n`;
-  }
-  if (assets.benchDataUri) {
-    declarations += `const customBenchmarkImg = typeof Image !== "undefined" ? new Image() : null;\n  if (customBenchmarkImg) { customBenchmarkImg.src = "${assets.benchDataUri}"; }\n`;
-  }
-  if (assets.cozmoSketchDataUri) {
-    declarations += `const customCozmoSketchImg = typeof Image !== "undefined" ? new Image() : null;\n  if (customCozmoSketchImg) { customCozmoSketchImg.src = "${assets.cozmoSketchDataUri}"; }\n`;
+    lines.push(`const customMokaIcon = createAsyncImg("${assets.mokaDataUri}");`);
   }
   if (assets.joinAppDataUri) {
-    declarations += `const customJoinAppImg = typeof Image !== "undefined" ? new Image() : null;\n  if (customJoinAppImg) { customJoinAppImg.src = "${assets.joinAppDataUri}"; }\n`;
+    lines.push(`const customJoinAppImg = createAsyncImg("${assets.joinAppDataUri}");`);
   }
   if (assets.figmaDataUri) {
-    declarations += `const customFigmaImg = typeof Image !== "undefined" ? new Image() : null;\n  if (customFigmaImg) { customFigmaImg.src = "${assets.figmaDataUri}"; }\n`;
-  }
-  if (assets.figmaDiagramDataUri) {
-    declarations += `const customFigmaDiagramImg = typeof Image !== "undefined" ? new Image() : null;\n  if (customFigmaDiagramImg) { customFigmaDiagramImg.src = "${assets.figmaDiagramDataUri}"; }\n`;
+    lines.push(`const customFigmaImg = createAsyncImg("${assets.figmaDataUri}");`);
   }
   if (assets.claudeCodeDataUri) {
-    declarations += `const customClaudeCodeImg = typeof Image !== "undefined" ? new Image() : null;\n  if (customClaudeCodeImg) { customClaudeCodeImg.src = "${assets.claudeCodeDataUri}"; }\n`;
+    lines.push(`const customClaudeCodeImg = createAsyncImg("${assets.claudeCodeDataUri}");`);
   }
-  if (assets.claudeCodeDiagramDataUri) {
-    declarations += `const customClaudeDiagramImg = typeof Image !== "undefined" ? new Image() : null;\n  if (customClaudeDiagramImg) { customClaudeDiagramImg.src = "${assets.claudeCodeDiagramDataUri}"; }\n`;
+  if (assets.cursorCoverDataUri) {
+    lines.push(`const customCursorCoverImg = createAsyncImg("${assets.cursorCoverDataUri}");`);
+  }
+  if (assets.roboflowCoverDataUri) {
+    lines.push(`const customRoboflowCoverImg = createAsyncImg("${assets.roboflowCoverDataUri}");`);
   }
 
-  if (declarations) {
-    cleanedCode = cleanedCode.replace('let qt = !1;', `let qt = !1;\n  ${declarations.trim()}`);
+  // Interior page plate images stay lazy until hydrateBookPages() runs
+  if (assets.benchDataUri) {
+    lines.push(`const customBenchmarkImg = createLazyImg("${assets.benchDataUri}");`);
+  }
+  if (assets.cozmoSketchDataUri) {
+    lines.push(`const customCozmoSketchImg = createLazyImg("${assets.cozmoSketchDataUri}");`);
   }
 
+  lines.push(
+    'const ensureLazyImage = (img, onReady) => { if (!img) return; if (img.naturalWidth > 0) return; if (!img.src && img.datasetSrc) { img.src = img.datasetSrc; } if (onReady) { const fire = () => { if (img.naturalWidth > 0) onReady(); }; img.decode ? img.decode().then(fire).catch(() => { img.onload = fire; }) : (img.onload = fire); } };',
+    'const coverImagesReadyPromise = typeof Promise !== "undefined" ? Promise.allSettled([customMokaIcon, customJoinAppImg, customFigmaImg, customClaudeCodeImg, customCursorCoverImg, customRoboflowCoverImg].filter(Boolean).map((img) => img.decode ? img.decode().catch(() => {}) : new Promise((res) => { if (img.complete) res(); else { img.onload = res; img.onerror = res; } }))) : Promise.resolve();',
+    '/* __ASSET_INJECT_END__ */'
+  );
+
+  cleanedCode = cleanedCode.replace('let qt = !1;', `let qt = !1;\n  ${lines.join('\n  ')}`);
   return cleanedCode;
 }

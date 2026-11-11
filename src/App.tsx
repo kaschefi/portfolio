@@ -7,6 +7,7 @@ import { BookshelfSkeleton } from './components/BookshelfSkeleton';
 import { ContactFooterSkeleton } from './components/ContactFooterSkeleton';
 import { useIsMobile } from './utils/useIsMobile';
 import type { VolumeProject } from './data/portfolioData';
+import { preloadBookshelfScene } from './utils/bookshelfPreload';
 
 // Code-split components
 const LazyAboutSection = lazy(() =>
@@ -53,6 +54,57 @@ export function App() {
     }
     window.scrollTo(0, 0);
   }, []);
+
+  // Idle prefetch on desktop so JS chunks and WebP covers are cached before scrolling
+  useEffect(() => {
+    if (isMobile || activeViewMode !== '3d' || shouldLoadBookshelf) return;
+
+    let cancelled = false;
+    const runPrefetch = () => {
+      if (cancelled) return;
+      void import('./components/BookshelfSection');
+      void preloadBookshelfScene();
+
+      const urls = [
+        '/walnut_wood.webp',
+        '/moka_icon.webp',
+        '/sawyerRobot.webp',
+        '/cursor_cover.webp',
+        '/roboflow_cover.webp',
+        '/claude_code.webp',
+        '/joinapp.webp'
+      ];
+      for (const url of urls) {
+        const img = new Image();
+        img.decoding = 'async';
+        img.src = url;
+      }
+    };
+
+    const win = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+
+    let idleId: number | null = null;
+    let fallbackTimer: number | null = null;
+
+    if (typeof win.requestIdleCallback === 'function') {
+      idleId = win.requestIdleCallback(runPrefetch, { timeout: 2500 });
+    } else {
+      fallbackTimer = window.setTimeout(runPrefetch, 2200);
+    }
+
+    return () => {
+      cancelled = true;
+      if (idleId !== null && typeof win.cancelIdleCallback === 'function') {
+        win.cancelIdleCallback(idleId);
+      }
+      if (fallbackTimer !== null) {
+        window.clearTimeout(fallbackTimer);
+      }
+    };
+  }, [isMobile, activeViewMode, shouldLoadBookshelf]);
 
   // Proximity observer: Only download and mount Three.js when user scrolls towards it
   useEffect(() => {

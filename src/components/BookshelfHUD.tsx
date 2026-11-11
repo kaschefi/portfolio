@@ -69,9 +69,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
     else sound.playClick();
 
     // Trigger internal ThreeUI bookshelf action buttons in DOM
-    const elem = (document.querySelector(`.bookshelf__source-controls #${id}`) ||
-      document.querySelector(`.bookshelf #${id}`) ||
-      document.querySelector(`#${id}`)) as HTMLButtonElement | null;
+    const elem = document.querySelector(`.bookshelf__source-controls #${id}`) as HTMLButtonElement | null;
     if (elem) {
       elem.click();
     }
@@ -196,16 +194,16 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
       </header>
 
       {/* 2. Bottom Shelf Browse Navigation */}
-      <section className="browse-ui" id="browse-ui" aria-label="Shelf navigation">
+      <section className="browse-ui" id="hud-browse-ui" aria-label="Shelf navigation">
         <div className="selection">
-          <span className="counter" id="counter">
+          <span className="counter" id="hud-counter">
             {pad(currentIdx + 1)} / {pad(VOLUMES_DATA.length)}
           </span>
           <div className="selection__copy">
-            <h1 className="selection__title" id="selection-title">
+            <h1 className="selection__title" id="hud-selection-title">
               {volume.title}
             </h1>
-            <p className="selection__note" id="selection-note">
+            <p className="selection__note" id="hud-selection-note">
               {volume.note}
             </p>
           </div>
@@ -214,7 +212,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
         <div className="browse-actions">
           <button
             className="round-button"
-            id="previous"
+            id="hud-previous"
             onClick={handlePrevVolume}
             type="button"
             aria-label="Previous volume"
@@ -225,7 +223,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
           </button>
           <button
             className="text-button"
-            id="inspect"
+            id="hud-inspect"
             onClick={handleInspectToggle}
             type="button"
           >
@@ -233,7 +231,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
           </button>
           <button
             className="round-button"
-            id="next"
+            id="hud-next"
             onClick={handleNextVolume}
             type="button"
             aria-label="Next volume"
@@ -245,7 +243,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
         </div>
 
         <nav className="index-nav" aria-label="Volume index">
-          <div className="markers" id="markers" role="tablist" aria-label="Choose a volume">
+          <div className="markers" id="hud-markers" role="tablist" aria-label="Choose a volume">
             {VOLUMES_DATA.map((v, idx) => (
               <button
                 key={v.id}
@@ -266,10 +264,10 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
       {/* 3. Detail Mode Panel (Right Side Inspection) */}
       <aside
         className={`detail-panel ${isExpanded ? 'is-expanded-panel' : ''}`}
-        id="detail-panel"
+        id="hud-detail-panel"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="detail-title"
+        aria-labelledby="hud-detail-title"
         aria-hidden={!sceneState.isInspecting}
       >
         <div className="detail-panel-actions">
@@ -302,13 +300,13 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
           </button>
         </div>
 
-        <p className="eyebrow" id="detail-eyebrow">
+        <p className="eyebrow" id="hud-detail-eyebrow">
           Volume {volume.roman} · {(sceneState.isOpen || isExpanded) && richContent?.discipline ? richContent.discipline : volume.discipline}
         </p>
-        <h2 className="detail-title" id="detail-title">
+        <h2 className="detail-title" id="hud-detail-title">
           {(sceneState.isOpen || isExpanded) && richContent ? richContent.title : volume.title}
         </h2>
-        <p className="detail-deck" id="detail-deck">
+        <p className="detail-deck" id="hud-detail-deck">
           {(sceneState.isOpen || isExpanded) && richContent ? richContent.subtitle : volume.deck}
         </p>
 
@@ -402,7 +400,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
         <div className="page-navigation" role="group" aria-label="Browse sample pages">
           <button
             className="page-button"
-            id="previous-page"
+            id="hud-previous-page"
             onClick={isExpanded ? handlePrevExpandedPage : handlePrevPage}
             disabled={isExpanded ? expandedPage <= 1 : (!sceneState.isOpen || sceneState.page <= 1)}
             type="button"
@@ -413,16 +411,16 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
             </svg>
           </button>
           <p className="page-status" aria-live="off">
-            <strong id="page-label">
+            <strong id="hud-page-label">
               {(sceneState.isOpen || isExpanded) ? getPageTitle(activePageNumber) : 'Closed'}
             </strong>
-            <span id="page-counter">
+            <span id="hud-page-counter">
               {(sceneState.isOpen || isExpanded) ? `Spread 0${activePageNumber} / 05` : 'Click book to open'}
             </span>
           </p>
           <button
             className="page-button"
-            id="next-page"
+            id="hud-next-page"
             onClick={isExpanded ? handleNextExpandedPage : handleNextPage}
             disabled={isExpanded ? expandedPage >= 5 : (!sceneState.isOpen || sceneState.page >= 5)}
             type="button"
@@ -440,7 +438,7 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
           <div className="detail-buttons">
             <button
               className="text-button reset-button"
-              id="toggle-book"
+              id="hud-toggle-book"
               onClick={handleBookToggle}
               type="button"
               aria-pressed={sceneState.isOpen}
@@ -449,18 +447,12 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
             </button>
             <button
               className="text-button reset-button"
-              id="reset-view"
+              id="hud-reset-view"
               onClick={handleResetCamera}
               type="button"
             >
               Reset view
             </button>
-            <button
-              id="view-spine"
-              style={{ display: 'none' }}
-              type="button"
-              aria-hidden="true"
-            />
           </div>
         </div>
       </aside>

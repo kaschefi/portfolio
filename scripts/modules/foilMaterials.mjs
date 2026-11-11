@@ -1,14 +1,15 @@
 // scripts/modules/foilMaterials.mjs
-// Spine foil, back cover foil, and Three.js MeshPhysicalMaterial shader properties.
+// Spine foil, back cover foil, cached cloth/edge/paper textures, and Three.js material properties.
+// Idempotent across both fresh and already-patched bookshelfRenderer.js.
 
 export function applyFoilAndMaterialPatches(rawCode) {
   let code = rawCode;
-  if (code.includes('let _clothBumpCache = null;')) {
-    return code;
-  }
 
   // 0a. Patch cloth bump An(e) and cloth normal/roughness Ln(e) to cache shared textures
-  const anStartIdx = code.indexOf('function An(e) {');
+  let anStartIdx = code.indexOf('let _clothBumpCache = null;');
+  if (anStartIdx === -1) {
+    anStartIdx = code.indexOf('function An(e) {');
+  }
   const eoStartIdx = code.indexOf('function eo(e, o) {');
   if (anStartIdx !== -1 && eoStartIdx !== -1) {
     const newAnAndLnFunction = `let _clothBumpCache = null;
@@ -36,7 +37,7 @@ export function applyFoilAndMaterialPatches(rawCode) {
     t.stroke();
     const a = new l.CanvasTexture(o);
     a.wrapS = l.RepeatWrapping, a.wrapT = l.RepeatWrapping, a.repeat.set(5, 8);
-    return _clothBumpCache = Q(a, { color: !1, anisotropy: 4 });
+    return _clothBumpCache = Q(a, { color: !1, anisotropy: 2 });
   }
 
   let _clothMapsCache = null;
@@ -67,7 +68,7 @@ export function applyFoilAndMaterialPatches(rawCode) {
     const x = (f, g) => {
       const v = new l.CanvasTexture(f);
       v.name = \`shared-\${g}\`, v.wrapS = l.RepeatWrapping, v.wrapT = l.RepeatWrapping, v.repeat.set(5, 8);
-      return Q(v, { color: !1, anisotropy: 4 });
+      return Q(v, { color: !1, anisotropy: 2 });
     };
     return _clothMapsCache = {
       normal: x(r, "cloth-normal"),
@@ -130,8 +131,11 @@ export function applyFoilAndMaterialPatches(rawCode) {
     code = code.slice(0, toStartIdx) + newToFunction + code.slice(tnStartIdx);
   }
 
-  // 0c. Patch page edge textures zn(e) with batched bezier paths (1300 strokes -> 1 stroke)
-  const znStartIdx = code.indexOf('function zn(e) {');
+  // 0c. Patch page edge textures zn(e) with batched bezier paths
+  let znStartIdx = code.indexOf('let _edgeTexturesCache = null;');
+  if (znStartIdx === -1) {
+    znStartIdx = code.indexOf('function zn(e) {');
+  }
   const ooStartIdx = code.indexOf('function oo(e, o, t) {');
   if (znStartIdx !== -1 && ooStartIdx !== -1) {
     const newZnFunction = `let _edgeTexturesCache = null;
@@ -147,7 +151,7 @@ export function applyFoilAndMaterialPatches(rawCode) {
       c.fillStyle = "#dcd5c7";
       c.fillRect(0, 0, w, h);
       const step = a === "fore-edge" ? 2.5 : 2;
-      
+
       c.strokeStyle = "rgba(106, 103, 97, 0.16)";
       c.lineWidth = 0.5;
       c.beginPath();
@@ -164,7 +168,7 @@ export function applyFoilAndMaterialPatches(rawCode) {
       s.addColorStop(1, "rgba(58,48,35,0.12)");
       c.fillStyle = s;
       c.fillRect(0, 0, w, h);
-      return Q(new l.CanvasTexture(n), { anisotropy: 4 });
+      return Q(new l.CanvasTexture(n), { anisotropy: 2 });
     };
     return _edgeTexturesCache = {
       fore: o(512, 2048, "fore-edge"),
@@ -174,54 +178,61 @@ export function applyFoilAndMaterialPatches(rawCode) {
     code = code.slice(0, znStartIdx) + newZnFunction + code.slice(ooStartIdx);
   }
 
-  // 0d. Patch Spine cloth Dn(e) (Reduced loop from 1900 to 60 iterations with batched path)
+  // 0d. Patch Spine cloth Dn(e) (256x1024 scaled cleanly from 384x1536, batched strokes)
   const dnStartIdx = code.indexOf('function Dn(e) {');
   const knTargetIdx = code.indexOf('function Kn(e) {');
   if (dnStartIdx !== -1 && knTargetIdx !== -1) {
     const newDnFunction = `function Dn(e) {
     const o = document.createElement("canvas");
-    o.width = 384, o.height = 1536;
-    const t = o.getContext("2d"), r = ye(pe(\`\${e.id}-spine-cloth\`) + e.seed);
-    t.fillStyle = e.color, t.fillRect(0, 0, o.width, o.height);
-    const a = t.createLinearGradient(0, 0, o.width, 0);
-    a.addColorStop(0, "rgba(0,0,0,0.2)"), a.addColorStop(0.14, "rgba(255,255,255,0.055)"), a.addColorStop(0.62, "rgba(255,255,255,0.012)"), a.addColorStop(1, "rgba(0,0,0,0.16)"), t.fillStyle = a, t.fillRect(0, 0, o.width, o.height);
+    o.width = 256, o.height = 1024;
+    const W = 384, H = 1536;
+    const t = o.getContext("2d", { alpha: false }), r = ye(pe(\`\${e.id}-spine-cloth\`) + e.seed);
+    t.setTransform(o.width / W, 0, 0, o.height / H, 0, 0);
+    t.fillStyle = e.color, t.fillRect(0, 0, W, H);
+    const a = t.createLinearGradient(0, 0, W, 0);
+    a.addColorStop(0, "rgba(0,0,0,0.2)"), a.addColorStop(0.14, "rgba(255,255,255,0.055)"), a.addColorStop(0.62, "rgba(255,255,255,0.012)"), a.addColorStop(1, "rgba(0,0,0,0.16)"), t.fillStyle = a, t.fillRect(0, 0, W, H);
     t.lineWidth = 0.5;
     t.strokeStyle = "rgba(255,255,255,0.028)";
     t.beginPath();
     for (let c = 0; c < 60; c += 1) {
-      const i = r() * o.width, d = r() * o.height;
+      const i = r() * W, d = r() * H;
       t.moveTo(i, d);
       t.lineTo(i + 8 + r() * 24, d + (r() - 0.5) * 1.5);
     }
     t.stroke();
-    const n = t.createLinearGradient(0, o.height * 0.82, 0, o.height);
-    n.addColorStop(0, "rgba(0,0,0,0)"), n.addColorStop(1, "rgba(0,0,0,0.12)"), t.fillStyle = n, t.fillRect(0, 0, o.width, o.height);
-    return Q(new l.CanvasTexture(o), { anisotropy: 4 });
+    const n = t.createLinearGradient(0, H * 0.82, 0, H);
+    n.addColorStop(0, "rgba(0,0,0,0)"), n.addColorStop(1, "rgba(0,0,0,0.12)"), t.fillStyle = n, t.fillRect(0, 0, W, H);
+    return Q(new l.CanvasTexture(o), { anisotropy: 2 });
   }\n  `;
     code = code.slice(0, dnStartIdx) + newDnFunction + code.slice(knTargetIdx);
   }
 
-  // 1. Patch Spine foil Kn(e)
+  // 1. Patch Spine foil Kn(e) (256x1024 scaled cleanly from 384x1536)
   const knStartIdx = code.indexOf('function Kn(e) {');
-  const knEndIdx = code.indexOf('function kn(e) {');
+  let knEndIdx = code.indexOf('const _backClothCache = new Map();');
+  if (knEndIdx === -1) {
+    knEndIdx = code.indexOf('function kn(e) {');
+  }
   if (knStartIdx !== -1 && knEndIdx !== -1) {
     const newKnFunction = `function Kn(e) {
     const o = document.createElement("canvas");
-    o.width = 384, o.height = 1536;
+    o.width = 256, o.height = 1024;
+    const W = 384, H = 1536;
     const t = o.getContext("2d");
+    t.setTransform(o.width / W, 0, 0, o.height / H, 0, 0);
     const foilColor = (e.id === "xcode" || e.id === "codex" || e.id === "claude-code") ? (e.foil || "#efc16d") : "#ffffff";
-    t.clearRect(0, 0, o.width, o.height);
+    t.clearRect(0, 0, W, H);
     t.fillStyle = foilColor;
     t.strokeStyle = foilColor;
     t.lineWidth = 2.4;
-    t.strokeRect(34, 38, o.width - 68, o.height - 76);
+    t.strokeRect(34, 38, W - 68, H - 76);
     t.textAlign = "center";
     t.textBaseline = "middle";
     t.font = '500 24px Inter, "Helvetica Neue", Arial, sans-serif';
     t.letterSpacing = "5px";
-    t.fillText(e.roman, o.width * 0.5, 118);
+    t.fillText(e.roman, W * 0.5, 118);
     t.save();
-    t.translate(o.width * 0.5, o.height * 0.5);
+    t.translate(W * 0.5, H * 0.5);
     t.rotate(Math.PI / 2);
     if (e.id === "xcode") {
       t.font = '800 68px Inter, "Helvetica Neue", Arial, sans-serif';
@@ -242,11 +253,11 @@ export function applyFoilAndMaterialPatches(rawCode) {
     }
     t.restore();
     t.beginPath();
-    t.arc(o.width * 0.5, o.height - 120, 24, 0, Math.PI * 2);
+    t.arc(W * 0.5, H - 120, 24, 0, Math.PI * 2);
     t.stroke();
     t.beginPath();
-    t.moveTo(o.width * 0.5 - 24, o.height - 120);
-    t.lineTo(o.width * 0.5 + 24, o.height - 120);
+    t.moveTo(W * 0.5 - 24, H - 120);
+    t.lineTo(W * 0.5 + 24, H - 120);
     t.stroke();
     return Q(new l.CanvasTexture(o), { anisotropy: 2 });
   }\n  `;
@@ -254,22 +265,39 @@ export function applyFoilAndMaterialPatches(rawCode) {
   }
 
   // 1b. Patch Back cloth kn(e) to defer large canvas bake until inspection
-  const backClothStartIdx = code.indexOf('function kn(e) {');
-  const mnStartIdx = code.indexOf('function Mn(e) {');
+  let backClothStartIdx = code.indexOf('const _backClothCache = new Map();');
+  if (backClothStartIdx === -1) {
+    backClothStartIdx = code.indexOf('function kn(e) {');
+  }
+  let mnStartIdx = code.indexOf('let _emptyFoilTexture = null;');
+  if (mnStartIdx === -1) {
+    mnStartIdx = code.indexOf('function Mn(e) {');
+  }
   if (backClothStartIdx !== -1 && mnStartIdx !== -1) {
     const newBackClothFunction = `const _backClothCache = new Map();
   function renderBackCloth(e) {
     if (_backClothCache.has(e.id)) return _backClothCache.get(e.id);
     const o = document.createElement("canvas");
     o.width = 512, o.height = 768;
-    const t = o.getContext("2d"), r = ye(pe(\`\${e.id}-back-cloth\`) + e.seed);
+    const t = o.getContext("2d", { alpha: false }), r = ye(pe(\`\${e.id}-back-cloth\`) + e.seed);
     t.fillStyle = e.color, t.fillRect(0, 0, o.width, o.height);
     const a = t.createLinearGradient(0, 0, o.width, 0);
     a.addColorStop(0, "rgba(0,0,0,0.15)"), a.addColorStop(0.05, "rgba(255,255,255,0.028)"), a.addColorStop(0.84, "rgba(255,255,255,0)"), a.addColorStop(1, "rgba(0,0,0,0.11)"), t.fillStyle = a, t.fillRect(0, 0, o.width, o.height);
-    for (let c = 0; c < 50; c += 1) {
+    t.lineWidth = 0.6;
+    t.strokeStyle = "rgba(255,255,255,0.018)";
+    t.beginPath();
+    for (let c = 0; c < 25; c += 1) {
       const i = r() * o.width, d = r() * o.height, s = 5 + r() * 30;
-      t.strokeStyle = r() > 0.5 ? "rgba(255,255,255,0.018)" : "rgba(0,0,0,0.016)", t.lineWidth = 0.45 + r() * 0.65, t.beginPath(), t.moveTo(i, d), t.lineTo(i + s, d + (r() - 0.5) * 1.5), t.stroke();
+      t.moveTo(i, d); t.lineTo(i + s, d + (r() - 0.5) * 1.5);
     }
+    t.stroke();
+    t.strokeStyle = "rgba(0,0,0,0.016)";
+    t.beginPath();
+    for (let c = 0; c < 25; c += 1) {
+      const i = r() * o.width, d = r() * o.height, s = 5 + r() * 30;
+      t.moveTo(i, d); t.lineTo(i + s, d + (r() - 0.5) * 1.5);
+    }
+    t.stroke();
     const n = t.createRadialGradient(
       o.width * 0.62,
       o.height * 0.38,
@@ -290,7 +318,10 @@ export function applyFoilAndMaterialPatches(rawCode) {
   }
 
   // 2. Patch Back foil Mn(e) to defer large canvas bake until inspection
-  const mnIdx = code.indexOf('function Mn(e) {');
+  let mnIdx = code.indexOf('let _emptyFoilTexture = null;');
+  if (mnIdx === -1) {
+    mnIdx = code.indexOf('function Mn(e) {');
+  }
   const tFuncIdx = code.indexOf('function T(e, o, t');
   if (mnIdx !== -1 && tFuncIdx !== -1) {
     const newMnFunction = `let _emptyFoilTexture = null;
@@ -355,7 +386,7 @@ export function applyFoilAndMaterialPatches(rawCode) {
     code = code.slice(0, mnIdx) + newMnFunction + code.slice(tFuncIdx);
   }
 
-  // 3. Material performance properties
+  // 3. Foil material performance properties
   code = code.replace(
     /po\s*=\s*new l\.MeshPhysicalMaterial\(\{[\s\S]*?polygonOffsetFactor:\s*-2\s*\}\)/,
     `po = new l.MeshPhysicalMaterial({
