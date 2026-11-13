@@ -83,7 +83,7 @@
         "0.9666 weighted F1 score",
         "Label smoothing calibration"
       ],
-      "image": "/cat-breed-recognition/line_chart.png",
+      "image": "/cat-breed-recognition/line_chart.webp",
       "plateTitle": "TRAINING DYNAMICS & CONVERGENCE",
       "imageCaption": "Loss and accuracy progression across epochs: loss convergence to 0.15 and validation accuracy ascending to 96.67% under calibrated AdamW regularization."
     },
@@ -97,7 +97,7 @@
         "Visual attribution verification",
         "Confidence-correlated heatmap diffusion"
       ],
-      "image": "/cat-breed-recognition/grad_cam.png",
+      "image": "/cat-breed-recognition/grad_cam.webp",
       "plateTitle": "GRAD-CAM SPATIAL ATTRIBUTION",
       "imageCaption": "Grad-CAM explainability heatmaps across test specimens: spatial activations localize tightly onto feline facial and ear morphology rather than background artifacts."
     },
@@ -111,7 +111,7 @@
         "Ragdoll vs. Birman morphological boundary",
         "Architecture > raw parameter count"
       ],
-      "image": "/cat-breed-recognition/confusion_matrix.png",
+      "image": "/cat-breed-recognition/confusion_matrix.webp",
       "plateTitle": "12-BREED CONFUSION TOPOLOGY",
       "imageCaption": "12-class normalized confusion matrix: clean diagonal separation across distinct breeds with isolated cross-attributions between phenotypically close Ragdoll and Birman classes."
     }

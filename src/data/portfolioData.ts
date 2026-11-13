@@ -10,6 +10,7 @@ export interface Chapter {
   image?: string;
   imageCaption?: string;
   plateTitle?: string;
+  video?: string;
 }
 
 export interface VolumeProject {

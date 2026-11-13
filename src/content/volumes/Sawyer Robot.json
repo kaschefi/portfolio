@@ -63,7 +63,11 @@
         "7-DoF Sawyer cobot with series elastic actuators",
         "Asynchronous rosbridge_suite WebSocket teleoperation",
         "Hierarchical Design Tree motion architecture"
-      ]
+      ],
+      "image": "/sawyer-robot/sawyer_wave_poster.webp",
+      "video": "/sawyer-robot/sawyer_wave.mp4",
+      "plateTitle": "TELEOPERATED WAVING TASK",
+      "imageCaption": "Live physical execution of the 7-DoF Sawyer cobot waving sequence over WebSocket teleoperation (rosbridge_suite) with safe Cartesian waypoints."
     },
     {
       "number": "02",
@@ -74,7 +78,10 @@
         "Empirical benchmark: YOLOv8 (96% static) vs. HSV (100% controlled)",
         "Sub-millisecond HSV contour centroid extraction",
         "Inference latency analysis in closed-loop visual servoing"
-      ]
+      ],
+      "image": "/sawyer-robot/vision.webp",
+      "plateTitle": "BIRD'S EYE TRACKING STATE",
+      "imageCaption": "Top-down camera vision segmentation during active shell game tracking: real-time HSV contour centroid localization and dynamic cup identity assignment."
     },
     {
       "number": "03",
@@ -86,7 +93,10 @@
         "4D state vector Kalman filter ([x, y, dx, dy]) with 0.85 velocity decay",
         "Augmented Hungarian assignment with cosine velocity penalty",
         "Dynamic occlusion tethering reducing ID switches from 50% to <10%"
-      ]
+      ],
+      "image": "/sawyer-robot/shallgame.webp",
+      "plateTitle": "SHELL GAME SIMULATION TWIN",
+      "imageCaption": "Gazebo 11 simulation twin environment: 7-DoF Sawyer manipulator executing visual servoing and trajectory planning above the 3-cup shell game arena."
     },
     {
       "number": "04",
@@ -98,7 +108,11 @@
         "Gazebo digital twin with collision-free S-curve shuffling",
         "2D pixel to 3D Cartesian base frame transformation matrix",
         "MoveIt RRT-Connect planning (~1.0s solve time) with quaternion pose stabilization"
-      ]
+      ],
+      "image": "/sawyer-robot/robot_playing_poster.webp",
+      "video": "/sawyer-robot/robot_playing.mp4",
+      "plateTitle": "MOVEIT TRAJECTORY EXECUTION",
+      "imageCaption": "Full autonomous shell game gameplay sequence: Sawyer executing real-time MoveIt RRT-Connect trajectory planning to lift and reveal the winning cup in Gazebo."
     },
     {
       "number": "05",

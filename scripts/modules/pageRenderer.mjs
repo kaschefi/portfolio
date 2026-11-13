@@ -36,7 +36,8 @@ export function applyPagePatches(code) {
               content: ch.content || "",
               image: ch.image || "",
               imageCaption: ch.imageCaption || "",
-              plateTitle: ch.plateTitle || ""
+              plateTitle: ch.plateTitle || "",
+              video: ch.video || ""
             }))
           };
         }

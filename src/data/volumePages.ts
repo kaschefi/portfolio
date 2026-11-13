@@ -23,6 +23,7 @@ export interface BookPageSpread {
   highlights?: string[];
   image?: string;
   imageCaption?: string;
+  video?: string;
 }
 
 const pad = (val: number) => String(val).padStart(2, '0');
@@ -95,7 +96,8 @@ export function generateVolumePages(volume: VolumeProject): BookPageSpread[] {
         highlights: ch.highlights || [],
         keyMetrics: (ch as any).keyMetrics || (i === 0 ? details?.keyMetrics : undefined),
         image: (ch as any).image,
-        imageCaption: (ch as any).imageCaption
+        imageCaption: (ch as any).imageCaption,
+        video: (ch as any).video
       });
     } else {
       // Fallback for missing chapter

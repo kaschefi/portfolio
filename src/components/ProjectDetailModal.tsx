@@ -145,16 +145,30 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         </div>
       )}
 
-      {/* Architecture System Image / Diagram */}
-      {page.image && (
+      {/* Architecture System Image / Diagram / Video */}
+      {(page.video || page.image) && (
         <div className="moka-img-box">
-          <img
-            src={page.image}
-            alt={page.imageCaption || page.title}
-            className="moka-diagram-img"
-            loading="lazy"
-            decoding="async"
-          />
+          {page.video ? (
+            <video
+              src={page.video}
+              poster={page.image}
+              className="moka-diagram-img"
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls
+              style={{ maxHeight: '420px', objectFit: 'contain', width: '100%', borderRadius: '6px' }}
+            />
+          ) : (
+            <img
+              src={page.image}
+              alt={page.imageCaption || page.title}
+              className="moka-diagram-img"
+              loading="lazy"
+              decoding="async"
+            />
+          )}
           {page.imageCaption && (
             <p style={{ marginTop: '8px', fontSize: '0.74rem', color: '#9da9be', textAlign: 'center' }}>
               {page.imageCaption}

@@ -369,17 +369,36 @@ export const BookshelfHUD: React.FC<BookshelfHUDProps> = ({
               </div>
             )}
 
-            {richContent.image && (
+            {(richContent.video || richContent.image) && (
               <div className="moka-img-box">
-                <img
-                  src={richContent.image}
-                  alt={richContent.imageCaption || "System Architecture"}
-                  className="moka-diagram-img"
-                  loading="lazy"
-                  decoding="async"
-                  width={800}
-                  height={400}
-                />
+                {richContent.video ? (
+                  <video
+                    src={richContent.video}
+                    poster={richContent.image}
+                    className="moka-diagram-img"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    controls
+                    style={{ maxHeight: '360px', objectFit: 'contain', width: '100%', borderRadius: '4px' }}
+                  />
+                ) : (
+                  <img
+                    src={richContent.image}
+                    alt={richContent.imageCaption || "System Architecture"}
+                    className="moka-diagram-img"
+                    loading="lazy"
+                    decoding="async"
+                    width={800}
+                    height={400}
+                  />
+                )}
+                {richContent.imageCaption && (
+                  <div style={{ fontSize: '11px', opacity: 0.7, marginTop: '6px', textAlign: 'center' }}>
+                    {richContent.imageCaption}
+                  </div>
+                )}
               </div>
             )}
 
