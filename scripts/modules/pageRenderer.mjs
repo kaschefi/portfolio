@@ -33,7 +33,10 @@ export function applyPagePatches(code) {
               number: ch.number || "",
               title: ch.title || "",
               subtitle: ch.subtitle || "",
-              content: ch.content || ""
+              content: ch.content || "",
+              image: ch.image || "",
+              imageCaption: ch.imageCaption || "",
+              plateTitle: ch.plateTitle || ""
             }))
           };
         }
@@ -81,21 +84,63 @@ export function applyPagePatches(code) {
 
   const _volumeDataMap = ${JSON.stringify(volumeDataMap)};
   const _bookPagesCache = new Map();
+  const _imageCache = new Map();
+
+  function getLazyImage(src) {
+    if (!src) return null;
+    if (_imageCache.has(src)) {
+      const existing = _imageCache.get(src);
+      if (existing && (!existing.complete || existing.naturalWidth > 0)) {
+        return existing;
+      }
+      _imageCache.delete(src);
+    }
+    if (src.includes('router_benchmark') && typeof customBenchmarkImg !== 'undefined') {
+      _imageCache.set(src, customBenchmarkImg);
+      return customBenchmarkImg;
+    }
+    if (src.includes('cozmo_hardware_sketch') && typeof customCozmoSketchImg !== 'undefined') {
+      _imageCache.set(src, customCozmoSketchImg);
+      return customCozmoSketchImg;
+    }
+    const img = typeof createLazyImg === "function" ? createLazyImg(src) : (() => {
+      if (typeof Image === "undefined") return null;
+      const i = new Image();
+      i.decoding = "async";
+      i.datasetSrc = src;
+      return i;
+    })();
+    _imageCache.set(src, img);
+    return img;
+  }
 
   function drawPlateImageOrWait(ctx, img, x, y, imgW, texture) {
     if (!img) return;
     const drawNow = () => {
       if (img.naturalWidth > 0) {
-        const imgH = Math.round((imgW / img.naturalWidth) * img.naturalHeight);
-        ctx.drawImage(img, x, y, imgW, imgH);
+        let w = imgW;
+        let h = Math.round((imgW / img.naturalWidth) * img.naturalHeight);
+        const maxH = 270;
+        if (h > maxH) {
+          h = maxH;
+          w = Math.round((maxH / img.naturalHeight) * img.naturalWidth);
+        }
+        const drawX = x + Math.round((imgW - w) / 2);
+        ctx.drawImage(img, drawX, y, w, h);
         if (texture) texture.needsUpdate = true;
         if (typeof __wake === "function") __wake(12);
       }
     };
     if (img.naturalWidth > 0) {
       drawNow();
-    } else if (typeof ensureLazyImage === "function") {
-      ensureLazyImage(img, drawNow);
+      return;
+    }
+    if (!img.src && img.datasetSrc) {
+      img.src = img.datasetSrc;
+    }
+    img.addEventListener("load", drawNow, { once: true });
+    if (typeof img.decode === "function") {
+      img.decode().then(drawNow).catch(() => {});
     }
   }
 
@@ -131,77 +176,33 @@ export function applyPagePatches(code) {
       s.fillRect(48, 64, i - 96, 1);
       s.globalAlpha = 1;
 
-      // 1. LEFT PAGES (Diagrams & Plates)
-      if (n === 1 && e.id === "codex") {
-        s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
-        s.letterSpacing = "2px";
-        s.fillText("PLATE 01  /  LANGSMITH ROUTER BENCHMARK", 54, 146);
-        if (typeof customBenchmarkImg !== "undefined") {
-          drawPlateImageOrWait(s, customBenchmarkImg, 54, 190, 404, texture);
+      // 1. LEFT PAGES (Diagrams & Plates) - Completely data-driven from JSON
+      // Left pages are odd indices (n = 1, 3, 5, 7). Each faces a chapter (chIndex = Math.floor((n - 1) / 2)).
+      if (n % 2 === 1 && n <= 7) {
+        const chIndex = Math.floor((n - 1) / 2);
+        const ch = vol.chapters?.[chIndex];
+        if (ch && ch.image) {
+          const plateNum = String(chIndex + 1).padStart(2, "0");
+          const plateHeading = (ch.plateTitle || ch.subtitle || ch.title || ("PLATE " + plateNum)).toUpperCase();
+          s.fillStyle = r;
+          s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
+          s.letterSpacing = "2px";
+          s.fillText("PLATE " + plateNum + "  /  " + plateHeading, 54, 146);
+
+          const img = getLazyImage(ch.image);
+          drawPlateImageOrWait(s, img, 54, 180, 404, texture);
+
+          const captionText = ch.imageCaption || ch.caption;
+          if (captionText) {
+            s.globalAlpha = 0.52;
+            s.font = '400 15px "Iowan Old Style", Georgia, serif';
+            s.fillStyle = r;
+            de(s, captionText, 54, 470, 38, 22, 5);
+            s.globalAlpha = 1;
+          }
         }
-        s.globalAlpha = 0.52;
-        s.font = '400 15px "Iowan Old Style", Georgia, serif';
-        de(s, "57-case benchmark evaluation: Monolithic LLM baseline (A) vs MoKa Two-Layer Router (B). 95.8% LAYA routing accuracy, 0 output tokens, and 5.5ms P50 latency.", 54, 460, 38, 22, 5);
-      } else if (n === 3 && e.id === "codex") {
-        s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
-        s.letterSpacing = "2px";
-        s.fillText("PLATE 02  /  PHYSICAL ROBOTIC CHASSIS", 54, 146);
-        if (typeof customCozmoSketchImg !== "undefined") {
-          drawPlateImageOrWait(s, customCozmoSketchImg, 54, 176, 404, texture);
-        }
-        s.globalAlpha = 0.52;
-        s.font = '400 15px "Iowan Old Style", Georgia, serif';
-        de(s, "Mechanical dimension schematics and sensor topology of the Anki Cozmo embodied chassis: drop IR array, 3-axis IMU pitch tilt monitor, and 33Hz packet safety interceptors.", 54, 510, 38, 22, 5);
-      } else if (n === 1 && e.id === "figma") {
-        s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
-        s.letterSpacing = "2px";
-        s.fillText("PLATE 01  /  VISION DETECTION & BENCHMARK", 54, 146);
-        const imgX = 54, imgY = 180, imgW = 404, imgH = 250;
-        s.fillStyle = "rgba(18, 20, 23, 0.85)";
-        s.fillRect(imgX, imgY, imgW, imgH);
-        s.globalAlpha = 0.52;
-        s.font = '400 15px "Iowan Old Style", Georgia, serif';
-        de(s, "Empirical benchmark between classical HSV thresholding and YOLOv8 deep neural networks. Sub-millisecond HSV execution eliminates inference latency, ensuring reliable 90% closed-loop dynamic tracking.", 54, 460, 38, 22, 5);
-      } else if (n === 3 && e.id === "figma") {
-        s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
-        s.letterSpacing = "2px";
-        s.fillText("PLATE 02  /  KALMAN MOT & OCCLUSION TETHERING", 54, 146);
-        const imgX = 54, imgY = 176, imgW = 404, imgH = 260;
-        s.fillStyle = "rgba(18, 20, 23, 0.85)";
-        s.fillRect(imgX, imgY, imgW, imgH);
-        s.globalAlpha = 0.52;
-        s.font = '400 15px "Iowan Old Style", Georgia, serif';
-        de(s, "Independent 4D Kalman filters with cosine velocity penalties and leader-follower occlusion tethering, reducing identity switches by over 80% during dynamic shuffles.", 54, 510, 38, 22, 5);
-      } else if (n === 1 && e.id === "cursor") {
-        s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
-        s.letterSpacing = "2px";
-        s.fillText("PLATE 01  /  MULTI-MODAL SEMANTIC PIPELINE TOPOLOGY", 54, 146);
-        const imgX = 54, imgY = 180, imgW = 404, imgH = 250;
-        s.fillStyle = "rgba(23, 25, 20, 0.85)";
-        s.fillRect(imgX, imgY, imgW, imgH);
-        s.globalAlpha = 0.52;
-        s.font = '400 15px "Iowan Old Style", Georgia, serif';
-        de(s, "End-to-end multi-modal ETL: Deep layout detection with Docling v2, parallel Vision Language Model diagram transcription on Groq LPUs, and calibrated 70/30 hybrid vector retrieval with Cross-Encoder reranking.", 54, 460, 38, 22, 5);
-      } else if (n === 1 && e.id === "claude-code") {
-        s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
-        s.letterSpacing = "2px";
-        s.fillText("PLATE 01  /  CONVNEXT-TINY ARCHITECTURE & GRAD-CAM", 54, 146);
-        const imgX = 54, imgY = 180, imgW = 404, imgH = 250;
-        s.fillStyle = "rgba(18, 53, 36, 0.88)";
-        s.fillRect(imgX, imgY, imgW, imgH);
-        s.globalAlpha = 0.52;
-        s.font = '400 15px "Iowan Old Style", Georgia, serif';
-        de(s, "Fine-grained feline vision pipeline: ImageNet transfer learning on Oxford-IIIT Pet dataset, aggressive regularization pass, and Grad-CAM spatial attribution.", 54, 460, 38, 22, 5);
-      } else if (n === 1 && e.id === "antigravity") {
-        s.font = '500 11px Inter, "Helvetica Neue", Arial, sans-serif';
-        s.letterSpacing = "2px";
-        s.fillText("PLATE 01  /  GRAPH-BASED WAREHOUSE ENGINE TOPOLOGY", 54, 146);
-        const imgX = 54, imgY = 180, imgW = 404, imgH = 250;
-        s.fillStyle = "rgba(11, 25, 83, 0.88)";
-        s.fillRect(imgX, imgY, imgW, imgH);
-        s.globalAlpha = 0.52;
-        s.font = '400 15px "Iowan Old Style", Georgia, serif';
-        de(s, "RoboFlow warehouse engine: 20x20 discrete floor grid, Dijkstra robot routing with obstacle avoidance, Prim infrastructure cabling, and DAG task dependency ordering.", 54, 460, 38, 22, 5);
+        // If no image is provided in JSON, nothing is drawn:
+        // no black placeholder rectangle, no dummy plate title, no clutter.
       }
 
       // 2. RIGHT PAGES (Full Narrative Chapters - Loaded from Unified JSON Content)

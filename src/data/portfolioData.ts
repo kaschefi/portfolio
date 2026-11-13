@@ -7,6 +7,9 @@ export interface Chapter {
   content: string;
   codeSnippet?: string;
   highlights: string[];
+  image?: string;
+  imageCaption?: string;
+  plateTitle?: string;
 }
 
 export interface VolumeProject {

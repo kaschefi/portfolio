@@ -69,7 +69,10 @@
         "100% accuracy on physical robot movement commands",
         "<10ms hardware cliff cut & event-driven motor interception",
         "Sliding-window accelerometer shock & OpenCV visual stasis detection"
-      ]
+      ],
+      "image": "/moka/router_benchmark.webp",
+      "plateTitle": "LANGSMITH ROUTER BENCHMARK",
+      "imageCaption": "57-case benchmark evaluation: Monolithic LLM baseline (A) vs MoKa Two-Layer Router (B). 95.8% LAYA routing accuracy, 0 output tokens, and 5.5ms P50 latency."
     },
     {
       "number": "02",
@@ -82,7 +85,10 @@
         "0 generative output tokens via 135M LAYA cross-encoder",
         "O(k) constant context complexity scaling across 20 to 100 tools",
         "Mean latency slashed from 1,455.6ms to 205.3ms (P50: 5.5ms)"
-      ]
+      ],
+      "image": "/moka/cozmo_hardware_sketch.webp",
+      "plateTitle": "PHYSICAL ROBOTIC CHASSIS",
+      "imageCaption": "Mechanical dimension schematics and sensor topology of the Anki Cozmo embodied chassis: drop IR array, 3-axis IMU pitch tilt monitor, and 33Hz packet safety interceptors."
     },
     {
       "number": "03",
