@@ -16,19 +16,19 @@ def convert(src, dst, quality=88, lossless=False):
 
 # 1. Public assets
 public_conversions = [
-    ('public/cat.png', 'public/cat.webp', 85, False),
-    ('public/claude_code.png', 'public/claude_code.webp', 85, False),
-    ('public/cozmo_hardware_sketch.png', 'public/cozmo_hardware_sketch.webp', 85, False),
-    ('public/joinapp.png', 'public/joinapp.webp', 88, False),
-    ('public/robotIcon.png', 'public/robotIcon.webp', 88, False),
-    ('public/router_benchmark.png', 'public/router_benchmark.webp', 90, False),
-    ('public/sawyerRobot.png', 'public/sawyerRobot.webp', 88, False),
-    ('public/sawyerRobot_clean.png', 'public/sawyerRobot_clean.webp', 88, False),
-    ('public/sawyerRobot_full.png', 'public/sawyerRobot_full.webp', 88, False),
-    ('public/xcode_waveform.png', 'public/xcode_waveform.webp', 85, False),
-    ('public/antigravity_icon.png', 'public/antigravity_icon.webp', 92, False),
-    ('public/moka-icon.png', 'public/moka-icon.webp', 92, False),
-    ('public/moka_icon.png', 'public/moka_icon.webp', 92, False),
+    ('public/cat-breed-recognition/cat.png', 'public/cat-breed-recognition/cat.webp', 85, False),
+    ('public/cat-breed-recognition/claude_code.png', 'public/cat-breed-recognition/claude_code.webp', 85, False),
+    ('public/moka/cozmo_hardware_sketch.png', 'public/moka/cozmo_hardware_sketch.webp', 85, False),
+    ('public/joinapp/joinapp.png', 'public/joinapp/joinapp.webp', 88, False),
+    ('public/sawyer-robot/robotIcon.png', 'public/sawyer-robot/robotIcon.webp', 88, False),
+    ('public/moka/router_benchmark.png', 'public/moka/router_benchmark.webp', 90, False),
+    ('public/sawyer-robot/sawyerRobot.png', 'public/sawyer-robot/sawyerRobot.webp', 88, False),
+    ('public/sawyer-robot/sawyerRobot_clean.png', 'public/sawyer-robot/sawyerRobot_clean.webp', 88, False),
+    ('public/sawyer-robot/sawyerRobot_full.png', 'public/sawyer-robot/sawyerRobot_full.webp', 88, False),
+    ('public/joinapp/xcode_waveform.png', 'public/joinapp/xcode_waveform.webp', 85, False),
+    ('public/roboflow/antigravity_icon.png', 'public/roboflow/antigravity_icon.webp', 92, False),
+    ('public/moka/moka-icon.png', 'public/moka/moka-icon.webp', 92, False),
+    ('public/moka/moka_icon.png', 'public/moka/moka_icon.webp', 92, False),
 ]
 
 for src, dst, q, loss in public_conversions:

@@ -85,9 +85,9 @@ if __name__ == '__main__':
     if os.path.exists('src/assets/cat.jpg'):
         process_image('src/assets/cat.jpg', [
             'src/assets/claude_code.png',
-            'public/claude_code.png',
+            'public/cat-breed-recognition/claude_code.png',
             'src/assets/cat.png',
-            'public/cat.png'
+            'public/cat-breed-recognition/cat.png'
         ])
     if os.path.exists('src/assets/me.jpg'):
         process_image('src/assets/me.jpg', [

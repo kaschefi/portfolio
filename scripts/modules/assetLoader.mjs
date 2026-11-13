@@ -3,14 +3,14 @@
 
 export function getAssetDataUris() {
   return {
-    mokaDataUri: '/moka_icon.webp',
-    benchDataUri: '/router_benchmark.webp',
-    cozmoSketchDataUri: '/cozmo_hardware_sketch.webp',
-    joinAppDataUri: '/joinapp.webp',
-    figmaDataUri: '/sawyerRobot.webp',
-    claudeCodeDataUri: '/claude_code.webp',
-    cursorCoverDataUri: '/cursor_cover.webp',
-    roboflowCoverDataUri: '/roboflow_cover.webp',
+    mokaDataUri: '/moka/moka_icon.webp',
+    benchDataUri: '/moka/router_benchmark.webp',
+    cozmoSketchDataUri: '/moka/cozmo_hardware_sketch.webp',
+    joinAppDataUri: '/joinapp/joinapp.webp',
+    figmaDataUri: '/sawyer-robot/sawyerRobot.webp',
+    claudeCodeDataUri: '/cat-breed-recognition/claude_code.webp',
+    cursorCoverDataUri: '/semantic-etl-pipeline/cursor_cover.webp',
+    roboflowCoverDataUri: '/roboflow/roboflow_cover.webp',
   };
 }
 

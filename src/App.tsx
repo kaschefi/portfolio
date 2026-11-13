@@ -67,12 +67,12 @@ export function App() {
 
       const urls = [
         '/walnut_wood.webp',
-        '/moka_icon.webp',
-        '/sawyerRobot.webp',
-        '/cursor_cover.webp',
-        '/roboflow_cover.webp',
-        '/claude_code.webp',
-        '/joinapp.webp'
+        '/moka/moka_icon.webp',
+        '/sawyer-robot/sawyerRobot.webp',
+        '/semantic-etl-pipeline/cursor_cover.webp',
+        '/roboflow/roboflow_cover.webp',
+        '/cat-breed-recognition/claude_code.webp',
+        '/joinapp/joinapp.webp'
       ];
       for (const url of urls) {
         const img = new Image();

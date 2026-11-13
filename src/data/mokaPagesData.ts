@@ -88,7 +88,7 @@ async def process_user_utterance(user_input: str, thread_id: str = "cozmo_defaul
     subtitle: "Sub-6ms Semantic Reflexes & Hardware Safety Interceptor",
     discipline: "Reflex Kinematics & Sub-6ms Edge Routing",
     thesis: "Overcoming Physical Robotics Latency Dilemma via Sub-6ms FastEmbed Reflexes and Event-Driven Motor Interception",
-    image: "/router_benchmark.webp",
+    image: "/moka/router_benchmark.webp",
     imageCaption: "LangSmith 57-Case Benchmark: Monolithic LLM Baseline (A) vs. MoKa Two-Layer Router (B) achieving 93.0% routing accuracy, 83% token reduction, and ~45ms P50 latency.",
     overview:
       "Physical robotic assistants cannot afford the 1,500ms+ latency of standard LLM reasoning loops for motor safety. MoKa implements a Layer 1 FastEmbed semantic router (BAAI/bge-small-en-v1.5) executing in 5.5ms (median P50), intercepting physical kinematics, emergency halts, and system utilities with 0 LLM tokens and 100% accuracy on physical commands.",
@@ -135,7 +135,7 @@ class ReflexSafetyGuard:
     subtitle: "FAISS Top-k Pruning & Zero-Token LAYA Cross-Encoder",
     discipline: "Information Retrieval & Cross-Encoder Decision Routing",
     thesis: "Eliminating Tool Crowding, Softmax Attention Dilution, and O(N) Context Pre-Fill via O(k) Vector Filtering and Typed Decision Models",
-    image: "/cozmo_hardware_sketch.webp",
+    image: "/moka/cozmo_hardware_sketch.webp",
     imageCaption: "Physical Schematic & Dimensions: Anki Cozmo robotic chassis with 4-DOF articulators, drop IR sensors, 3-axis IMU pitch tilt guards, and 33Hz packet-level safety interceptors.",
     overview:
       "In conventional LLM architectures, passing 15 to 100+ tool schemas into a monolithic prompt degrades classification accuracy, bloats prompt pre-fill latency to 2,000–8,000ms, and causes softmax attention dilution (dropping monolithic LAYA to 60.4%). MoKa solves this via a Two-Layer Top-K architecture: an in-memory FAISS vector index with BAAI/bge-small-en-v1.5 pre-filters the catalog to top-k (k=3) candidates, reducing input complexity to O(k) constant space. The pruned choices are evaluated by the 135M parameter LAYA cross-encoder (convaiinnovations/laya-typed-decisions), achieving 95.8% Top-1 accuracy with 0 generative output tokens—matching local Ollama qwen2.5:3b while slashing mean latency from 1,455.6ms to 205.3ms.",
